@@ -7,7 +7,7 @@ from PIL import Image
 __author__ = 'ren'
 
 
-class PreparationHelper(object):
+class PrepareHelper(object):
     # 画像変換指定用ラベル
     TRANS = "TRANSLATE"
     ROTATE = "ROTATE"
