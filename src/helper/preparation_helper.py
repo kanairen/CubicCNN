@@ -48,3 +48,15 @@ class PreparationHelper(object):
             answers.extend([i] * len(arrays))
 
         return inputs, answers, images, r_images
+
+    @classmethod
+    def hold_out(cls, inputs, answers, train_rate):
+        # 入力・正解データを訓練用・テスト用に分割
+        perm = np.random.permutation(len(inputs))
+        n_train = int(len(inputs) * train_rate)
+        train_inputs, test_inputs = np.split(
+            np.array([inputs[i] for i in perm], dtype=np.float32), [n_train])
+        train_answers, test_answers = np.split(
+            np.array([answers[i] for i in perm], dtype=np.int32), [n_train])
+
+        return train_inputs, test_inputs, train_answers, test_answers, perm
