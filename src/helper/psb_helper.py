@@ -102,30 +102,22 @@ class PSB(object):
         return vertices
 
     @staticmethod
-    def norm(points):
-        assert type(points) == np.ndarray
-        norm = np.linalg.norm(points)
-        return points / norm
-
-    @staticmethod
-    def center(points):
+    def standard(points):
         mean = np.mean(points, axis=0)
-        return np.array([(p - mean) for p in points])
+        norm = np.max(points) - np.min(points)
+        return np.array([(p - mean) / norm for p in points])
 
     @classmethod
     def boxel(cls, points, n_div=100):
         # -0.5~0.5
-        points = cls.center(points)
+        points = cls.standard(points)
         boxel = np.zeros(shape=(n_div, n_div, n_div))
-
         for p in points:
             x, y, z = p
             bz = int(z * n_div + n_div) / 2
             by = int(y * n_div + n_div) / 2
             bx = int(x * n_div + n_div) / 2
-
             boxel[bz][by][bx] = 1
-
         return boxel
 
     @classmethod
