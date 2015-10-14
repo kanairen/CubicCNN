@@ -100,3 +100,30 @@ class PSB(object):
                 np.save(path_np, vertices)
 
         return vertices
+
+    @staticmethod
+    def norm(points):
+        assert type(points) == np.ndarray
+        norm = np.linalg.norm(points)
+        return points / norm
+
+    @staticmethod
+    def centerize(points):
+        mean = np.mean(points, axis=0)
+        return np.array([(p - mean) for p in points])
+
+    @classmethod
+    def boxel(cls, n_div=100):
+        # -0.5~0.5
+        points = cls.centerize().points
+        boxel = np.zeros(shape=(n_div, n_div, n_div))
+
+        for p in points:
+            x, y, z = p
+            bz = int(z * n_div + n_div) / 2
+            by = int(y * n_div + n_div) / 2
+            bx = int(x * n_div + n_div) / 2
+
+            boxel[bz][by][bx] = 1
+
+        return boxel
