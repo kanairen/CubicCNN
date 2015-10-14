@@ -108,14 +108,14 @@ class PSB(object):
         return points / norm
 
     @staticmethod
-    def centerize(points):
+    def center(points):
         mean = np.mean(points, axis=0)
         return np.array([(p - mean) for p in points])
 
     @classmethod
-    def boxel(cls, n_div=100):
+    def boxel(cls, points, n_div=100):
         # -0.5~0.5
-        points = cls.centerize().points
+        points = cls.center(points)
         boxel = np.zeros(shape=(n_div, n_div, n_div))
 
         for p in points:
@@ -127,3 +127,7 @@ class PSB(object):
             boxel[bz][by][bx] = 1
 
         return boxel
+
+    @classmethod
+    def boxel_all(cls, points_list, n_div=100):
+        return np.array([cls.boxel(points, n_div) for points in points_list])
