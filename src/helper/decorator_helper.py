@@ -8,7 +8,7 @@ __author__ = 'ren'
 
 
 def client(func):
-    print "Run Chainer Client..."
+    print "Run Client..."
 
     # use gpu
     cuda.get_device(GPU_ID).use()
