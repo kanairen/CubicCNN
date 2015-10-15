@@ -6,11 +6,18 @@ __author__ = 'ren'
 
 
 class MLP(object):
-    def __init__(self, n_in, n_hidden, n_out):
-        self.l1 = Layer(n_in=n_in, n_out=n_hidden)
-        self.l2 = Layer(n_in=n_hidden, n_out=n_out)
+    def __init__(self, n_units, activation=None):
 
-    def forward(self):
-        pass
+        self.layers = []
+        prev_inputs = None
+        for i in range(len(n_units) - 1):
+            layer = Layer(n_units[i], n_units[i + 1], inputs=prev_inputs,
+                          activation=activation)
+            self.layers.append(layer)
+            prev_inputs = layer.outputs
 
-
+    def forward(self, inputs, updates=(), givens={}):
+        outputs = inputs
+        for layer in self.layers:
+            outputs = layer.forward(outputs, updates=updates, givens=givens)
+        return outputs
