@@ -8,7 +8,7 @@ __author__ = 'ren'
 PATH
 """
 
-path = os.path.dirname(__file__)+"/../.."
+path = os.path.dirname(__file__) + "/../.."
 
 path_res = path + "/res"
 
@@ -26,7 +26,11 @@ path_res_3d_psb_classifier = path_res_3d_psb + "/classifier"
 
 # res/numpy
 path_res_numpy_psb = path_res_numpy + "/psb"
+path_res_numpy_boxel = path_res_numpy + "/boxel"
 
+# res/numpy/boxel
+path_res_numpy_boxel_test = path_res_numpy_boxel + "/test"
+path_res_numpy_boxel_train = path_res_numpy_boxel + "/train"
 
 '''
 CUDA

@@ -3,6 +3,7 @@
 import os
 import itertools
 import numpy as np
+from theano import config
 from src.util.config import path_res_3d_psb, path_res_3d_psb_classifier, \
     path_res_numpy_psb
 
@@ -105,13 +106,14 @@ class PSB(object):
     def standard(points):
         mean = np.mean(points, axis=0)
         norm = np.max(points) - np.min(points)
-        return np.array([(p - mean) / norm for p in points])
+        return np.array([(p - mean) / norm for p in points],
+                        dtype=config.floatX)
 
     @classmethod
     def boxel(cls, points, n_div=100):
         # -0.5~0.5
         points = cls.standard(points)
-        boxel = np.zeros(shape=(n_div, n_div, n_div))
+        boxel = np.zeros(shape=(n_div, n_div, n_div), dtype=config.floatX)
         for p in points:
             x, y, z = p
             bz = int(z * n_div + n_div) / 2
@@ -122,4 +124,5 @@ class PSB(object):
 
     @classmethod
     def boxel_all(cls, points_list, n_div=100):
-        return np.array([cls.boxel(points, n_div) for points in points_list])
+        return np.array([cls.boxel(points, n_div) for points in points_list],
+                        dtype=config.floatX)
