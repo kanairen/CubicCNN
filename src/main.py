@@ -11,8 +11,12 @@ from src.util.config import path_res_numpy_boxel_test, \
 
 __author__ = 'ren'
 
-# TODO numpyボクセルデータ書き込み
-# TODO バッチ分割実装
+# TODO テスト・訓練データのクラス情報の取得 30min
+# TODO numpyボクセルデータ書き込み 30min
+# TODO バッチ分割実装 30min/2 TO 10:30
+# TODO 繰り返しがくしゅう・テストする機構実装
+    #TODO 学習→MLP
+# TODO グラフプロット 30min
 
 @client
 def cubic_cnn(n_div=50):
