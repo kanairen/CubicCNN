@@ -1,10 +1,8 @@
 # coding:utf-8
 
-import numpy as np
-from theano import config
-from src.helper.psb_helper import PSB
-from src.helper.visualize_helper import plot_boxel
 from src.helper.decorator_helper import client
+from src.helper.psb_helper import PSB
+from src.model.mlp.layer import Layer
 from src.model.mlp.mlp import MLP
 
 __author__ = 'ren'
@@ -28,7 +26,11 @@ def cubic_cnn():
 
     print "preparing models..."
 
-    model = MLP(n_units=[100 * 100 * 100, 1000, 500])
+    model = MLP(l1=Layer(100 * 100 * 100, 2000),
+                l2=Layer(2000, 1000),
+                l3=Layer(1000, 500))
+    model.chain()
+    print model.forward(train_inputs[0])
 
     """
     TRAIN
