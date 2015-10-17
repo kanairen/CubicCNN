@@ -53,10 +53,14 @@ class PSB(object):
     def load_vertices_all(cls, dir=path_res_3d_psb):
         train_vertices = []
         test_vertices = []
+        train_answers = []
+        test_answers = []
 
         train_classes, test_classes = cls.load_class_infos()
-        train_answers = list(itertools.chain(*train_classes.values()))
-        test_answers = list(itertools.chain(*test_classes.values()))
+        classes = dict(train_classes, **test_classes)
+
+        train_members = list(itertools.chain(*train_classes.values()))
+        test_members = list(itertools.chain(*test_classes.values()))
 
         for f in os.listdir(dir):
 
@@ -64,13 +68,23 @@ class PSB(object):
                 continue
 
             id = int(f.split(".")[0])
-            if id in test_answers:
-                test_vertices.append(cls.load_vertices(f, dir))
-            elif id in train_answers:
-                train_vertices.append(cls.load_vertices(f, dir))
-            else:
-                # TODO you should check class list if this error is raised.
-                raise RuntimeError
+
+            if id in test_members:
+                v_list = test_vertices
+                a_list = test_answers
+            elif id in train_members:
+                v_list = train_vertices
+                a_list = train_answers
+
+            # データの格納
+            v_list.append(cls.load_vertices(f, dir))
+
+            # 正解ラベルの探索と格納
+            keys = classes.keys()
+            for key in keys:
+                if id in classes.get(key):
+                    a_list.append(keys.index(key))
+                    break
 
         return train_vertices, test_vertices, train_answers, test_answers
 

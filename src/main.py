@@ -11,11 +11,12 @@ from src.util.config import path_res_numpy_boxel_test, \
 
 __author__ = 'ren'
 
+
 # TODO テスト・訓練データのクラス情報の取得 30min
 # TODO numpyボクセルデータ書き込み 30min
 # TODO バッチ分割実装 30min/2 TO 10:30
 # TODO 繰り返しがくしゅう・テストする機構実装
-    #TODO 学習→MLP
+# TODO 学習→MLP
 # TODO グラフプロット 30min
 
 @client
@@ -24,8 +25,14 @@ def cubic_cnn(n_div=50):
     DATA
     """
     print "loading data..."
-    # PSB
+    # 点群データ
     train_inputs, test_inputs, train_answers, test_answers = PSB.load_vertices_all()
+
+    print "train data : ", len(train_inputs)
+    print "test data : ", len(test_inputs)
+    print "train classes : ", len(set(train_answers))
+    print "test classes : ", len(set(test_answers))
+    print "total classes : ", len(set(train_answers + test_answers))
 
     train_inputs = [PSB.boxel(p, n_div=n_div).flatten() for p in train_inputs]
     test_inputs = [PSB.boxel(p, n_div=n_div).flatten() for p in test_inputs]
