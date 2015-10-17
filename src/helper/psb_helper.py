@@ -5,22 +5,28 @@ import itertools
 import numpy as np
 from theano import config
 from src.util.config import path_res_3d_psb, path_res_3d_psb_classifier, \
-    path_res_numpy_psb
+    path_res_numpy_psb, path_res_numpy_psb_test, path_res_numpy_psb_train, \
+    path_res_numpy_boxel_test, path_res_numpy_boxel_train
 
 __author__ = 'ren'
 
 
 class PSB(object):
     @classmethod
-    def load_class_infos(cls, train_name="train.cla", test_name="test.cla"):
-        return cls.load_class_info(train_name), cls.load_class_info(test_name)
+    def load_class_info_all(cls):
+        return dict(cls.load_class_info(is_test=True),
+                    **cls.load_class_info(is_test=False))
 
     @staticmethod
-    def load_class_info(f_name, dir=path_res_3d_psb_classifier):
+    def load_class_info(is_test=False, train_name="train.cla",
+                        test_name="test.cla"):
 
         classifier = {}
 
-        with file(dir + "/" + f_name) as f:
+        f_name = test_name if is_test else train_name
+        path = path_res_3d_psb_classifier + "/" + f_name
+
+        with file(path) as f:
 
             line = f.readline()
 
@@ -56,8 +62,9 @@ class PSB(object):
         train_answers = []
         test_answers = []
 
-        train_classes, test_classes = cls.load_class_infos()
-        classes = dict(train_classes, **test_classes)
+        train_classes = cls.load_class_info(is_test=False)
+        test_classes = cls.load_class_info(is_test=True)
+        classes = cls.load_class_info_all()
 
         train_members = list(itertools.chain(*train_classes.values()))
         test_members = list(itertools.chain(*test_classes.values()))
@@ -72,12 +79,14 @@ class PSB(object):
             if id in test_members:
                 v_list = test_vertices
                 a_list = test_answers
+                is_test = True
             elif id in train_members:
                 v_list = train_vertices
                 a_list = train_answers
+                is_test = False
 
             # データの格納
-            v_list.append(cls.load_vertices(f, dir))
+            v_list.append(cls.load_vertices(f, dir, is_test=is_test))
 
             # 正解ラベルの探索と格納
             keys = classes.keys()
@@ -86,15 +95,16 @@ class PSB(object):
                     a_list.append(keys.index(key))
                     break
 
-        return train_vertices, test_vertices, train_answers, test_answers
+        return train_vertices, test_vertices, train_answers, test_answers, train_members, test_members
 
     @staticmethod
-    def load_vertices(f_name, dir=path_res_3d_psb, is_saved=True):
+    def load_vertices(f_name, dir=path_res_3d_psb, is_test=False):
 
         # saved numpy array
-        path_np = path_res_numpy_psb + "/" + f_name + ".npy"
-        if os.path.exists(path_np):
-            return np.load(path_np)
+        np_dir = path_res_numpy_psb_test if is_test else path_res_numpy_psb_train
+        np_path = np_dir + "/" + f_name.split(".")[0] + ".npy"
+        if os.path.exists(np_path):
+            return np.load(np_path)
 
         with file(dir + "/" + f_name) as f:
 
@@ -110,9 +120,6 @@ class PSB(object):
             # 三行目以降の頂点座標情報のみ取得
             vertices = np.array(
                 [map(float, line.split(" ")) for line in lines[2:n_ver]])
-
-            if is_saved:
-                np.save(path_np, vertices)
 
         return vertices
 
@@ -134,9 +141,53 @@ class PSB(object):
             by = int(y * n_div + n_div) / 2
             bx = int(x * n_div + n_div) / 2
             boxel[bz][by][bx] = 1
+
         return boxel
 
     @classmethod
     def boxel_all(cls, points_list, n_div=100):
         return np.array([cls.boxel(points, n_div) for points in points_list],
                         dtype=config.floatX)
+
+    @staticmethod
+    def save_vertices(vertices, id, is_test=False):
+        assert vertices.shape[-1] == 3
+        if is_test:
+            np.save(path_res_numpy_psb_test + "/" + str(id), vertices)
+        else:
+            np.save(path_res_numpy_psb_train + "/" + str(id), vertices)
+
+    @staticmethod
+    def save_boxel(boxel, id, is_test):
+        assert boxel.ndim == 1
+        if is_test:
+            np.save(path_res_numpy_boxel_test + "/" + str(id), boxel)
+        else:
+            np.save(path_res_numpy_boxel_train + "/" + str(id), boxel)
+
+    @staticmethod
+    def load_boxel(id, is_test=False):
+        if is_test:
+            path = path_res_numpy_boxel_test + "/" + str(id) + ".npy"
+        else:
+            path = path_res_numpy_boxel_train + "/" + str(id) + ".npy"
+        return np.load(path)
+
+    @classmethod
+    def load_boxels(cls, is_test=False):
+
+        boxels = []
+        answers = []
+
+        classes = cls.load_class_info(is_test=is_test)
+        all_classes = cls.load_class_info_all()
+
+        for id_list in classes.values():
+            for id in id_list:
+                boxels.append(cls.load_boxel(id, is_test=is_test))
+                for class_label, class_ids in enumerate(all_classes.values()):
+                    if id in class_ids:
+                        answers += [class_label] * len(id_list)
+                        break
+
+        return boxels, answers

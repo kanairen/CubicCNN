@@ -28,6 +28,10 @@ path_res_3d_psb_classifier = path_res_3d_psb + "/classifier"
 path_res_numpy_psb = path_res_numpy + "/psb"
 path_res_numpy_boxel = path_res_numpy + "/boxel"
 
+# res/numpy/psb
+path_res_numpy_psb_test = path_res_numpy_psb + "/test"
+path_res_numpy_psb_train = path_res_numpy_psb + "/train"
+
 # res/numpy/boxel
 path_res_numpy_boxel_test = path_res_numpy_boxel + "/test"
 path_res_numpy_boxel_train = path_res_numpy_boxel + "/train"
