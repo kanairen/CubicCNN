@@ -15,7 +15,7 @@ class Image(object):
     DEFAULT_TRANS_RANGE_Y = (-5, 5)
 
     DEFAULT_ROTATE_STEP = 1
-    DEFAULT_ROTATE_ANGLE = 20
+    DEFAULT_ROTATE_ANGLE = 40
     # 画像変換指定用ラベル
     TRANS = "TRANSLATE"
     ROTATE = "ROTATE"
@@ -70,7 +70,6 @@ class Image(object):
 
     @staticmethod
     def scale(image, pw, ph):
-        assert isinstance(image, Image)
 
         w, h = image.size
         cropped_image = image.crop((pw, ph, w - pw, h - ph))
@@ -80,7 +79,6 @@ class Image(object):
 
     @staticmethod
     def translate_with_zoom(image, pw, ph, zoom=1.5):
-        assert isinstance(image, Image)
 
         w, h = image.size
         cropped_image = image.crop(
@@ -91,7 +89,6 @@ class Image(object):
 
     @staticmethod
     def translate(image, tx, ty):
-        assert isinstance(image, Image)
         return image.transform(size=image.size,
                                method=AFFINE,
                                data=(1, 0, tx, 0, 1, ty))

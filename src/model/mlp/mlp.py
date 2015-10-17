@@ -4,18 +4,9 @@ import six
 import itertools
 from theano import tensor as T, function, shared, config
 from src.model.mlp.layer import Layer
-from src.util.sequence import joint_dict
 
 __author__ = 'ren'
 
-
-# 出力層のソフトマックス関数実装 30min(14:40) fin
-# 精度出力関数を実装 30min(15:05) fin
-# TODO 逆伝播時の更新式を実装 30min(15:30)
-# TODO コスト関数
-# TODO 微分
-# TODO 更新式
-# TODO 関数呼び出し
 
 class MLP(object):
     def __init__(self, **layers):

@@ -1,5 +1,6 @@
 # coding:utf-8
 
+import six
 import numpy as np
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
@@ -82,4 +83,18 @@ def plot_boxel(boxels,
     ax.plot3D(np.array(px, dtype=int),
               np.array(py, dtype=int),
               np.array(pz, dtype=int), "s")
+    pyplot.show()
+
+
+def plot_2d(xlabel, ylabel, xlim=None, ylim=None, **args):
+    # グラフの描画
+    for name, values in six.iteritems(args):
+        pyplot.plot(values, label=name)
+    pyplot.legend()
+    pyplot.xlabel(xlabel)
+    pyplot.ylabel(ylabel)
+    if xlim:
+        pyplot.xlim(xlim)
+    if ylim:
+        pyplot.ylim(ylim)
     pyplot.show()
