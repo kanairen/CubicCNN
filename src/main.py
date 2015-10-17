@@ -5,15 +5,14 @@ from src.helper.psb import PSB
 from src.model.mlp.layer import Layer
 from src.model.mlp.mlp import MLP
 
-
 __author__ = 'ren'
 
 
 # テスト・訓練データのクラス情報の取得 30min fin
 # numpyボクセルデータ書き込み 30min fin
-# TODO バッチ分割実装 30min/2 TO 11:30
-# TODO 繰り返しがくしゅう・テストする機構実装
-# TODO 学習→MLP
+# TODO バッチ分割実装 30min/2
+# 繰り返しがくしゅう・テストする機構実装 fin
+# 学習→MLP fin
 # TODO グラフプロット 30min
 
 @client
@@ -46,11 +45,17 @@ def cubic_cnn(n_div=50):
                 l3=Layer(1000, 500))
     model.chain()
 
-    print model.forward(inputs=train_inputs,answers=train_answers)
-
     """
     TRAIN
     """
+
+    for i in range(1000):
+        print "{}st learning...".format(i)
+        print "train : ", model.forward(inputs=train_inputs,
+                                        answers=train_answers)
+        print "test : ", model.forward(inputs=test_inputs,
+                                       answers=test_answers,
+                                       updates=())
 
 
 if __name__ == '__main__':

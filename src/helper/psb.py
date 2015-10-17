@@ -185,8 +185,6 @@ class PSB(object):
 
         classes = cls.load_class_info(is_test=is_test)
         all_classes = cls.load_class_info_all()
-        print classes
-        print all_classes
 
         for id_list in classes.values():
             for id in id_list:
