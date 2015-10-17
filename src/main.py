@@ -1,13 +1,10 @@
 # coding:utf-8
 
 from src.helper.decorator import client
-from src.helper.psb_helper import PSB
+from src.helper.psb import PSB
 from src.model.mlp.layer import Layer
 from src.model.mlp.mlp import MLP
 
-import numpy as np
-from src.util.config import path_res_numpy_boxel_test, \
-    path_res_numpy_boxel_train
 
 __author__ = 'ren'
 
@@ -29,16 +26,14 @@ def cubic_cnn(n_div=50):
     train_inputs, train_answers = PSB.load_boxels(is_test=False)
     test_inputs, test_answers = PSB.load_boxels(is_test=True)
 
-    print train_answers
-    print test_answers
+    print len(train_answers)
+    print len(test_answers)
 
     print "train data : ", len(train_inputs)
     print "test data : ", len(test_inputs)
     print "train classes : ", len(set(train_answers))
     print "test classes : ", len(set(test_answers))
     print "total classes : ", len(set(train_answers + test_answers))
-
-    print "saving data..."
 
     """
     MODEL
@@ -51,7 +46,7 @@ def cubic_cnn(n_div=50):
                 l3=Layer(1000, 500))
     model.chain()
 
-    print model.forward((train_inputs[0],))
+    print model.forward(inputs=train_inputs,answers=train_answers)
 
     """
     TRAIN

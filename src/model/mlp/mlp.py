@@ -3,18 +3,20 @@
 import six
 from theano import tensor as T, function
 from src.model.mlp.layer import Layer
+from src.util.sequence import joint_dict
 
 __author__ = 'ren'
 
 
-# TODO 出力層のソフトマックス関数実装
-# TODO 逆伝播時の更新式を実装
-# TODO 精度出力関数を実装
+# TODO 出力層のソフトマックス関数実装 30min(14:40)
+# TODO 逆伝播時の更新式を実装 30min(15:15)
+# TODO 精度出力関数を実装 30min(15:50)
 
 class MLP(object):
     def __init__(self, **layers):
 
         self.inputs_symbol = T.fmatrix('inputs')
+        self.answers_symbol = T.lvector('answers')
 
         self.layers = []
         for name, layer in sorted(six.iteritems(layers)):
@@ -28,14 +30,24 @@ class MLP(object):
             layer.inputs = prev_inputs
             prev_inputs = layer.output()
 
-    def forward(self, inputs, updates=(), givens={}):
+    def forward(self, inputs, answers, updates=(), givens={}):
         output_layer = self.layers[-1]
-        return function(inputs=[self.inputs_symbol],
-                        outputs=output_layer.output(),
+        return function(inputs=[self.inputs_symbol, self.answers_symbol],
+                        outputs=self.accuracy(output_layer.output(),
+                                              self.answers_symbol),
                         updates=updates,
-                        givens=givens)(inputs)
+                        givens=givens)(inputs, answers)
 
     @staticmethod
-    def accuracy(pred, answer):
-        assert len(pred) == len(answer)
-        return function(T.mean(T.eq(pred, answer)))
+    def softmax(x):
+        return T.nnet.softmax(x)
+
+    @classmethod
+    def softmax_argmax(cls, x):
+        return T.argmax(cls.softmax(x), axis=1)
+
+    @classmethod
+    def accuracy(cls, x, answers):
+        return T.mean(T.eq(cls.softmax_argmax(x), answers))
+
+

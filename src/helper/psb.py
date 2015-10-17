@@ -7,15 +7,19 @@ from theano import config
 from src.util.config import path_res_3d_psb, path_res_3d_psb_classifier, \
     path_res_numpy_psb, path_res_numpy_psb_test, path_res_numpy_psb_train, \
     path_res_numpy_boxel_test, path_res_numpy_boxel_train
+from src.util.sequence import joint_dict
 
 __author__ = 'ren'
 
 
+# TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
+
 class PSB(object):
     @classmethod
     def load_class_info_all(cls):
-        return dict(cls.load_class_info(is_test=True),
-                    **cls.load_class_info(is_test=False))
+        test_classes = cls.load_class_info(is_test=True)
+        train_classes = cls.load_class_info(is_test=False)
+        return joint_dict(test_classes, train_classes)
 
     @staticmethod
     def load_class_info(is_test=False, train_name="train.cla",
@@ -181,13 +185,15 @@ class PSB(object):
 
         classes = cls.load_class_info(is_test=is_test)
         all_classes = cls.load_class_info_all()
+        print classes
+        print all_classes
 
         for id_list in classes.values():
             for id in id_list:
                 boxels.append(cls.load_boxel(id, is_test=is_test))
                 for class_label, class_ids in enumerate(all_classes.values()):
                     if id in class_ids:
-                        answers += [class_label] * len(id_list)
+                        answers.append(class_label)
                         break
 
         return boxels, answers
