@@ -39,7 +39,7 @@ class MLP(object):
                         updates=updates,
                         givens=givens)(inputs, answers)
 
-    def update(self, learning_rate=0.1):
+    def update(self, learning_rate=0.01):
         output_layer = self.layers[-1]
         cost = self.negative_log_likelihood(output_layer.output(),
                                             self.answers_symbol)

@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import numpy as np
-from theano import tensor as T, shared, config, function
+from theano import tensor as T, shared, config
 
 __author__ = 'ren'
 
@@ -36,14 +36,11 @@ class Layer(object):
             activation = self.relu
         self.activation = activation
 
-        # 入力シンボル
-        self.inputs = None
-
         self.params = self.W, self.b
 
     @staticmethod
     def relu(x):
         return x * (x > 0)
 
-    def output(self):
-        return self.activation(T.dot(self.inputs, self.W) + self.b)
+    def output(self, inputs_symbol):
+        return self.activation(T.dot(inputs_symbol, self.W) + self.b)

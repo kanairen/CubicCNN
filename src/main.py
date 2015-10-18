@@ -12,16 +12,15 @@ from src.util.config import path_res_2d_pattern
 __author__ = 'ren'
 
 
+# TODO CNN フィルタ実装 1h
+    # TODO プレーン
+    # TODO スポーク
+
 # TODO バッチ分割実装 15min
 # TODO テストデータシャッフル 15min(18:35)
 # TODO 誤りデータの表示と誤り例（深層学習　p）1h
 # TODO Dropoutの実装 1h
-
-# TODO CNN
-# TODO フィルタ実装
-# TODO プレーンフィルタ実装
-# TODO スポークフィルタ実装
-
+# TODO モデルのサーフェスだけでなく、ソリッドも試す
 
 @client
 def cubic_cnn(n_div=50, is_boxel=False):
