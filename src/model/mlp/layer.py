@@ -38,6 +38,10 @@ class Layer(object):
 
         self.params = self.W, self.b
 
+    def update(self, cost, learning_rate=0.01):
+        grads = T.grad(cost, self.params)
+        return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
+
     @staticmethod
     def relu(x):
         return x * (x > 0)

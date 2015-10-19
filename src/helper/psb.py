@@ -12,8 +12,6 @@ from src.util.sequence import joint_dict
 __author__ = 'ren'
 
 
-# TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
-
 class PSB(object):
     @classmethod
     def load_class_info_all(cls):

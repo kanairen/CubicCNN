@@ -10,7 +10,7 @@ __author__ = 'ren'
 
 class Image(object):
     # 画像変換のパラメタ
-    DEFAULT_TRANSLATE_STEP = 1
+    DEFAULT_TRANSLATE_STEP = 2
     DEFAULT_TRANS_RANGE_X = (-4, 4)
     DEFAULT_TRANS_RANGE_Y = (-5, 5)
 

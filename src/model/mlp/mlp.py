@@ -1,8 +1,7 @@
 # coding:utf-8
 
 import six
-import itertools
-from theano import tensor as T, function, shared, config
+from theano import tensor as T, function
 from src.model.mlp.layer import Layer
 
 __author__ = 'ren'
@@ -20,31 +19,25 @@ class MLP(object):
             setattr(self, name, layer)
             self.layers.append(layer)
 
-        self.params = list(itertools.chain(*[l.params for l in self.layers]))
-
-    def chain(self):
-        prev_inputs = self.inputs_symbol
+        self.output = self.inputs_symbol
         for layer in self.layers:
-            layer.inputs = prev_inputs
-            prev_inputs = layer.output()
+            self.output = layer.output(self.output)
 
     def forward(self, inputs, answers, updates=None, givens={}):
         if updates is None:
             updates = self.update()
 
-        output_layer = self.layers[-1]
         return function(inputs=[self.inputs_symbol, self.answers_symbol],
-                        outputs=self.accuracy(output_layer.output(),
-                                              self.answers_symbol),
+                        outputs=self.accuracy(self.output, self.answers_symbol),
                         updates=updates,
                         givens=givens)(inputs, answers)
 
     def update(self, learning_rate=0.01):
-        output_layer = self.layers[-1]
-        cost = self.negative_log_likelihood(output_layer.output(),
-                                            self.answers_symbol)
-        grads = T.grad(cost, self.params)
-        return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
+        cost = self.negative_log_likelihood(self.output, self.answers_symbol)
+        updates = []
+        for layer in self.layers:
+            updates.extend(layer.update(cost, learning_rate=learning_rate))
+        return updates
 
     @staticmethod
     def softmax(x):

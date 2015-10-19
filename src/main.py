@@ -13,14 +13,15 @@ __author__ = 'ren'
 
 
 # TODO CNN フィルタ実装 1h
-    # TODO プレーン
-    # TODO スポーク
+# TODO プレーン
+# TODO スポーク
 
 # TODO バッチ分割実装 15min
 # TODO テストデータシャッフル 15min(18:35)
 # TODO 誤りデータの表示と誤り例（深層学習　p）1h
 # TODO Dropoutの実装 1h
 # TODO モデルのサーフェスだけでなく、ソリッドも試す
+# TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
 def cubic_cnn(n_div=50, is_boxel=False):
@@ -57,17 +58,15 @@ def cubic_cnn(n_div=50, is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else 128 * 128
 
-    model = MLP(l1=Layer(n_in, 2000),
-                l2=Layer(2000, 1000),
-                l3=Layer(1000, 500))
-    model.chain()
+    model = MLP(l1=Layer(n_in, 1000),
+                l2=Layer(1000, 500))
 
     """
     TRAIN
     """
     train_accuracies = []
     test_accuracies = []
-    for i in range(10000):
+    for i in range(1000):
         print "{}st learning...".format(i)
         train_accuracy = model.forward(inputs=train_inputs,
                                        answers=train_answers)

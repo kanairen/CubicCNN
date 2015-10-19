@@ -51,5 +51,4 @@ class ConvLayer2d(Layer):
         if W is None:
             W = shared(np.zeros(shape=(n_in, n_out)), name='W', borrow=True)
 
-        def output(self):
-            pass
+
