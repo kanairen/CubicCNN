@@ -8,6 +8,7 @@ from src.helper.image import Image
 from src.model.mlp.layer import Layer
 from src.model.mlp.mlp import MLP
 from src.util.config import path_res_2d_pattern
+from src.model.mlp.conv import ConvLayer2d
 
 __author__ = 'ren'
 
@@ -24,7 +25,7 @@ __author__ = 'ren'
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
     """
     DATA
     """
@@ -35,7 +36,8 @@ def cubic_cnn(n_div=50, is_boxel=False):
         test_inputs, test_answers = PSB.load_boxels(is_test=True)
     else:
         inputs, answers, images, r_images = Image.image_set(path_res_2d_pattern,
-                                                            Image.TRANS)
+                                                            Image.TRANS,
+                                                            size=img_size)
         train_inputs, test_inputs, train_answers, test_answers, perm = Image.hold_out(
             inputs, answers, train_rate=0.8)
 
@@ -56,10 +58,10 @@ def cubic_cnn(n_div=50, is_boxel=False):
 
     print "preparing models..."
 
-    n_in = n_div ** 3 if is_boxel else 128 * 128
+    n_in = n_div ** 3 if is_boxel else img_size[0] * img_size[1]
 
-    model = MLP(l1=Layer(n_in, 1000),
-                l2=Layer(1000, 500))
+    model = MLP(l1=ConvLayer2d(img_size=img_size, k_size=3, in_channel=1,
+                               out_channel=3))
 
     """
     TRAIN

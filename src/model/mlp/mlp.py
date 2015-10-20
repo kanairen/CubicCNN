@@ -15,7 +15,7 @@ class MLP(object):
 
         self.layers = []
         for name, layer in sorted(six.iteritems(layers)):
-            assert type(layer) == Layer
+            # assert type(layer) == Layer
             setattr(self, name, layer)
             self.layers.append(layer)
 

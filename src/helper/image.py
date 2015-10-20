@@ -3,7 +3,7 @@
 import os
 import numpy as np
 import itertools
-from PIL.Image import AFFINE, Image,open
+from PIL.Image import AFFINE, Image, open
 
 __author__ = 'ren'
 
@@ -21,7 +21,8 @@ class Image(object):
     ROTATE = "ROTATE"
 
     @classmethod
-    def image_set(cls, target_path, process_type, is_flatten=False):
+    def image_set(cls, target_path, process_type, size=(128, 128),
+                  is_flatten=False):
         # 学習器入力リスト
         inputs = []
         # 正解データリスト
@@ -33,7 +34,8 @@ class Image(object):
 
         for i, f_name in enumerate(os.listdir(target_path)):
             # 元画像
-            image = open(target_path + "/" + f_name).convert('1')
+            image = open(target_path + "/" + f_name).convert('1').resize(
+                size=size)
             images.append(image)
 
             # 指定された変換を画像に適用し、変換結果をリストで受け取る
