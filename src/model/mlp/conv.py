@@ -35,12 +35,13 @@ class ConvLayer2d(object):
                         high=np.sqrt(1. / in_channel * kw * kh),
                         size=(kw * kh * in_channel * out_channel)),
             dtype=dtype
-        ), name='W', borrow=True)
+        ), name='h', borrow=True)
 
         # 結合行列
         # 値としてスパースなベクトルではなく。ｈのインデックスを保持
         T = np.zeros(
-            (self.n_in, self.n_out, out_channel * in_channel * kh * kw))
+            (self.n_in, self.n_out, out_channel * in_channel * kh * kw),
+            dtype=dtype)
 
         # ユニットの結合を定義
         for i in range(w - kw):
@@ -50,7 +51,7 @@ class ConvLayer2d(object):
                         for k_w in range(kw):
                             T[i + k_w * stride][j + k_h * stride][
                                 (kw * k_h + k_w) * c] = 1
-        self.T = shared(T)
+        self.T = shared(T, name='T', borrow=True)
 
         # バイアスベクトル
         if b is None:
@@ -62,14 +63,21 @@ class ConvLayer2d(object):
             activation = Layer.relu
         self.activation = activation
 
+        # プーリング関数
+        self.pool = T.max
+
         self.params = self.h, self.b
 
     def update(self, cost, learning_rate=0.01):
         # TODO もしかしたら、勾配の修正方法が正しくないかも
+        # TODO 勾配の更新がなされていない
         grads = T.grad(cost, self.params)
         return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
 
     def output(self, inputs_symbol):
         # 重み共有のため、毎回フィルタの重みを拝借
+        print self.T.ndim
+        print self.h.ndim
         W = T.dot(self.T, self.h)
-        return self.activation(T.dot(inputs_symbol, W + self.b))
+        print W.ndim
+        return self.activation(T.dot(inputs_symbol, W) + self.b)

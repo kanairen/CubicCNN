@@ -10,8 +10,6 @@ from src.model.mlp.mlp import MLP
 from src.util.config import path_res_2d_pattern
 from src.model.mlp.conv import ConvLayer2d
 
-__author__ = 'ren'
-
 
 # TODO CNN フィルタ実装 1h
 # TODO プレーン
@@ -25,7 +23,7 @@ __author__ = 'ren'
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(32,32), is_boxel=False):
     """
     DATA
     """
@@ -60,8 +58,9 @@ def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size[0] * img_size[1]
 
-    model = MLP(l1=ConvLayer2d(img_size=img_size, k_size=3, in_channel=1,
-                               out_channel=3))
+    # model = MLP(l1=ConvLayer2d(img_size,3,1,3))
+
+    model = MLP(l1=Layer(n_in,1000))
 
     """
     TRAIN
