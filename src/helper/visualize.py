@@ -86,11 +86,13 @@ def plot_boxel(boxels,
     pyplot.show()
 
 
-def plot_2d(xlabel, ylabel, xlim=None, ylim=None, **args):
+def plot_2d(xlabel, ylabel, xlim=None, ylim=None, locate="lower right", **args):
     # グラフの描画
-    for name, values in six.iteritems(args):
-        pyplot.plot(values, label=name)
-    pyplot.legend()
+    values = []
+    for name, value in six.iteritems(args):
+        pyplot.plot(value, label=name)
+        values.append(value)
+    pyplot.legend(loc=locate)
     pyplot.xlabel(xlabel)
     pyplot.ylabel(ylabel)
     if xlim:
