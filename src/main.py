@@ -6,9 +6,10 @@ from src.helper.psb import PSB
 from src.helper.visualize import plot_2d
 from src.helper.image import Image
 from src.model.mlp.layer import Layer
-from src.model.mlp.mlp import MLP
-from src.util.config import path_res_2d_pattern
 from src.model.mlp.conv import ConvLayer2d
+from src.model.mlp.mlp import MLP
+from src.util.config import path_res_2d_pattern, path_res_numpy_array
+from src.util.time import ymdt
 
 
 # TODO CNN フィルタ実装 1h
@@ -81,6 +82,10 @@ def cubic_cnn(n_div=50, img_size=(32,32), is_boxel=False):
 
     plot_2d(xlabel="iteration", ylabel="accuracy", train=train_accuracies,
             test=test_accuracies)
+
+    # 精度の保存
+    np.save(path_res_numpy_array + "/" + ymdt() + "_traain", train_accuracies)
+    np.save(path_res_numpy_array + "/" + ymdt() + "_test", test_accuracies)
 
 
 if __name__ == '__main__':
