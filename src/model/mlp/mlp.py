@@ -1,8 +1,7 @@
 # coding:utf-8
 
 import six
-from theano import tensor as T, function
-from src.model.mlp.layer import Layer
+from theano import tensor as T, function, pp
 
 __author__ = 'ren'
 
@@ -27,10 +26,11 @@ class MLP(object):
         if updates is None:
             updates = self.update()
 
-        return function(inputs=[self.inputs_symbol, self.answers_symbol],
-                        outputs=self.accuracy(self.output, self.answers_symbol),
-                        updates=updates,
-                        givens=givens)(inputs, answers)
+        f = function(inputs=[self.inputs_symbol, self.answers_symbol],
+                     outputs=self.accuracy(self.output, self.answers_symbol),
+                     updates=updates,
+                     givens=givens)
+        return f(inputs, answers)
 
     def update(self, learning_rate=0.01):
         cost = self.negative_log_likelihood(self.output, self.answers_symbol)
