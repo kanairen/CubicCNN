@@ -15,7 +15,7 @@ class Image(object):
     DEFAULT_TRANS_RANGE_Y = (-5, 5)
 
     DEFAULT_ROTATE_STEP = 1
-    DEFAULT_ROTATE_ANGLE = 40
+    DEFAULT_ROTATE_ANGLE = 20
     # 画像変換指定用ラベル
     TRANS = "TRANSLATE"
     ROTATE = "ROTATE"
@@ -63,12 +63,12 @@ class Image(object):
         # 入力・正解データを訓練用・テスト用に分割
         perm = np.random.permutation(len(inputs))
         n_train = int(len(inputs) * train_rate)
-        train_inputs, test_inputs = np.split(
+        train_in, test_in = np.split(
             np.array([inputs[i] for i in perm], dtype=np.float32), [n_train])
-        train_answers, test_answers = np.split(
+        train_ans, test_ans = np.split(
             np.array([answers[i] for i in perm], dtype=np.int32), [n_train])
 
-        return train_inputs, test_inputs, train_answers, test_answers, perm
+        return train_in, test_in, train_ans, test_ans, perm
 
     @staticmethod
     def scale(image, pw, ph):
