@@ -42,9 +42,5 @@ class Layer(object):
         grads = T.grad(cost, self.params)
         return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
 
-    @staticmethod
-    def relu(x):
-        return x * (x > 0)
-
     def output(self, inputs_symbol):
         return self.activation(T.dot(inputs_symbol, self.W) + self.b)

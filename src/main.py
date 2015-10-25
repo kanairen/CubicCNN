@@ -1,7 +1,6 @@
 # coding:utf-8
 
 import numpy as np
-from pylab import colorbar, pcolor, show, meshgrid
 from src.helper.decorator import client
 from src.helper.psb import PSB
 from src.helper.visualize import plot_2d
@@ -11,7 +10,6 @@ from src.model.mlp.convolution import ConvLayer2d
 from src.model.mlp.mlp import MLP
 from src.util.config import path_res_2d_pattern, path_res_numpy_array
 from src.util.time import ymdt
-import matplotlib.pyplot as plt
 
 
 # TODO CNN フィルタ実装 1h
@@ -26,7 +24,7 @@ import matplotlib.pyplot as plt
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
     """
     DATA
     """
@@ -61,9 +59,8 @@ def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size[0] * img_size[1]
 
-    model = MLP(l1=ConvLayer2d(img_size, k_size=3, in_channel=1, out_channel=8),
-                l2=ConvLayer2d(img_size, k_size=3, in_channel=8,
-                               out_channel=32))
+    model = MLP(l0=Layer(n_in, 16*16),
+                l2=Layer(16*16,100))
 
     """
     TRAIN

@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import numpy as np
-from theano import config, shared, tensor as T, function, pp
+from theano import config, shared, tensor as T
 from layer import Layer, rnd
 from src.util import conv
 import six
