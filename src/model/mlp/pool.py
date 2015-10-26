@@ -37,10 +37,6 @@ class PoolLayer(object):
             activation = relu
         self.activation = activation
 
-    def output(self,input_symbol):
-
-
-
 
     def pool(self, img):
         output = []
