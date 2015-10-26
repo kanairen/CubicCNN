@@ -1,3 +1,0 @@
-CubicCNN
-
-backword()
