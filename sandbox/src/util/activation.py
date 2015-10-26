@@ -23,3 +23,10 @@ def d_relu(x):
     else:
         return 0.
 
+
+def softmax(x):
+    exp = np.exp(x - np.max(x))
+    if exp.dim == 1:
+        return exp / np.sum(exp, axis=0)
+    else:
+        return exp / np.array([np.sum(exp, axis=1)]).T
