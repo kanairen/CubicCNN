@@ -18,15 +18,12 @@ def relu(x):
 
 
 def d_relu(x):
-    if x > 0:
-        return 1.
-    else:
-        return 0.
+    return 1. * (x > 0)
 
 
 def softmax(x):
     exp = np.exp(x - np.max(x))
-    if exp.dim == 1:
+    if exp.ndim == 1:
         return exp / np.sum(exp, axis=0)
     else:
         return exp / np.array([np.sum(exp, axis=1)]).T
