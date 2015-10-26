@@ -1,26 +1,14 @@
 CubicCNN
 ====
 
-Overview
+!!!Work In Progress!!!
+
+CubicCNNは、三次元形状識別を目的としたニューラルネットの実装を行うためのプロジェクトです。
 
 ## Description
 
-## Demo
-
-## VS.
-
-## Requirement
-
 ## Usage
-
-## Install
-
-## Contribution
-
-## Licence
-
-[MIT](https://github.com/tcnksm/tool/blob/master/LICENCE)
 
 ## Author
 
-[tcnksm](https://github.com/tcnksm)
+[kanairen](https://github.com/kanairen)
