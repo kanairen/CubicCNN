@@ -24,7 +24,7 @@ from src.util.time import ymdt
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
     """
     DATA
     """
@@ -43,9 +43,6 @@ def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
     train_ins = [inputs.flatten() for inputs in train_ins]
     test_ins = [inputs.flatten() for inputs in test_ins]
 
-    print len(train_ans)
-    print len(test_ans)
-
     print "train data : ", len(train_ins)
     print "test data : ", len(test_ins)
     print "train classes : ", len(set(train_ans))
@@ -57,32 +54,40 @@ def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
 
     print "preparing models..."
 
-    n_in = n_div ** 3 if is_boxel else img_size[0] * img_size[1]
+    n_in = n_div ** 3 if is_boxel else img_size
 
-    model = MLP(l0=Layer(n_in, 16*16),
-                l2=Layer(16*16,100))
+    model = MLP(l1=ConvLayer2d(n_in,k_size=3,in_channel=1,out_channel=3))
+    model = MLP(l1=Layer(n_in))
 
     """
     TRAIN
     """
     train_accuracies = []
     test_accuracies = []
+
     n_iter = 100
     n_epoch = 10
+
     for i in range(n_iter):
+
         print "{}st learning...".format(i)
+
         train_accuracy = 0
         test_accuracy = 0
+
         for j in range(n_epoch):
             train_accuracy += model.forward(inputs=train_ins,
                                             answers=train_ans)
             test_accuracy += model.forward(inputs=test_ins,
                                            answers=test_ans,
                                            updates=())
+
         train_accuracy /= n_epoch
         test_accuracy /= n_epoch
+
         print "train : ", train_accuracy
         print "test : ", test_accuracy
+
         train_accuracies.append(train_accuracy)
         test_accuracies.append(test_accuracy)
 

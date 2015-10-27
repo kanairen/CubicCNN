@@ -2,6 +2,7 @@
 
 import numpy as np
 from theano import tensor as T, shared, config
+from src.util.activation import relu
 
 __author__ = 'ren'
 
@@ -33,7 +34,7 @@ class Layer(object):
 
         # 活性化関数
         if activation is None:
-            activation = self.relu
+            activation = relu
         self.activation = activation
 
         self.params = self.W, self.b
