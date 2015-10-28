@@ -1,5 +1,6 @@
 # coding:utf-8
 
+import numbers
 import functools
 import operator
 
@@ -24,5 +25,8 @@ def product(x):
     :param x: 数値配列
     :return: 総乗
     """
+    if isinstance(x, numbers.Number):
+        return x
+
     prod = functools.partial(functools.reduce, operator.mul)
     return prod(x)
