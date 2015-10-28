@@ -1,53 +1,42 @@
 # coding:utf-8
 
 import numpy as np
-import six
-from layer import Layer
-from theano import config
-from src.util.conv import pair
+from theano import config, tensor as T
+from src.model.mlp.convolution import ConvLayer2d
 from src.util.activation import relu
+from src.util.conv import pair
 
 __author__ = 'ren'
 
 
-class PoolLayer(object):
+class PoolLayer(ConvLayer2d):
     POOL_MAX = 0
     POOL_AVERAGE = 1
 
-    def __init__(self, img_size, k_size, in_channel, stride=1, pad=0, W=None,
-                 b=None, dtype=config.floatX, activation=None):
+    def __init__(self, img_size, in_channel, k_size, pad=0, dtype=config.floatX,
+                 activation=relu, pool_type=POOL_MAX):
 
-        # 入力画像のサイズ
-        self.img_w, self.img_h = pair(img_size)
+        kw, kh = pair(k_size)
 
-        # プーリング領域の大きさ
-        self.kw, self.kh = pair(k_size)
+        # フィルタベクトル
+        filter = np.ones((in_channel * in_channel * kh * kw), dtype=dtype)
 
-        # ストライド
-        self.sw, self.sh = pair(stride)
+        super(PoolLayer, self).__init__(img_size, in_channel, in_channel,
+                                        k_size, k_size, pad, None, None, filter,
+                                        dtype, activation)
 
-        # パディング
-        self.pw, self.ph = pair(pad)
+        self.pool_type = pool_type
 
-        # 入力チャンネル
-        self.in_channel = in_channel
+    def update(self, cost, learning_rate=0.01):
+        return []
 
-        # 活性化関数
-        if activation is None:
-            activation = relu
-        self.activation = activation
+    def output(self, inputs_symbol):
+        self.filtering()
 
-
-    def pool(self, img):
-        output = []
-        # フィルタ移動
-        for c in six.moves.range(self.in_channel):
-            for h in six.moves.range(0, self.img_h, self.sh):
-                for w in six.moves.range(0, self.img_w, self.sw):
-                    # プーリング対象
-                    pool_set = set()
-                    #
-                    for kh in six.moves.range(self.kh):
-                        for kw in six.moves.range(self.kw):
-                            pool_set.add(img[c][h + kh][w + kw])
-                    output.append(max(pool_set))
+        linear = T.dot(inputs_symbol, self.W.T) + self.b
+        if self.pool_type == PoolLayer.POOL_MAX:
+            return T.max(linear, axis=1)
+        elif self.pool_type == PoolLayer.POOL_AVERAGE:
+            return T.mean(linear, axis=1)
+        else:
+            raise RuntimeError("pool_type is invalid.")

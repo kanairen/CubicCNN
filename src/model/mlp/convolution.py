@@ -14,8 +14,9 @@ __author__ = 'ren'
 
 
 class ConvLayer2d(object):
-    def __init__(self, img_size, k_size, in_channel, out_channel, stride=1,
-                 pad=0, W=None, b=None, dtype=config.floatX, activation=None):
+    def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
+                 pad=0, W=None, b=None, filter=None, dtype=config.floatX,
+                 activation=None):
 
         # 画像サイズ
         self.img_w, self.img_h = conv.pair(img_size)
@@ -40,16 +41,16 @@ class ConvLayer2d(object):
         if W is None:
             W = np.zeros(shape=(self.n_out, self.n_in), dtype=dtype)
         self.W = shared(W, name='W', borrow=True)
-        print self.W.name, self.W.get_value().shape
 
         # フィルタベクトル
-        self.filter = shared(np.asarray(
-            rnd.uniform(low=-np.sqrt(1. / in_channel * self.kw * self.kh),
-                        high=np.sqrt(1. / in_channel * self.kw * self.kh),
-                        size=(out_channel * in_channel * self.kh * self.kw)),
-            dtype=dtype
-        ), name='filter', borrow=True)
-        print self.filter.name, self.filter.get_value().shape
+        if filter is None:
+            filter = np.asarray(
+                rnd.uniform(low=-np.sqrt(1. / in_channel * self.kw * self.kh),
+                            high=np.sqrt(1. / in_channel * self.kw * self.kh),
+                            size=(
+                            out_channel * in_channel * self.kh * self.kw)),
+                dtype=dtype)
+        self.filter = shared(filter, name='filter', borrow=True)
 
         # バイアスベクトル
         if b is None:
@@ -69,10 +70,10 @@ class ConvLayer2d(object):
 
     def output(self, inputs_symbol):
         # 重み共有のため、毎回フィルタの重みを拝借
-        self.conv_filter()
+        self.filtering()
         return self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
 
-    def conv_filter(self):
+    def filtering(self):
         h_outsize = conv.conv_outsize(self.img_h, self.kh, self.sh, self.ph,
                                       True)
         w_outsize = conv.conv_outsize(self.img_w, self.kw, self.sw, self.pw,
