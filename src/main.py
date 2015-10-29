@@ -7,9 +7,11 @@ from src.helper.visualize import plot_2d
 from src.helper.image import Image
 from src.model.mlp.layer import Layer
 from src.model.mlp.convolution import ConvLayer2d
+from src.model.mlp.pool import PoolLayer
 from src.model.mlp.mlp import MLP
 from src.util.config import path_res_2d_pattern, path_res_numpy_array
 from src.util.time import ymdt
+from src.util.sequence import product
 
 
 # TODO CNN フィルタ実装 1h
@@ -24,7 +26,7 @@ from src.util.time import ymdt
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(256,256), is_boxel=False):
     """
     DATA
     """
@@ -56,8 +58,8 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size
 
-    model = MLP(l1=ConvLayer2d(n_in,k_size=3,in_channel=1,out_channel=3))
-    model = MLP(l1=Layer(n_in))
+    # model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3))
+    model = MLP(l1=Layer(product(n_in), 1000), l2=Layer(1000, 500))
 
     """
     TRAIN
@@ -74,6 +76,8 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
 
         train_accuracy = 0
         test_accuracy = 0
+
+        # print model.l1.W.get_value()
 
         for j in range(n_epoch):
             train_accuracy += model.forward(inputs=train_ins,
@@ -93,7 +97,8 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
 
 
     # グラフの描画
-    plot_2d(xlabel="iteration", ylabel="accuracy", train=train_accuracies,
+    plot_2d(xlabel="iteration", ylabel="accuracy", ylim=(0, 1),
+            train=train_accuracies,
             test=test_accuracies)
 
     # 精度の保存

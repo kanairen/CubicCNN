@@ -86,7 +86,8 @@ def plot_boxel(boxels,
     pyplot.show()
 
 
-def plot_2d(xlabel, ylabel, xlim=None, ylim=None, locate="lower right", **args):
+def plot_2d(xlabel, ylabel, xlim=None, ylim=None, locate="lower right",font_size=20, **args):
+
     # グラフの描画
     values = []
     for name, value in six.iteritems(args):
@@ -99,4 +100,5 @@ def plot_2d(xlabel, ylabel, xlim=None, ylim=None, locate="lower right", **args):
         pyplot.xlim(xlim)
     if ylim:
         pyplot.ylim(ylim)
+    pyplot.rcParams['font.size']=font_size
     pyplot.show()
