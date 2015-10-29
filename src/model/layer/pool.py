@@ -3,7 +3,7 @@
 import numpy as np
 from theano import config, tensor as T
 
-from src.model.layer.convolution import ConvLayer2d
+from src.model.layer.conv import ConvLayer2d
 from src.util.activation import relu
 from src.util.conv import pair
 
