@@ -1,14 +1,13 @@
 # coding:utf-8
 
 import numpy as np
+
 from src.helper.decorator import client
 from src.helper.psb import PSB
 from src.helper.visualize import plot_2d
 from src.helper.image import Image
-from src.model.mlp.layer import Layer
-from src.model.mlp.convolution import ConvLayer2d
-from src.model.mlp.pool import PoolLayer
-from src.model.mlp.mlp import MLP
+from src.model.layer.layer import Layer
+from src.model.layerset.mlp import MLP
 from src.util.config import path_res_2d_pattern, path_res_numpy_array
 from src.util.time import ymdt
 from src.util.sequence import product
