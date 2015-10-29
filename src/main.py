@@ -3,7 +3,7 @@
 import numpy as np
 
 from src.helper.decorator import client
-from src.helper.psb import PSB
+from src.data.psb import PSB
 from src.helper.visualize import plot_2d
 from src.helper.image import Image
 from src.model.layer.layer import Layer
