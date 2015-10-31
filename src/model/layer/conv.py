@@ -2,8 +2,8 @@
 
 import numpy as np
 from theano import config, shared, tensor as T
-from layer import Layer, rnd
-from src.util import conv
+from layer import rnd
+from src.util import conv, sequence
 import six
 
 __author__ = 'ren'
@@ -19,16 +19,16 @@ class ConvLayer2d(object):
                  activation=None):
 
         # 画像サイズ
-        self.img_w, self.img_h = conv.pair(img_size)
+        self.img_w, self.img_h = sequence.pair(img_size)
 
         # フィルタサイズ
-        self.kw, self.kh = conv.pair(k_size)
+        self.kw, self.kh = sequence.pair(k_size)
 
         # ストライド
-        self.sw, self.sh = conv.pair(stride)
+        self.sw, self.sh = sequence.pair(stride)
 
         # パディング
-        self.pw, self.ph = conv.pair(pad)
+        self.pw, self.ph = sequence.pair(pad)
 
         # 入力・出力チャネル
         self.in_channel = in_channel
@@ -48,7 +48,7 @@ class ConvLayer2d(object):
                 rnd.uniform(low=-np.sqrt(1. / in_channel * self.kw * self.kh),
                             high=np.sqrt(1. / in_channel * self.kw * self.kh),
                             size=(
-                            out_channel * in_channel * self.kh * self.kw)),
+                                out_channel * in_channel * self.kh * self.kw)),
                 dtype=dtype)
         self.filter = shared(filter, name='filter', borrow=True)
 

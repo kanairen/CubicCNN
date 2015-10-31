@@ -30,3 +30,9 @@ def product(x):
 
     prod = functools.partial(functools.reduce, operator.mul)
     return prod(x)
+
+
+def pair(x):
+    if hasattr(x, '__getitem__'):
+        return x
+    return (x, x)

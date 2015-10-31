@@ -5,10 +5,6 @@ import numpy as np
 __author__ = 'ren'
 
 
-def pair(x):
-    if hasattr(x, '__getitem__'):
-        return x
-    return (x, x)
 
 
 def img_col(img, kh, kw, sy, sx, ph, pw, pval=0, cover_all=False):
