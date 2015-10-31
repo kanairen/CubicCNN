@@ -3,7 +3,7 @@
 import numpy as np
 from theano import config, shared, tensor as T
 from layer import rnd
-from src.util import conv, sequence
+from src.util import sequence
 import six
 
 __author__ = 'ren'
@@ -74,9 +74,9 @@ class ConvLayer2d(object):
         return self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
 
     def filtering(self):
-        h_outsize = conv.conv_outsize(self.img_h, self.kh, self.sh, self.ph,
+        h_outsize = self.conv_outsize(self.img_h, self.kh, self.sh, self.ph,
                                       True)
-        w_outsize = conv.conv_outsize(self.img_w, self.kw, self.sw, self.pw,
+        w_outsize = self.conv_outsize(self.img_w, self.kw, self.sw, self.pw,
                                       True)
         filter = self.filter.get_value()
         W = self.W.get_value()
@@ -91,3 +91,10 @@ class ConvLayer2d(object):
                                         i + kw * self.sw))] = filter[
                                     m * k * kh * kw]
         self.W.set_value(W)
+
+    @staticmethod
+    def conv_outsize(size, k, s, p, cover_all=False):
+        if cover_all:
+            return (size + p * 2 - k + s - 1) // s + 1
+        else:
+            return (size + p * 2 - k) // s + 1
