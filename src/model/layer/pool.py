@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import numpy as np
-from theano import config, tensor as T
+from theano import config, tensor as T,scan
 
 from src.model.layer.conv import ConvLayer2d
 from src.util.activation import relu
@@ -29,15 +29,23 @@ class PoolLayer(ConvLayer2d):
         self.pool_type = pool_type
 
     def update(self, cost, learning_rate=0.01):
-        return []
+        return None
 
     def output(self, inputs_symbol):
         self.filtering()
 
         linear = T.dot(inputs_symbol, self.W.T) + self.b
         if self.pool_type == PoolLayer.POOL_MAX:
-            return T.max(linear, axis=1)
+
+            def max_pool_output(v):
+                max_arg = T.argmax(v)
+                zeros = T.zeros_like(v)
+                return T.set_subtensor(zeros[max_arg],v[max_arg])
+
+            result,update = scan(fn=max_pool_output,sequences=linear)
+
+            return result
         elif self.pool_type == PoolLayer.POOL_AVERAGE:
-            return T.mean(linear, axis=1)
+            return T.mean(linear, axis=1,keepdims=True)
         else:
             raise RuntimeError("pool_type is invalid.")

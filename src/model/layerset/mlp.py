@@ -30,13 +30,19 @@ class MLP(object):
                      outputs=self.accuracy(self.output, self.answers_symbol),
                      updates=updates,
                      givens=givens)
+        # print "arg:",T.mean(T.eq(self.softmax_argmax(self.output),self.answers_symbol)).eval({self.inputs_symbol:inputs,self.answers_symbol:answers})
+        print self.output.eval({self.inputs_symbol:inputs})
+        # print "arg:",self.softmax_argmax(self.output).eval({self.inputs_symbol:inputs})
+        # print "answer:",answers
         return f(inputs, answers)
 
     def update(self, learning_rate=0.01):
         cost = self.negative_log_likelihood(self.output, self.answers_symbol)
         updates = []
         for layer in self.layers:
-            updates.extend(layer.update(cost, learning_rate=learning_rate))
+            update = layer.update(cost,learning_rate)
+            if update is not None:
+                updates.extend(update)
         return updates
 
     @staticmethod

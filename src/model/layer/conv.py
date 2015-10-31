@@ -36,7 +36,7 @@ class ConvLayer2d(object):
 
         # 入力・出力ユニット数
         self.n_in = self.img_w * self.img_h * in_channel
-        self.n_out = self.img_w * self.img_h * out_channel
+        self.n_out = self.img_w * self.img_h * out_channel / (stride ** 2)
 
         if W is None:
             W = np.zeros(shape=(self.n_out, self.n_in), dtype=dtype)
