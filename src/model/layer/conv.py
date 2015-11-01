@@ -18,25 +18,34 @@ class ConvLayer2d(object):
                  pad=0, W=None, b=None, no_bias=False, filter=None,
                  dtype=config.floatX, activation=None):
 
+        img_w, img_h = sequence.pair(img_size)
+        kw, kh = sequence.pair(k_size)
+        sw, sh = sequence.pair(stride)
+        pw, ph = sequence.pair(pad)
+
         # 画像サイズ
-        self.img_w, self.img_h = sequence.pair(img_size)
+        self.img_w, self.img_h = img_w, img_h
 
         # フィルタサイズ
-        self.kw, self.kh = sequence.pair(k_size)
+        self.kw, self.kh = kw, kh
 
         # ストライド
-        self.sw, self.sh = sequence.pair(stride)
+        self.sw, self.sh = sw, sh
 
         # パディング
-        self.pw, self.ph = sequence.pair(pad)
+        self.pw, self.ph = pw, ph
 
         # 入力・出力チャネル
         self.in_channel = in_channel
         self.out_channel = out_channel
 
         # 入力・出力ユニット数
-        self.n_in = self.img_w * self.img_h * in_channel
-        self.n_out = self.img_w * self.img_h * out_channel / (stride ** 2)
+        self.n_in = img_w * img_h * in_channel
+        self.n_out = img_w * img_h * out_channel / (stride ** 2)
+
+        # 畳み込み時の画像幅・高さ
+        self.h_outsize = self.conv_outsize(img_h, kh, sh, ph, True)
+        self.w_outsize = self.conv_outsize(img_w, kw, sw, pw, True)
 
         if W is None:
             W = np.zeros(shape=(self.n_out, self.n_in), dtype=dtype)
@@ -45,10 +54,9 @@ class ConvLayer2d(object):
         # フィルタベクトル
         if filter is None:
             filter = np.asarray(
-                rnd.uniform(low=-np.sqrt(1. / in_channel * self.kw * self.kh),
-                            high=np.sqrt(1. / in_channel * self.kw * self.kh),
-                            size=(
-                                out_channel * in_channel * self.kh * self.kw)),
+                rnd.uniform(low=-np.sqrt(1. / in_channel * kw * kh),
+                            high=np.sqrt(1. / in_channel * kw * kh),
+                            size=(out_channel * in_channel * kh * kw)),
                 dtype=dtype)
         self.filter = shared(filter, name='filter', borrow=True)
 
@@ -82,27 +90,24 @@ class ConvLayer2d(object):
         return self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
 
     def filtering(self):
-        h_outsize = self.conv_outsize(self.img_h, self.kh, self.sh, self.ph,
-                                      True)
-        w_outsize = self.conv_outsize(self.img_w, self.kw, self.sw, self.pw,
-                                      True)
         W = self.W.get_value()
+
         filter = self.filter.get_value()
 
         for k in six.moves.range(self.in_channel):
-            for j in six.moves.range(0, h_outsize, self.sh):
-                for i in six.moves.range(0, w_outsize, self.sw):
+            for j in six.moves.range(0, self.h_outsize, self.sh):
+                for i in six.moves.range(0, self.w_outsize, self.sw):
                     for m in six.moves.range(self.out_channel):
                         for kh in six.moves.range(self.kh):
                             for kw in six.moves.range(self.kw):
-                                W[(
-                                      j * (w_outsize - self.kw) + i) + (
-                                      m * self.kw * self.kh) + (
+                                W[(j * (self.w_outsize - self.kw) + i) + (
+                                    m * self.kw * self.kh) + (
                                       kh * self.kw + kw)][
                                     k * j * i] = filter[m * (
                                     self.in_channel * self.kh * self.kw) + k * (
                                                             self.kh * self.kw) + kh * self.kw + kw]
         self.W.set_value(W)
+
 
     @staticmethod
     def conv_outsize(size, k, s, p, cover_all=False):
