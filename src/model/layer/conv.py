@@ -86,10 +86,10 @@ class ConvLayer2d(object):
 
     def output(self, inputs_symbol):
         # 重み共有のため、毎回フィルタの重みを拝借
-        self.filtering()
+        self.init_weight()
         return self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
 
-    def filtering(self):
+    def init_weight(self):
         W = self.W.get_value()
 
         filter = self.filter.get_value()
@@ -107,7 +107,6 @@ class ConvLayer2d(object):
                                     self.in_channel * self.kh * self.kw) + k * (
                                                             self.kh * self.kw) + kh * self.kw + kw]
         self.W.set_value(W)
-
 
     @staticmethod
     def conv_outsize(size, k, s, p, cover_all=False):

@@ -31,7 +31,7 @@ class MLP(object):
                      updates=updates,
                      givens=givens)
         # print "arg:",T.mean(T.eq(self.softmax_argmax(self.output),self.answers_symbol)).eval({self.inputs_symbol:inputs,self.answers_symbol:answers})
-        print self.output.eval({self.inputs_symbol:inputs})
+        print self.output.eval({self.inputs_symbol:inputs}).shape
         # print "arg:",self.softmax_argmax(self.output).eval({self.inputs_symbol:inputs})
         # print "answer:",answers
         return f(inputs, answers)
