@@ -78,18 +78,22 @@ class ConvLayer2d(object):
                                       True)
         w_outsize = self.conv_outsize(self.img_w, self.kw, self.sw, self.pw,
                                       True)
-        filter = self.filter.get_value()
         W = self.W.get_value()
-        for m in six.moves.range(self.out_channel):
-            for j in six.moves.range(h_outsize):
-                for i in six.moves.range(w_outsize):
-                    for k in six.moves.range(self.in_channel):
+        filter = self.filter.get_value()
+
+        for k in six.moves.range(self.in_channel):
+            for j in six.moves.range(0, h_outsize, self.sh):
+                for i in six.moves.range(0, w_outsize, self.sw):
+                    for m in six.moves.range(self.out_channel):
                         for kh in six.moves.range(self.kh):
                             for kw in six.moves.range(self.kw):
-                                W[m * j * i][
-                                    k * ((j + kh * self.sh) * self.img_w + (
-                                        i + kw * self.sw))] = filter[
-                                    m * k * kh * kw]
+                                W[(
+                                      j * (w_outsize - self.kw) + i) + (
+                                      m * self.kw * self.kh) + (
+                                      kh * self.kw + kw)][
+                                    k * j * i] = filter[m * (
+                                self.in_channel * self.kh * self.kw) + k * (
+                                                        self.kh * self.kw) + kh * self.kw + kw]
         self.W.set_value(W)
 
     @staticmethod
