@@ -15,8 +15,8 @@ __author__ = 'ren'
 
 class ConvLayer2d(object):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
-                 pad=0, W=None, b=None, filter=None, dtype=config.floatX,
-                 activation=None):
+                 pad=0, W=None, b=None, no_bias=False, filter=None,
+                 dtype=config.floatX, activation=None):
 
         # 画像サイズ
         self.img_w, self.img_h = sequence.pair(img_size)
@@ -53,16 +53,24 @@ class ConvLayer2d(object):
         self.filter = shared(filter, name='filter', borrow=True)
 
         # バイアスベクトル
-        if b is None:
-            b = shared(np.zeros(shape=(self.n_out,), dtype=dtype), name='b',
-                       borrow=True)
-        self.b = b
+        if not no_bias:
+            if b is None:
+                b = shared(np.zeros(shape=(self.n_out,), dtype=dtype), name='b',
+                           borrow=True)
+            self.b = b
 
+        # 活性化関数
         if activation is None:
             activation = lambda x: x
         self.activation = activation
 
-        self.params = self.W, self.b
+        # 更新対象パラメタ
+        self.params = [self.W, ]
+        if not no_bias:
+            self.params.append(self.b)
+
+        # バイアスの有無
+        self.no_bias = no_bias
 
     def update(self, cost, learning_rate=0.01):
         grads = T.grad(cost, self.params)
@@ -92,8 +100,8 @@ class ConvLayer2d(object):
                                       m * self.kw * self.kh) + (
                                       kh * self.kw + kw)][
                                     k * j * i] = filter[m * (
-                                self.in_channel * self.kh * self.kw) + k * (
-                                                        self.kh * self.kw) + kh * self.kw + kw]
+                                    self.in_channel * self.kh * self.kw) + k * (
+                                                            self.kh * self.kw) + kh * self.kw + kw]
         self.W.set_value(W)
 
     @staticmethod
