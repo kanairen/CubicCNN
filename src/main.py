@@ -6,20 +6,16 @@ from src.helper.decorator import client
 from src.data.psb import PSB
 from src.data.image import Image
 from src.helper.visualize import plot_2d
-from src.model.layer.layer import Layer
 from src.model.layer.conv import ConvLayer2d
 from src.model.layer.pool import PoolLayer
 from src.model.layerset.mlp import MLP
 from src.util.config import path_res_2d_pattern, path_res_numpy_array
 from src.util.time import ymdt
-from src.util.sequence import product
 
 
-# TODO CNN フィルタ実装 1h
 # TODO プレーン
 # TODO スポーク
 
-# TODO バッチ分割実装 15min
 # TODO テストデータシャッフル 15min(18:35)
 # TODO 誤りデータの表示と誤り例（深層学習　p）1h
 # TODO Dropoutの実装 1h

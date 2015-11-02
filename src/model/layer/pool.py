@@ -1,9 +1,7 @@
 # coding:utf-8
 
-import six
-import itertools
 import numpy as np
-from theano import config, tensor as T, scan, printing
+from theano import config, tensor as T, scan
 
 from src.model.layer.conv import ConvLayer2d
 from src.util.activation import relu

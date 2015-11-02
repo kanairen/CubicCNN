@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import six
-from theano import tensor as T, function, pp
+from theano import tensor as T, function
 
 __author__ = 'ren'
 

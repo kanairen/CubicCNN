@@ -5,7 +5,7 @@ import itertools
 import numpy as np
 from theano import config
 from src.util.config import path_res_3d_psb, path_res_3d_psb_classifier, \
-    path_res_numpy_psb, path_res_numpy_psb_test, path_res_numpy_psb_train, \
+    path_res_numpy_psb_test, path_res_numpy_psb_train, \
     path_res_numpy_boxel_test, path_res_numpy_boxel_train
 from src.util.sequence import joint_dict
 
