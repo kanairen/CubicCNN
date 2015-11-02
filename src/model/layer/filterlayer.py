@@ -8,6 +8,7 @@ __author__ = 'ren'
 
 class FilterLayer(object):
     def __init__(self):
+        self.rnd = np.random.RandomState(1111)
         pass
 
     @staticmethod

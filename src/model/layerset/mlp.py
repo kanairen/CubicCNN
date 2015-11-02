@@ -14,7 +14,6 @@ class MLP(object):
 
         self.layers = []
         for name, layer in sorted(six.iteritems(layers)):
-            # assert type(layer) == Layer
             setattr(self, name, layer)
             self.layers.append(layer)
 
@@ -37,7 +36,7 @@ class MLP(object):
         cost = self.negative_log_likelihood(self.output, self.answers_symbol)
         updates = []
         for layer in self.layers:
-            update = layer.update(cost,learning_rate)
+            update = layer.update(cost, learning_rate)
             if update is not None:
                 updates.extend(update)
         return updates
