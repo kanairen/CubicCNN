@@ -15,41 +15,30 @@ __author__ = 'ren'
 
 class ConvLayer2d(object):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
-                 pad=0, W=None, b=None, no_bias=False, filter=None,
+                 pad=0, W=None, T=None, b=None, no_bias=False, filter=None,
                  dtype=config.floatX, activation=None):
 
-        img_w, img_h = sequence.pair(img_size)
-        kw, kh = sequence.pair(k_size)
-        sw, sh = sequence.pair(stride)
-        pw, ph = sequence.pair(pad)
-
         # 画像サイズ
-        self.img_w, self.img_h = img_w, img_h
+        img_w, img_h = sequence.pair(img_size)
 
         # フィルタサイズ
-        self.kw, self.kh = kw, kh
+        kw, kh = sequence.pair(k_size)
 
         # ストライド
-        self.sw, self.sh = sw, sh
+        sw, sh = sequence.pair(stride)
 
         # パディング
-        self.pw, self.ph = pw, ph
-
-        # 入力・出力チャネル
-        self.in_channel = in_channel
-        self.out_channel = out_channel
+        pw, ph = sequence.pair(pad)
 
         # 入力・出力ユニット数
-        self.n_in = img_w * img_h * in_channel
-        self.n_out = img_w * img_h * out_channel / (stride ** 2)
+        n_in = img_w * img_h * in_channel
+        n_out = img_w * img_h * out_channel / (stride ** 2)
 
-        # 畳み込み時の画像幅・高さ
-        self.h_outsize = self.conv_outsize(img_h, kh, sh, ph, True)
-        self.w_outsize = self.conv_outsize(img_w, kw, sw, pw, True)
-
-        if W is None:
-            W = np.zeros(shape=(self.n_out, self.n_in), dtype=dtype)
-        self.W = shared(W, name='W', borrow=True)
+        # 重み・フィルタ変換行列
+        if T is None:
+            T = self.init_T(img_w, img_h, kw, kh, sw, sh, n_in, n_out,
+                            in_channel, out_channel, dtype=dtype)
+        self.T = shared(T, name='T', borrow=True)
 
         # フィルタベクトル
         if filter is None:
@@ -63,9 +52,8 @@ class ConvLayer2d(object):
         # バイアスベクトル
         if not no_bias:
             if b is None:
-                b = shared(np.zeros(shape=(self.n_out,), dtype=dtype), name='b',
-                           borrow=True)
-            self.b = b
+                b = np.zeros(shape=(n_out,), dtype=dtype)
+            self.b = shared(b, name='b', borrow=True)
 
         # 活性化関数
         if activation is None:
@@ -73,7 +61,7 @@ class ConvLayer2d(object):
         self.activation = activation
 
         # 更新対象パラメタ
-        self.params = [self.W, ]
+        self.params = [self.filter, ]
         if not no_bias:
             self.params.append(self.b)
 
@@ -86,33 +74,44 @@ class ConvLayer2d(object):
 
     def output(self, inputs_symbol):
         # 重み共有のため、フィルタの重みを拝借
-        self.init_weight()
-
-        return self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
-
-    def init_weight(self):
-        # 重みnumpy行列
-        W = self.W.get_value()
-        # フィルタnumpy配列
-        filter = self.filter.get_value()
-
-        for k in six.moves.range(self.in_channel):
-            for j in six.moves.range(0, self.h_outsize, self.sh):
-                for i in six.moves.range(0, self.w_outsize, self.sw):
-                    for m in six.moves.range(self.out_channel):
-                        for kh in six.moves.range(self.kh):
-                            for kw in six.moves.range(self.kw):
-                                W[(j * (self.w_outsize - self.kw) + i) + (
-                                    m * self.kw * self.kh) + (
-                                      kh * self.kw + kw)][
-                                    k * j * i] = filter[m * (
-                                    self.in_channel * self.kh * self.kw) + k * (
-                                                            self.kh * self.kw) + kh * self.kw + kw]
-        self.W.set_value(W)
+        W = T.tensordot(self.filter, self.T, axes=(0, 2))
+        return self.activation(T.dot(inputs_symbol, W.T) + self.b)
 
     @staticmethod
-    def conv_outsize(size, k, s, p, cover_all=False):
-        if cover_all:
-            return (size + p * 2 - k + s - 1) // s + 1
-        else:
-            return (size + p * 2 - k) // s + 1
+    def init_T(img_w, img_h, kw, kh, sw, sh, n_in, n_out, in_channel,
+               out_channel, dtype):
+
+        filter_length = out_channel * in_channel * kh * kw
+
+        # 重みnumpy行列
+        T = np.zeros(shape=(n_out, n_in, filter_length), dtype=dtype)
+
+        max_w = img_w - kw
+        max_h = img_h - kh
+
+        ksq = kw * kh
+        kcsq = out_channel * ksq
+
+        for in_c in six.moves.range(in_channel):
+
+            for in_j in six.moves.range(max_h):
+
+                for in_i in six.moves.range(max_w):
+
+                    for out_c in six.moves.range(out_channel):
+
+                        for out_j in six.moves.range(0, max_h, sh):
+
+                            for out_i in six.moves.range(0, max_w, sw):
+
+                                j = out_c * img_w * img_h + out_j * img_w + out_i
+                                i = in_c * img_w * img_h + in_j * img_w + in_i
+
+                                k_w = out_i - in_i
+                                k_h = out_j - in_j
+
+                                if 0 <= k_w < kw and 0 <= k_h < kh:
+                                    T[j][i][
+                                        in_c * kcsq + out_c * ksq + k_h * kw + k_w] = 1.
+
+        return T
