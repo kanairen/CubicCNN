@@ -27,7 +27,7 @@ from src.util.sequence import product
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
     """
     DATA
     """
@@ -43,8 +43,11 @@ def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
         train_ins, test_ins, train_ans, test_ans, perm = Image.hold_out(
             inputs, answers, train_rate=0.8)
 
-    train_ins = [inputs.flatten() for inputs in train_ins]
-    test_ins = [inputs.flatten() for inputs in test_ins]
+    # numpy配列にしておくと、スライシングでコピーが発生しない
+    train_ins = np.array([inputs.flatten() for inputs in train_ins])
+    test_ins = np.array([inputs.flatten() for inputs in test_ins])
+    train_ans = np.array(train_ans)
+    test_ans = np.array(test_ans)
 
     print "train data : ", len(train_ins)
     print "test data : ", len(test_ins)
@@ -58,11 +61,11 @@ def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size
     #
-    model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=32, k_size=3),
-                l2=PoolLayer(n_in, in_channel=32, k_size=3))
+    # model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=32, k_size=3),
+    #             l2=PoolLayer(n_in, in_channel=32, k_size=3))
     #
-    # model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3),
-    #             l2=Layer(product(n_in), product(n_in)))
+    model = MLP(
+                l2=Layer(product(n_in),4000))
 
     # model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3))
 
@@ -72,8 +75,10 @@ def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
     train_accuracies = []
     test_accuracies = []
 
-    n_iter = 100
-    n_epoch = 10
+    n_iter = 1000
+    n_batch = 1
+    batch_size_train = len(train_ins) / n_batch
+    batch_size_test = len(test_ins) / n_batch
 
     for i in range(n_iter):
 
@@ -84,15 +89,23 @@ def cubic_cnn(n_div=50, img_size=(32, 32), is_boxel=False):
 
         # print model.l1.W.get_value()
 
-        for j in range(n_epoch):
-            train_accuracy += model.forward(inputs=train_ins,
-                                            answers=train_ans)
-            test_accuracy += model.forward(inputs=test_ins,
-                                           answers=test_ans,
-                                           updates=())
+        for j in range(n_batch):
+            print "{}st batch...".format(j)
+            from_train = j * batch_size_train
+            from_test = j * batch_size_test
+            to_train = (j + 1) * batch_size_train
+            to_test = (j + 1) * batch_size_test
 
-        train_accuracy /= n_epoch
-        test_accuracy /= n_epoch
+            train_accuracy += model.forward(
+                inputs=train_ins[from_train:to_train],
+                answers=train_ans[from_train:to_train])
+            test_accuracy += model.forward(
+                inputs=test_ins[from_test:to_test],
+                answers=test_ans[from_test:to_test],
+                updates=())
+
+        train_accuracy /= n_batch
+        test_accuracy /= n_batch
 
         print "train : ", train_accuracy
         print "test : ", test_accuracy
