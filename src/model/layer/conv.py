@@ -85,13 +85,15 @@ class ConvLayer2d(object):
         return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
 
     def output(self, inputs_symbol):
-        # 重み共有のため、毎回フィルタの重みを拝借
+        # 重み共有のため、フィルタの重みを拝借
         self.init_weight()
+
         return self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
 
     def init_weight(self):
+        # 重みnumpy行列
         W = self.W.get_value()
-
+        # フィルタnumpy配列
         filter = self.filter.get_value()
 
         for k in six.moves.range(self.in_channel):

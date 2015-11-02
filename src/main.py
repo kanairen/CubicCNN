@@ -27,7 +27,7 @@ from src.util.sequence import product
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(32,32), is_boxel=False):
     """
     DATA
     """
@@ -60,12 +60,10 @@ def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
     print "preparing models..."
 
     n_in = n_div ** 3 if is_boxel else img_size
-    #
-    # model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=32, k_size=3),
-    #             l2=PoolLayer(n_in, in_channel=32, k_size=3))
-    #
-    model = MLP(
-                l2=Layer(product(n_in),4000))
+
+    model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3),
+                l2=PoolLayer(n_in, in_channel=1, k_size=3))
+
 
     # model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3))
 

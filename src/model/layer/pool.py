@@ -1,6 +1,7 @@
 # coding:utf-8
 
 import six
+import itertools
 import numpy as np
 from theano import config, tensor as T, scan, printing
 
@@ -42,37 +43,12 @@ class PoolLayer(ConvLayer2d):
         else:
             raise RuntimeError("pool_type is invalid.")
 
-
     def max_pooling(self, inputs_symbol):
         # Wを初期化
         self.init_weight()
-        # 各データに関して、プーリングの最大値とIndexを返す
-        result, update = scan(self.max_args, sequences=[inputs_symbol],
+
+        # 各入力の各プーリング領域における最大値を取得する
+        result, update = scan(fn=lambda input, W: T.max(input * W, axis=1),
+                              sequences=[inputs_symbol],
                               non_sequences=self.W)
-        # 最大値リストと、Indexリスト
-        max_prod, args_prod = result
-
-        # TODO args_prodがおそらくリストのリストなので、一つのリストにまとめないと怒られるかもしれない
-        w_zeros = T.zeros_like(self.W)
-        new_W = T.set_subtensor(w_zeros[range(self.n_out)][args_prod], 1)
-        self.W.set_value(new_W)
-
-        # TODO max_prodを返すと、逆伝播の時次元が違うと起こるかもしれない
-        return max_prod
-
-
-    @staticmethod
-    def max_args(input, weight):
-        prods = input * weight
-        max_prod = T.max(prods, axis=1)
-        args_prod = T.argmax(prods, axis=1)
-        return max_prod, args_prod
-
-
-    @staticmethod
-    def max_pool_weighting(v, w_row, weight):
-        max_arg = T.argmax(v)
-        zeros = T.zeros_like(v)
-        weight[w_row].fill(0)
-
-        return T.set_subtensor(zeros[max_arg], v[max_arg])
+        return result

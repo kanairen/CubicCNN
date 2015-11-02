@@ -23,6 +23,7 @@ class MLP(object):
             self.output = layer.output(self.output)
 
     def forward(self, inputs, answers, updates=None, givens={}):
+
         if updates is None:
             updates = self.update()
 
@@ -30,10 +31,6 @@ class MLP(object):
                      outputs=self.accuracy(self.output, self.answers_symbol),
                      updates=updates,
                      givens=givens)
-        # print "arg:",T.mean(T.eq(self.softmax_argmax(self.output),self.answers_symbol)).eval({self.inputs_symbol:inputs,self.answers_symbol:answers})
-        print self.output.eval({self.inputs_symbol:inputs}).shape
-        # print "arg:",self.softmax_argmax(self.output).eval({self.inputs_symbol:inputs})
-        # print "answer:",answers
         return f(inputs, answers)
 
     def update(self, learning_rate=0.01):
