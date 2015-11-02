@@ -18,7 +18,7 @@ class Layer(object):
             W = shared(np.asarray(
                 rnd.uniform(low=-np.sqrt(6. / (n_in + n_out)),
                             high=np.sqrt(6. / (n_in + n_out)),
-                            size=(n_in, n_out)),
+                            size=(n_out, n_in)),
                 dtype=dtype
             ), name='W', borrow=True)
 
@@ -44,4 +44,4 @@ class Layer(object):
         return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
 
     def output(self, inputs_symbol):
-        return self.activation(T.dot(inputs_symbol, self.W) + self.b)
+        return self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
