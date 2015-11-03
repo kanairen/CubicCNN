@@ -6,7 +6,6 @@ from src.helper.decorator import client
 from src.data.psb import PSB
 from src.data.image import Image
 from src.helper.visualize import plot_2d
-from src.model.layer.layer import Layer
 from src.model.layer.conv import ConvLayer2d
 from src.model.layer.pool import PoolLayer
 from src.model.layerset.mlp import MLP
@@ -24,7 +23,7 @@ from src.util.time import ymdt
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
     """
     DATA
     """
@@ -61,21 +60,23 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
     model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3),
                 l2=PoolLayer(n_in, in_channel=1, k_size=3))
 
-    # model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3))
-
-    #
-    # from src.util.sequence import product
-    # model = MLP(l1=Layer(product(n_in), 1000))
     """
     TRAIN
     """
-    train_accuracies = []
-    test_accuracies = []
 
+    # トレーニング繰り返し回数
     n_iter = 1000
+
+    # バッチ数
     n_batch = 1
+
+    # バッチサイズ
     batch_size_train = len(train_ins) / n_batch
     batch_size_test = len(test_ins) / n_batch
+
+    # 訓練・テストにおける精度の時系列リスト
+    train_accuracies = []
+    test_accuracies = []
 
     for i in range(n_iter):
 
@@ -84,8 +85,7 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
         train_accuracy = 0
         test_accuracy = 0
 
-        # print model.l1.W.get_value()
-
+        # バッチごとに学習
         for j in range(n_batch):
             print "{}st batch...".format(j)
             from_train = j * batch_size_train
@@ -109,7 +109,6 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
 
         train_accuracies.append(train_accuracy)
         test_accuracies.append(test_accuracy)
-
 
     # グラフの描画
     plot_2d(xlabel="iteration", ylabel="accuracy", ylim=(0, 1),
