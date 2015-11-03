@@ -3,13 +3,14 @@
 import numpy as np
 from theano import tensor as T, shared, config
 from src.util.activation import relu
+from src.interface.layerinterface import LayerInterface
 
 __author__ = 'ren'
 
 rnd = np.random.RandomState(1111)
 
 
-class Layer(object):
+class Layer(LayerInterface):
     def __init__(self, n_in, n_out, W=None, b=None, dtype=config.floatX,
                  activation=None):
 

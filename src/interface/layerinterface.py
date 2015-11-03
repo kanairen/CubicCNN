@@ -7,10 +7,10 @@ class LayerInterface(object):
     def __init__(self):
         pass
 
-    def update(self):
+    def update(self, cost, learning_rate):
         raise NotImplementedError(
             "layer objects should be implemented 'update'.")
 
-    def output(self):
+    def output(self, inputs_symbol):
         raise NotImplementedError(
             "layer objects should be implemented 'output'.")

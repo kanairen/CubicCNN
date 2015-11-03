@@ -57,9 +57,7 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size
 
-    model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3),
-                l2=PoolLayer(n_in, in_channel=1, k_size=3))
-
+    model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3))
     """
     TRAIN
     """
