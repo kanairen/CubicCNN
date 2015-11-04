@@ -14,7 +14,7 @@ class PoolLayer(FilterLayer):
     POOL_MAX = 0
     POOL_AVERAGE = 1
 
-    def __init__(self, img_size, in_channel, k_size, T=None, filter=None, pad=0,
+    def __init__(self, img_size, in_channel, k_size, T=None, h=None, pad=0,
                  dtype=config.floatX, activation=relu, pool_type=POOL_MAX):
 
         # フィルタサイズ
@@ -24,12 +24,12 @@ class PoolLayer(FilterLayer):
         self.pool_type = pool_type
 
         # フィルタベクトル
-        if filter is None:
-            filter = np.ones((in_channel * in_channel * kh * kw), dtype=dtype)
-        self.filter = shared(filter, name='filter', borrow=True)
+        if h is None:
+            h = np.ones((in_channel * in_channel * kh * kw), dtype=dtype)
+        self.h = shared(h, name='filter', borrow=True)
 
         super(PoolLayer, self).__init__(img_size, in_channel, in_channel,
-                                        k_size, k_size, T, None, True, filter,
+                                        k_size, k_size, T, None, True, h,
                                         dtype, activation)
 
     def update(self, cost, learning_rate=0.01):
@@ -44,7 +44,9 @@ class PoolLayer(FilterLayer):
             raise RuntimeError("pool_type is invalid.")
 
     def max_pooling(self, inputs_symbol):
-        W = T.tensordot(self.filter, self.T, axes=(0, 2))
+
+        W = T.tensordot(self.h, self.T, axes=(0, 2))
+
         # 各入力の各プーリング領域における最大値を取得する
         result, update = scan(fn=lambda input, W: T.max(input * W, axis=1),
                               sequences=[inputs_symbol],

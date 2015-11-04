@@ -11,7 +11,7 @@ __author__ = 'ren'
 
 class FilterLayer(LayerInterface):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
-                 T=None, b=None, no_bias=False, filter=None,
+                 T=None, b=None, no_bias=False, h=None,
                  dtype=config.floatX, activation=None):
 
         # 乱数生成器
@@ -37,13 +37,13 @@ class FilterLayer(LayerInterface):
         self.T = shared(T, name='T', borrow=True)
 
         # フィルタベクトル
-        if filter is None:
-            filter = np.asarray(
+        if h is None:
+            h = np.asarray(
                 self.rnd.uniform(low=-np.sqrt(1. / in_channel * kw * kh),
                                  high=np.sqrt(1. / in_channel * kw * kh),
                                  size=(out_channel * in_channel * kh * kw)),
                 dtype=dtype)
-        self.filter = shared(filter, name='filter', borrow=True)
+        self.h = shared(h, name='filter', borrow=True)
 
         # バイアスベクトル
         if not no_bias:
@@ -57,7 +57,7 @@ class FilterLayer(LayerInterface):
         self.activation = activation
 
         # 更新対象パラメタ
-        self.params = [self.filter, ]
+        self.params = [self.h, ]
         if not no_bias:
             self.params.append(self.b)
 
@@ -65,10 +65,9 @@ class FilterLayer(LayerInterface):
     def init_T(img_w, img_h, kw, kh, sw, sh, n_in, n_out, in_channel,
                out_channel, dtype):
 
-        filter_length = out_channel * in_channel * kh * kw
-
         # 重みnumpy行列
-        T = np.zeros(shape=(n_out, n_in, filter_length), dtype=dtype)
+        T = np.zeros(shape=(n_out, n_in, out_channel * in_channel * kh * kw),
+                     dtype=dtype)
 
         max_w = img_w - kw
         max_h = img_h - kh
