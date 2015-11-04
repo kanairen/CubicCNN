@@ -43,7 +43,7 @@ class FilterLayer(LayerInterface):
                                  high=np.sqrt(1. / in_channel * kw * kh),
                                  size=(out_channel * in_channel * kh * kw)),
                 dtype=dtype)
-        self.h = shared(h, name='filter', borrow=True)
+        self.h = shared(h, name='h', borrow=True)
 
         # バイアスベクトル
         if not no_bias:
