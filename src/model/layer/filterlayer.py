@@ -28,7 +28,7 @@ class FilterLayer(LayerInterface):
 
         # 入力・出力ユニット数
         n_in = img_w * img_h * in_channel
-        n_out = img_w * img_h * out_channel / (stride ** 2)
+        n_out = img_w * img_h * out_channel / (sw * sh)
 
         # 重み・フィルタ変換行列
         if T is None:
@@ -100,6 +100,7 @@ class FilterLayer(LayerInterface):
                                 k_h = out_j - in_j
 
                                 if 0 <= k_w < kw and 0 <= k_h < kh:
+                                    print in_c * kcsq + out_c * ksq + k_h * kw + k_w
                                     T[j][i][
                                         in_c * kcsq + out_c * ksq + k_h * kw + k_w] = 1.
 
