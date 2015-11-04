@@ -34,7 +34,7 @@ class FilterLayer(LayerInterface):
         if T is None:
             T = self.init_T(img_w, img_h, kw, kh, sw, sh, n_in, n_out,
                             in_channel, out_channel, dtype=dtype)
-        self.T = shared(T, name='T', borrow=True)
+        self.T = T
 
         # フィルタベクトル
         if h is None:
@@ -60,6 +60,12 @@ class FilterLayer(LayerInterface):
         self.params = [self.h, ]
         if not no_bias:
             self.params.append(self.b)
+
+    def update(self, cost, learning_rate):
+        super(FilterLayer, self).update()
+
+    def output(self, inputs_symbol):
+        super(FilterLayer, self).output()
 
     @staticmethod
     def init_T(img_w, img_h, kw, kh, sw, sh, n_in, n_out, in_channel,
