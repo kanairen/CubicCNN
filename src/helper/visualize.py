@@ -86,13 +86,11 @@ def plot_boxel(boxels,
     pyplot.show()
 
 
-def plot_2d(xlabel, ylabel, xlim=None, ylim=None, locate="lower right",font_size=20, **args):
-
+def plot_2d(array_dict, xlabel, ylabel, xlim=None, ylim=None,
+            locate="lower right", font_size=20):
     # グラフの描画
-    values = []
-    for name, value in six.iteritems(args):
+    for name, value in six.iteritems(array_dict):
         pyplot.plot(value, label=name)
-        values.append(value)
     pyplot.legend(loc=locate)
     pyplot.xlabel(xlabel)
     pyplot.ylabel(ylabel)
@@ -100,5 +98,5 @@ def plot_2d(xlabel, ylabel, xlim=None, ylim=None, locate="lower right",font_size
         pyplot.xlim(xlim)
     if ylim:
         pyplot.ylim(ylim)
-    pyplot.rcParams['font.size']=font_size
+    pyplot.rcParams['font.size'] = font_size
     pyplot.show()

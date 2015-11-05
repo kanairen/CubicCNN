@@ -109,9 +109,8 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
         test_accuracies.append(test_accuracy)
 
     # グラフの描画
-    plot_2d(xlabel="iteration", ylabel="accuracy", ylim=(0, 1),
-            train=train_accuracies,
-            test=test_accuracies)
+    plot_2d({"train": train_accuracies, "test": test_accuracies},
+            xlabel="iteration", ylabel="accuracy", ylim=(0, 1))
 
     # 精度の保存
     np.save(path_res_numpy_array + "/" + ymdt() + "_traain", train_accuracies)
