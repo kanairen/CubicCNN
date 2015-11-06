@@ -32,8 +32,8 @@ class FilterLayer(LayerInterface):
 
         # 重み・フィルタ変換行列
         if T is None:
-            T = self.init_T(img_w, img_h, kw, kh, sw, sh, n_in, n_out,
-                            in_channel, out_channel, dtype=dtype)
+            T = self.init_T(img_w, img_h, kw, kh, sw, sh, self.n_in, self.n_out,
+                            in_channel, out_channel, dtype='byte')
         self.T = shared(T, name='T', borrow=False)
 
         # フィルタベクトル
