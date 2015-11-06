@@ -14,15 +14,6 @@ from src.util.config import path_res_2d_pattern, path_res_numpy_array
 from src.util.time import ymdt
 
 
-# TODO プレーン
-# TODO スポーク
-
-# TODO テストデータシャッフル 15min(18:35)
-# TODO 誤りデータの表示と誤り例（深層学習　p）1h
-# TODO Dropoutの実装 1h
-# TODO モデルのサーフェスだけでなく、ソリッドも試す
-# TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
-
 @client
 def cubic_cnn(n_div=50, img_size=(32,32), is_boxel=False):
     """
