@@ -6,6 +6,7 @@ from src.helper.decorator import client
 from src.data.psb import PSB
 from src.data.image import Image
 from src.helper.visualize import plot_2d
+from src.model.layer.layer import Layer
 from src.model.layer.conv import ConvLayer2d
 from src.model.layer.pool import PoolLayer
 from src.model.layerset.mlp import MLP
@@ -23,7 +24,7 @@ from src.util.time import ymdt
 # TODO EASY-CLASSIFIERの実装（クラス分類数を大まかなものに変更）30min
 
 @client
-def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(32,32), is_boxel=False):
     """
     DATA
     """
@@ -57,7 +58,12 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size
 
-    model = MLP(l1=ConvLayer2d(n_in, in_channel=1, out_channel=1, k_size=3))
+    l1 = ConvLayer2d(n_in, in_channel=1, out_channel=4, k_size=3)
+    l2 = PoolLayer(n_in, in_channel=4, k_size=3)
+    l3 = Layer(l2.n_out, 1000)
+    l4 = Layer(l3.n_out, 500)
+
+    model = MLP(l1=l1, l2=l2, l3=l3, l4=l4)
     """
     TRAIN
     """

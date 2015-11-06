@@ -27,8 +27,8 @@ class FilterLayer(LayerInterface):
         sw, sh = pair(stride)
 
         # 入力・出力ユニット数
-        n_in = img_w * img_h * in_channel
-        n_out = img_w * img_h * out_channel / (sw * sh)
+        self.n_in = img_w * img_h * in_channel
+        self.n_out = img_w * img_h * out_channel / (sw * sh)
 
         # 重み・フィルタ変換行列
         if T is None:
@@ -48,7 +48,7 @@ class FilterLayer(LayerInterface):
         # バイアスベクトル
         if not no_bias:
             if b is None:
-                b = np.zeros(shape=(n_out,), dtype=dtype)
+                b = np.zeros(shape=(self.n_out,), dtype=dtype)
             self.b = shared(b, name='b', borrow=True)
 
         # 活性化関数
@@ -98,6 +98,6 @@ class FilterLayer(LayerInterface):
 
                                 if 0 <= k_w < kw and 0 <= k_h < kh:
                                     T[j][i][
-                                        out_c * in_channel * kh * kw + in_c * kh * kw + k_h * kw + k_w] = 1.
+                                        out_c * in_channel * kh * kw + in_c * kh * kw + k_h * kw + k_w] = 1
 
         return T

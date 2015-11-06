@@ -14,6 +14,10 @@ class Layer(LayerInterface):
     def __init__(self, n_in, n_out, W=None, b=None, dtype=config.floatX,
                  activation=None):
 
+        # 入出力ユニット数
+        self.n_in = n_in
+        self.n_out = n_out
+
         # 重み行列
         if W is None:
             W = shared(np.asarray(
