@@ -34,7 +34,7 @@ class FilterLayer(LayerInterface):
         if T is None:
             T = self.init_T(img_w, img_h, kw, kh, sw, sh, self.n_in, self.n_out,
                             in_channel, out_channel, dtype='byte')
-        self.T = shared(T, name='T', borrow=False)
+        self.T = shared(T, name='T', borrow=True)
 
         # フィルタベクトル
         if h is None:
