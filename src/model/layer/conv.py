@@ -19,6 +19,13 @@ class ConvLayer2d(FilterLayer):
         return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
 
     def output(self, inputs_symbol):
-        # 重み共有のため、フィルタの重みを拝借
-        W = T.tensordot(self.h, self.T, axes=(0, 2))
-        return self.activation(T.dot(inputs_symbol, W.T) + self.b)
+        inputs_4d = T.reshape(inputs_symbol, (
+            inputs_symbol.shape[0], self.in_channel, self.img_w, self.img_h))
+
+        col = self.im2col(inputs_4d)
+
+        u = T.tensordot(col, self.h, ((1, 2, 3), (1, 2, 3))) + self.b
+
+        z = self.activation(u)
+
+        return T.reshape(z, (inputs_symbol.shape[0], self.n_out))

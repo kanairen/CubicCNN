@@ -15,7 +15,7 @@ from src.util.time import ymdt
 
 
 @client
-def cubic_cnn(n_div=50, img_size=(32,32), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
     """
     DATA
     """
@@ -49,10 +49,10 @@ def cubic_cnn(n_div=50, img_size=(32,32), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size
 
-    l1 = ConvLayer2d(n_in, in_channel=1, out_channel=4, k_size=3)
-    l2 = PoolLayer(n_in, in_channel=4, k_size=3)
-    l3 = Layer(l2.n_out, 1000)
-    l4 = Layer(l3.n_out, 500)
+    l1 = ConvLayer2d(n_in, in_channel=1, out_channel=32, k_size=3)
+    l2 = PoolLayer(l1.output_img_size(), in_channel=32, k_size=3)
+    l3 = Layer(l2.n_out, 2000)
+    l4 = Layer(l3.n_out, 1000)
 
     model = MLP(l1=l1, l2=l2, l3=l3, l4=l4)
     """

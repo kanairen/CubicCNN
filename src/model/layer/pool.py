@@ -25,8 +25,8 @@ class PoolLayer(FilterLayer):
 
         # フィルタベクトル
         if h is None:
-            h = np.ones((in_channel * in_channel * kh * kw), dtype=dtype)
-        self.h = shared(h, name='filter', borrow=True)
+            h = np.ones((in_channel, in_channel, kh, kw), dtype=dtype)
+        self.h = shared(h, name='h', borrow=True)
 
         super(PoolLayer, self).__init__(img_size, in_channel, in_channel,
                                         k_size, k_size, T, None, True, h,
@@ -45,10 +45,20 @@ class PoolLayer(FilterLayer):
 
     def max_pooling(self, inputs_symbol):
 
-        W = T.tensordot(self.h, self.T, axes=(0, 2))
+        inputs_4d = T.reshape(inputs_symbol, (
+            inputs_symbol.shape[0], self.in_channel, self.img_w, self.img_h))
 
-        # 各入力の各プーリング領域における最大値を取得する
-        result, update = scan(fn=lambda input, W: T.max(input * W, axis=1),
-                              sequences=[inputs_symbol],
-                              non_sequences=W)
-        return result
+        col = self.im2col(inputs_4d)
+
+        u = T.tensordot(col, self.h, ((1, 2, 3), (1, 2, 3)))
+
+        reshaped_u = T.reshape(u, (inputs_symbol.shape[0], self.n_out))
+
+        max_args = T.argmax(reshaped_u, axis=1)
+
+        zeros = T.zeros_like(reshaped_u)
+
+        z = T.set_subtensor(zeros[T.arange(reshaped_u.shape[0]),max_args],
+                            reshaped_u[T.arange(reshaped_u.shape[0]),max_args])
+
+        return z

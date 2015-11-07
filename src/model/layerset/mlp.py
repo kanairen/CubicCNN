@@ -30,6 +30,7 @@ class MLP(object):
                      outputs=self.accuracy(self.output, self.answers_symbol),
                      updates=updates,
                      givens=givens)
+
         return f(inputs, answers)
 
     def update(self, learning_rate=0.01):

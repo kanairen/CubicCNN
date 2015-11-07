@@ -2,7 +2,7 @@
 
 import six
 import numpy as np
-from theano import config, shared
+from theano import config, shared, tensor as T
 from src.util.sequence import pair
 from src.interface.layerinterface import LayerInterface
 
@@ -12,43 +12,60 @@ __author__ = 'ren'
 class FilterLayer(LayerInterface):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
                  T=None, b=None, no_bias=False, h=None,
-                 dtype=config.floatX, activation=None):
+                 dtype=config.floatX, activation=None, cover_all=False):
 
         # 乱数生成器
         self.rnd = np.random.RandomState(1111)
 
         # 画像サイズ
         img_w, img_h = pair(img_size)
+        self.img_w = img_w
+        self.img_h = img_h
+
+        # チャネル数
+        self.in_channel = in_channel
+        self.out_channel = out_channel
 
         # フィルタサイズ
         kw, kh = pair(k_size)
+        self.kw = kw
+        self.kh = kh
 
         # ストライド
         sw, sh = pair(stride)
+        self.sw = sw
+        self.sh = sh
+
+        # パディング
+        pw, ph = pair(0)
+        self.pw = pw
+        self.ph = ph
+
+        # 出力画像サイズ
+        out_h = self.conv_outsize(img_h, kh, sh, ph, cover_all)
+        out_w = self.conv_outsize(img_w, kw, sw, pw, cover_all)
+        self.out_h = out_h
+        self.out_w = out_w
 
         # 入力・出力ユニット数
-        self.n_in = img_w * img_h * in_channel
-        self.n_out = img_w * img_h * out_channel / (sw * sh)
-
-        # 重み・フィルタ変換行列
-        if T is None:
-            T = self.init_T(img_w, img_h, kw, kh, sw, sh, self.n_in, self.n_out,
-                            in_channel, out_channel, dtype='byte')
-        self.T = shared(T, name='T', borrow=True)
+        n_in = img_w * img_h * in_channel
+        n_out = out_w * out_h * out_channel
+        self.n_in = n_in
+        self.n_out = n_out
 
         # フィルタベクトル
         if h is None:
             h = np.asarray(
                 self.rnd.uniform(low=-np.sqrt(1. / in_channel * kw * kh),
                                  high=np.sqrt(1. / in_channel * kw * kh),
-                                 size=(out_channel * in_channel * kh * kw)),
+                                 size=(out_channel, in_channel, kh, kw)),
                 dtype=dtype)
         self.h = shared(h, name='h', borrow=True)
 
         # バイアスベクトル
         if not no_bias:
             if b is None:
-                b = np.zeros(shape=(self.n_out,), dtype=dtype)
+                b = np.zeros(shape=(out_channel,), dtype=dtype)
             self.b = shared(b, name='b', borrow=True)
 
         # 活性化関数
@@ -67,37 +84,32 @@ class FilterLayer(LayerInterface):
     def output(self, inputs_symbol):
         super(FilterLayer, self).output()
 
+    def output_img_size(self):
+        return self.out_w, self.out_h
+
     @staticmethod
-    def init_T(img_w, img_h, kw, kh, sw, sh, n_in, n_out, in_channel,
-               out_channel, dtype):
+    def conv_outsize(size, k, s, p, cover_all=False):
+        if cover_all:
+            return (size + p * 2 - k + s - 1) // s + 1
+        else:
+            return (size + p * 2 - k) // s + 1
 
-        # 重みnumpy行列
-        T = np.zeros(shape=(n_out, n_in, out_channel * in_channel * kh * kw),
-                     dtype=dtype)
+    def im2col(self, img, pval=0):
+        n, c, h, w = img.shape
 
-        max_w = img_w - kw
-        max_h = img_h - kh
+        # img = np.pad(img, ((0, 0), (0, 0), (self.ph, self.ph + self.sh - 1),
+        #                    (self.pw, self.pw + self.sw - 1)),
+        #              mode='constant', constant_values=(pval,))
 
-        for in_c in six.moves.range(in_channel):
+        col = T.zeros((n, c, self.kh, self.kw, self.out_h, self.out_w),
+                      dtype=img.dtype)
 
-            for in_j in six.moves.range(img_h):
+        for i in six.moves.range(self.kh):
+            i_lim = i + self.sh * self.out_h
+            for j in six.moves.range(self.kw):
+                j_lim = j + self.sw * self.out_w
+                col = T.set_subtensor(col[:, :, i, j, :, :],
+                                      img[:, :, i:i_lim:self.sh,
+                                      j:j_lim:self.sw])
 
-                for in_i in six.moves.range(img_w):
-
-                    for out_c in six.moves.range(out_channel):
-
-                        for out_j in six.moves.range(0, max_h, sh):
-
-                            for out_i in six.moves.range(0, max_w, sw):
-
-                                j = out_c * img_w / sw * img_h / sh + out_j / sh * img_w / sw + out_i / sw
-                                i = in_c * img_w * img_h + in_j * img_w + in_i
-
-                                k_w = in_i - out_i
-                                k_h = in_j - out_j
-
-                                if 0 <= k_w < kw and 0 <= k_h < kh:
-                                    T[j][i][
-                                        out_c * in_channel * kh * kw + in_c * kh * kw + k_h * kw + k_w] = 1
-
-        return T
+        return col
