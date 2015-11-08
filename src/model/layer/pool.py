@@ -47,19 +47,26 @@ class PoolLayer(FilterLayer):
 
     def max_pooling(self, inputs_symbol):
 
+        # 一時的に4次元テンソルの形に
         inputs_4d = T.reshape(inputs_symbol, (
             inputs_symbol.shape[0], self.in_channel, self.img_w, self.img_h))
 
+        # 畳み込み対象となる画素のみを抽出したテンソル
         col = self.im2col(inputs_4d)
 
+        # テンソル演算 u=Wx
         u = T.tensordot(col, self.h, ((1, 2, 3), (1, 2, 3)))
 
+        # 各出力を一次元配列に戻す
         reshaped_u = T.reshape(u, (inputs_symbol.shape[0], self.n_out))
 
+        # 最大値インデックス配列
         max_args = T.argmax(reshaped_u, axis=1)
 
+        # ゼロ行列
         zeros = T.zeros_like(reshaped_u)
 
+        # 出力の各最大値をゼロ行列の同じインデックスに格納した結果
         z = T.set_subtensor(zeros[T.arange(reshaped_u.shape[0]), max_args],
                             reshaped_u[T.arange(reshaped_u.shape[0]), max_args])
 
