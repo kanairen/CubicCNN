@@ -37,11 +37,13 @@ class PoolLayer(FilterLayer):
 
     def output(self, inputs_symbol):
         if self.pool_type == PoolLayer.POOL_MAX:
-            return self.max_pooling(inputs_symbol)
+            output = self.max_pooling(inputs_symbol)
         elif self.pool_type == PoolLayer.POOL_AVERAGE:
-            return self.averate_pooling(inputs_symbol)
+            output = self.averate_pooling(inputs_symbol)
         else:
             raise RuntimeError("pool_type is invalid.")
+
+        return self.activation(output)
 
     def max_pooling(self, inputs_symbol):
 
@@ -58,7 +60,7 @@ class PoolLayer(FilterLayer):
 
         zeros = T.zeros_like(reshaped_u)
 
-        z = T.set_subtensor(zeros[T.arange(reshaped_u.shape[0]),max_args],
-                            reshaped_u[T.arange(reshaped_u.shape[0]),max_args])
+        z = T.set_subtensor(zeros[T.arange(reshaped_u.shape[0]), max_args],
+                            reshaped_u[T.arange(reshaped_u.shape[0]), max_args])
 
         return z
