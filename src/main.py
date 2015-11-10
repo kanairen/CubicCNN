@@ -15,7 +15,7 @@ from src.util.time import ymdt
 
 
 @client
-def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
     """
     DATA
     """
@@ -49,8 +49,8 @@ def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size
 
-    l1 = ConvLayer2d(n_in, in_channel=1, out_channel=32, k_size=3)
-    l2 = PoolLayer(l1.output_img_size(), in_channel=32, k_size=3)
+    l1 = ConvLayer2d(n_in, in_channel=1, out_channel=16, k_size=4)
+    l2 = PoolLayer(l1.output_img_size(), in_channel=16, k_size=4)
     l3 = Layer(l2.n_out, 2000)
     l4 = Layer(l3.n_out, 1000)
 
@@ -80,24 +80,27 @@ def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
         train_accuracy = 0
         test_accuracy = 0
 
-        # バッチごとに学習
-        for j in range(n_batch):
-            print "{}st batch...".format(j)
-            from_train = j * batch_size_train
-            from_test = j * batch_size_test
-            to_train = (j + 1) * batch_size_train
-            to_test = (j + 1) * batch_size_test
+        if n_batch == 1:
+            train_accuracy = model.forward(train_ins, train_ans)
+            test_accuracy = model.forward(test_ins, test_ans, updates=())
+        else:
+            # バッチごとに学習
+            for j in range(n_batch):
+                print "{}st batch...".format(j)
+                from_train = j * batch_size_train
+                from_test = j * batch_size_test
+                to_train = (j + 1) * batch_size_train
+                to_test = (j + 1) * batch_size_test
 
-            train_accuracy += model.forward(
-                inputs=train_ins[from_train:to_train],
-                answers=train_ans[from_train:to_train])
-            test_accuracy += model.forward(
-                inputs=test_ins[from_test:to_test],
-                answers=test_ans[from_test:to_test],
-                updates=())
-
-        train_accuracy /= n_batch
-        test_accuracy /= n_batch
+                train_accuracy += model.forward(
+                    inputs=train_ins[from_train:to_train],
+                    answers=train_ans[from_train:to_train])
+                test_accuracy += model.forward(
+                    inputs=test_ins[from_test:to_test],
+                    answers=test_ans[from_test:to_test],
+                    updates=())
+            train_accuracy /= n_batch
+            test_accuracy /= n_batch
 
         print "train : ", train_accuracy
         print "test : ", test_accuracy
@@ -110,7 +113,7 @@ def cubic_cnn(n_div=50, img_size=(128,128), is_boxel=False):
             xlabel="iteration", ylabel="accuracy", ylim=(0, 1))
 
     # 精度の保存
-    np.save(path_res_numpy_array + "/" + ymdt() + "_traain", train_accuracies)
+    np.save(path_res_numpy_array + "/" + ymdt() + "_train", train_accuracies)
     np.save(path_res_numpy_array + "/" + ymdt() + "_test", test_accuracies)
 
 

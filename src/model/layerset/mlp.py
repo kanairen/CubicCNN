@@ -23,6 +23,7 @@ class MLP(object):
 
     def forward(self, inputs, answers, updates=None, givens={}):
 
+        # print self.l2.output(self.l1.output(self.inputs_symbol)).eval({self.inputs_symbol:inputs})
         if updates is None:
             updates = self.update()
 
