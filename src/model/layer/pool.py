@@ -14,7 +14,7 @@ class PoolLayer(FilterLayer):
     POOL_AVERAGE = 1
 
     def __init__(self, img_size, in_channel, k_size, stride=None, T=None,
-                 h=None, pad=0, dtype=config.floatX, activation=relu,
+                 W=None, pad=0, dtype=config.floatX, activation=relu,
                  pool_type=POOL_MAX):
 
         # フィルタサイズ
@@ -27,12 +27,12 @@ class PoolLayer(FilterLayer):
             stride = k_size
 
         # フィルタベクトル
-        if h is None:
-            h = np.ones((in_channel, in_channel, kh, kw), dtype=dtype)
-        self.h = shared(h, name='h', borrow=True)
+        if W is None:
+            W = np.ones((in_channel, in_channel, kh, kw), dtype=dtype)
+        self.W = shared(W, name='W', borrow=True)
 
         super(PoolLayer, self).__init__(img_size, in_channel, in_channel,
-                                        k_size, stride, T, None, True, h,
+                                        k_size, stride, T, None, True, W,
                                         dtype, activation)
 
     def update(self, cost, learning_rate=0.001):

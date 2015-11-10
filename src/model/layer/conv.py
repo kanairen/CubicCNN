@@ -9,13 +9,13 @@ __author__ = 'ren'
 
 class ConvLayer2d(FilterLayer):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
-                 T=None, b=None, no_bias=False, h=None,
+                 T=None, b=None, no_bias=False, W=None,
                  dtype=config.floatX, activation=None):
         """
         note:画像サイズに対してフィルタサイズが大きいと、後ろの層でエラーが起こる
         """
         super(ConvLayer2d, self).__init__(img_size, in_channel, out_channel,
-                                          k_size, stride, T, b, no_bias, h,
+                                          k_size, stride, T, b, no_bias, W,
                                           dtype, activation)
 
     def update(self, cost, learning_rate=0.001):
@@ -32,7 +32,7 @@ class ConvLayer2d(FilterLayer):
 
         # テンソル演算 u=Wx
         u = np.rollaxis(
-            T.tensordot(col, self.h, ((1, 2, 3), (1, 2, 3))) + self.b, 3, 1)
+            T.tensordot(col, self.W, ((1, 2, 3), (1, 2, 3))) + self.b, 3, 1)
 
         # 各出力を一次元配列に戻す
         reshaped_u = T.flatten(u, outdim=2)

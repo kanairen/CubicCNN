@@ -13,17 +13,16 @@ class MLP(object):
         self.answers_symbol = T.lvector('answers')
 
         self.layers = []
+        self.output = self.inputs_symbol
+        self.regularization_term = 0
         for name, layer in sorted(six.iteritems(layers)):
             setattr(self, name, layer)
             self.layers.append(layer)
-
-        self.output = self.inputs_symbol
-        for layer in self.layers:
             self.output = layer.output(self.output)
+            self.regularization_term += abs(layer.W).sum()
 
     def forward(self, inputs, answers, updates=None, givens={}):
 
-        # print self.l2.output(self.l1.output(self.inputs_symbol)).eval({self.inputs_symbol:inputs})
         if updates is None:
             updates = self.update()
 
@@ -34,8 +33,9 @@ class MLP(object):
 
         return f(inputs, answers)
 
-    def update(self, learning_rate=0.01):
-        cost = self.negative_log_likelihood(self.output, self.answers_symbol)
+    def update(self, learning_rate=0.01, regularization_rate=0.001):
+        cost = self.negative_log_likelihood(self.output,
+                                            self.answers_symbol) + regularization_rate * self.regularization_term
         updates = []
         for layer in self.layers:
             update = layer.update(cost, learning_rate)

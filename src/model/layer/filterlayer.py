@@ -11,7 +11,7 @@ __author__ = 'ren'
 
 class FilterLayer(LayerInterface):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
-                 T=None, b=None, no_bias=False, h=None,
+                 T=None, b=None, no_bias=False, W=None,
                  dtype=config.floatX, activation=None, cover_all=False):
 
         # 乱数生成器
@@ -54,13 +54,13 @@ class FilterLayer(LayerInterface):
         self.n_out = n_out
 
         # フィルタベクトル
-        if h is None:
-            h = np.asarray(
+        if W is None:
+            W = np.asarray(
                 self.rnd.uniform(low=-np.sqrt(1. / in_channel * kw * kh),
                                  high=np.sqrt(1. / in_channel * kw * kh),
                                  size=(out_channel, in_channel, kh, kw)),
                 dtype=dtype)
-        self.h = shared(h, name='h', borrow=True)
+        self.W = shared(W, name='W', borrow=True)
 
         # バイアスベクトル
         if not no_bias:
@@ -74,7 +74,7 @@ class FilterLayer(LayerInterface):
         self.activation = activation
 
         # 更新対象パラメタ
-        self.params = [self.h, ]
+        self.params = [self.W, ]
         if not no_bias:
             self.params.append(self.b)
 
