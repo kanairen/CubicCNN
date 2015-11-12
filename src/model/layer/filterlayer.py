@@ -1,10 +1,11 @@
 # coding:utf-8
 
-import six
 import numpy as np
+import six
 from theano import config, shared, tensor as T
+
+from src.model.layer.baselayer import BaseLayer
 from src.util.sequence import pair
-from src.interface.baselayer import BaseLayer
 
 __author__ = 'ren'
 

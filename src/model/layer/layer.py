@@ -2,8 +2,9 @@
 
 import numpy as np
 from theano import tensor as T, shared, config
+
+from src.model.layer.baselayer import BaseLayer
 from src.util.activation import relu
-from src.interface.baselayer import BaseLayer
 
 __author__ = 'ren'
 
