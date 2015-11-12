@@ -9,11 +9,11 @@ from src.util.activation import relu
 __author__ = 'ren'
 
 
-class Layer(BaseLayer):
+class HiddenLayer(BaseLayer):
     def __init__(self, n_in, n_out, W=None, b=None, dtype=config.floatX,
                  activation=None, is_dropout=False):
 
-        super(Layer, self).__init__(is_dropout)
+        super(HiddenLayer, self).__init__(is_dropout)
 
         # 入出力ユニット数
         self.n_in = n_in

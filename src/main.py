@@ -5,7 +5,7 @@ from src.helper.decorator import client
 from src.data.psb import PSB
 from src.data.image import Image
 from src.helper.visualize import plot_2d
-from src.model.layer.layer import Layer
+from src.model.layer.hiddenlayer import HiddenLayer
 from src.model.layer.conv import ConvLayer2d
 from src.model.layer.pool import PoolLayer
 from src.model.layerset.mlp import MLP
@@ -52,8 +52,8 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
     l1 = ConvLayer2d(n_in, in_channel=1, out_channel=8, k_size=4,
                      is_dropout=True)
     l2 = PoolLayer(l1.output_img_size(), in_channel=8, k_size=4)
-    l3 = Layer(l2.n_out, 1000)
-    l4 = Layer(l3.n_out, 500)
+    l3 = HiddenLayer(l2.n_out, 1000)
+    l4 = HiddenLayer(l3.n_out, 500)
 
     model = MLP(l1=l1, l2=l2, l3=l3, l4=l4)
     """
