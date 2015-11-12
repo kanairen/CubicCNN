@@ -22,24 +22,24 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
     print "loading data..."
     if is_boxel:
         # 点群データ
-        train_ins, train_ans = PSB.load_boxels(is_test=False)
-        test_ins, test_ans = PSB.load_boxels(is_test=True)
+        x_train, y_train = PSB.load_boxels(is_test=False)
+        x_test, y_test = PSB.load_boxels(is_test=True)
     else:
-        inputs, answers, images, r_images = Image.image_set(path_res_2d_pattern,
-                                                            Image.TRANS,
-                                                            size=img_size)
-        train_ins, test_ins, train_ans, test_ans, perm = Image.hold_out(
-            inputs, answers, train_rate=0.8)
+        x, y, images, r_images = Image.image_set(path_res_2d_pattern,
+                                                 Image.TRANS,
+                                                 size=img_size)
+        x_train, x_test, y_train, y_test, perm = Image.hold_out(x, y,
+                                                                train_rate=0.8)
 
     # numpy配列にしておくと、スライシングでコピーが発生しない
-    train_ins = np.array([inputs.flatten() for inputs in train_ins])
-    test_ins = np.array([inputs.flatten() for inputs in test_ins])
-    train_ans = np.array(train_ans)
-    test_ans = np.array(test_ans)
+    x_train = np.array([x.flatten() for x in x_train])
+    x_test = np.array([x.flatten() for x in x_test])
+    y_train = np.array(y_train)
+    y_test = np.array(y_test)
 
-    print "train data : ", len(train_ins)
-    print "test data : ", len(test_ins)
-    print "classes : ", len(set(train_ans.tolist() + test_ans.tolist()))
+    print "train data : ", len(x_train)
+    print "test data : ", len(x_test)
+    print "classes : ", len(set(y_train.tolist() + y_test.tolist()))
 
     """
     MODEL
@@ -50,7 +50,7 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
     n_in = n_div ** 3 if is_boxel else img_size
 
     l1 = ConvLayer2d(n_in, in_channel=1, out_channel=8, k_size=4,
-                     is_dropout=True)
+                     activation=relu, is_dropout=True)
     l2 = PoolLayer(l1.output_img_size(), in_channel=8, k_size=4)
     l3 = HiddenLayer(l2.n_out, 1000)
     l4 = HiddenLayer(l3.n_out, 500)
@@ -67,8 +67,8 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
     n_batch = 1
 
     # バッチサイズ
-    batch_size_train = len(train_ins) / n_batch
-    batch_size_test = len(test_ins) / n_batch
+    batch_size_train = len(x_train) / n_batch
+    batch_size_test = len(x_test) / n_batch
 
     # 訓練・テストにおける精度の時系列リスト
     train_accuracies = []
@@ -82,8 +82,8 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
         test_accuracy = 0
 
         if n_batch == 1:
-            train_accuracy = model.forward(train_ins, train_ans, True)
-            test_accuracy = model.forward(test_ins, test_ans, False, updates=())
+            train_accuracy = model.forward(x_train, y_train, True)
+            test_accuracy = model.forward(x_test, y_test, False, updates=())
         else:
             # バッチごとに学習
             for j in range(n_batch):
@@ -94,12 +94,12 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
                 to_test = (j + 1) * batch_size_test
 
                 train_accuracy += model.forward(
-                    inputs=train_ins[from_train:to_train],
-                    answers=train_ans[from_train:to_train],
+                    inputs=x_train[from_train:to_train],
+                    answers=y_train[from_train:to_train],
                     is_train=True)
                 test_accuracy += model.forward(
-                    inputs=test_ins[from_test:to_test],
-                    answers=test_ans[from_test:to_test],
+                    inputs=x_test[from_test:to_test],
+                    answers=y_test[from_test:to_test],
                     is_train=False,
                     updates=())
             train_accuracy /= n_batch
