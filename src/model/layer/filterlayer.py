@@ -4,12 +4,12 @@ import six
 import numpy as np
 from theano import config, shared, tensor as T
 from src.util.sequence import pair
-from src.interface.layerinterface import LayerInterface
+from src.interface.baselayer import BaseLayer
 
 __author__ = 'ren'
 
 
-class FilterLayer(LayerInterface):
+class FilterLayer(BaseLayer):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
                  T=None, b=None, no_bias=False, W=None,
                  dtype=config.floatX, activation=None, cover_all=False):

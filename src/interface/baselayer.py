@@ -3,7 +3,7 @@
 __author__ = 'ren'
 
 
-class LayerInterface(object):
+class BaseLayer(object):
     def __init__(self):
         pass
 
@@ -11,6 +11,6 @@ class LayerInterface(object):
         raise NotImplementedError(
             "layer objects should be implemented 'update'.")
 
-    def output(self, inputs_symbol):
+    def output(self, inputs_symbol, is_train):
         raise NotImplementedError(
             "layer objects should be implemented 'output'.")
