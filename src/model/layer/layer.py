@@ -7,11 +7,12 @@ from src.interface.baselayer import BaseLayer
 
 __author__ = 'ren'
 
-rnd = np.random.RandomState(1111)
 
 class Layer(BaseLayer):
     def __init__(self, n_in, n_out, W=None, b=None, dtype=config.floatX,
-                 activation=None):
+                 activation=None, is_dropout=False):
+
+        super(Layer, self).__init__(is_dropout)
 
         # 入出力ユニット数
         self.n_in = n_in
@@ -20,9 +21,9 @@ class Layer(BaseLayer):
         # 重み行列
         if W is None:
             W = shared(np.asarray(
-                rnd.uniform(low=-np.sqrt(6. / (n_in + n_out)),
-                            high=np.sqrt(6. / (n_in + n_out)),
-                            size=(n_out, n_in)),
+                self.rnd.uniform(low=-np.sqrt(6. / (n_in + n_out)),
+                                 high=np.sqrt(6. / (n_in + n_out)),
+                                 size=(n_out, n_in)),
                 dtype=dtype
             ), name='W', borrow=True)
 
@@ -48,4 +49,13 @@ class Layer(BaseLayer):
         return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
 
     def output(self, inputs_symbol):
-        return self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
+
+        z = self.activation(T.dot(inputs_symbol, self.W.T) + self.b)
+
+        if self.is_dropout:
+            if self.is_train:
+                z *= self.srnd.binomial(size=z.shape, p=0.5)
+            else:
+                z *= 0.5
+
+        return z

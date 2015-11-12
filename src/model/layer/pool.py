@@ -15,7 +15,7 @@ class PoolLayer(FilterLayer):
 
     def __init__(self, img_size, in_channel, k_size, stride=None, T=None,
                  W=None, pad=0, dtype=config.floatX, activation=relu,
-                 pool_type=POOL_MAX):
+                 is_dropout=False, cover_all=False, pool_type=POOL_MAX):
 
         # フィルタサイズ
         kw, kh = pair(k_size)
@@ -33,7 +33,8 @@ class PoolLayer(FilterLayer):
 
         super(PoolLayer, self).__init__(img_size, in_channel, in_channel,
                                         k_size, stride, T, None, True, W,
-                                        dtype, activation)
+                                        dtype, activation, cover_all,
+                                        is_dropout)
 
     def update(self, cost, learning_rate=0.001):
         return None
@@ -46,7 +47,15 @@ class PoolLayer(FilterLayer):
         else:
             raise RuntimeError("pool_type is invalid.")
 
-        return self.activation(output)
+        z = self.activation(output)
+
+        if self.is_dropout:
+            if self.is_train:
+                z *= self.srnd.binomial(size=z.shape, p=0.5)
+            else:
+                z *= 0.5
+
+        return z
 
     def max_pooling(self, inputs_symbol):
 

@@ -1,7 +1,6 @@
 # coding:utf-8
 
 import numpy as np
-
 from src.helper.decorator import client
 from src.data.psb import PSB
 from src.data.image import Image
@@ -10,12 +9,13 @@ from src.model.layer.layer import Layer
 from src.model.layer.conv import ConvLayer2d
 from src.model.layer.pool import PoolLayer
 from src.model.layerset.mlp import MLP
+from src.util.activation import relu
 from src.util.config import path_res_2d_pattern, path_res_numpy_array
 from src.util.time import ymdt
 
 
 @client
-def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
+def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
     """
     DATA
     """
@@ -49,10 +49,11 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
 
     n_in = n_div ** 3 if is_boxel else img_size
 
-    l1 = ConvLayer2d(n_in, in_channel=1, out_channel=16, k_size=4)
-    l2 = PoolLayer(l1.output_img_size(), in_channel=16, k_size=4)
-    l3 = Layer(l2.n_out, 2000)
-    l4 = Layer(l3.n_out, 1000)
+    l1 = ConvLayer2d(n_in, in_channel=1, out_channel=8, k_size=4,
+                     is_dropout=True)
+    l2 = PoolLayer(l1.output_img_size(), in_channel=8, k_size=4)
+    l3 = Layer(l2.n_out, 1000)
+    l4 = Layer(l3.n_out, 500)
 
     model = MLP(l1=l1, l2=l2, l3=l3, l4=l4)
     """
@@ -81,8 +82,8 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
         test_accuracy = 0
 
         if n_batch == 1:
-            train_accuracy = model.forward(train_ins, train_ans)
-            test_accuracy = model.forward(test_ins, test_ans, updates=())
+            train_accuracy = model.forward(train_ins, train_ans, True)
+            test_accuracy = model.forward(test_ins, test_ans, False, updates=())
         else:
             # バッチごとに学習
             for j in range(n_batch):
@@ -94,10 +95,12 @@ def cubic_cnn(n_div=50, img_size=(64,64), is_boxel=False):
 
                 train_accuracy += model.forward(
                     inputs=train_ins[from_train:to_train],
-                    answers=train_ans[from_train:to_train])
+                    answers=train_ans[from_train:to_train],
+                    is_train=True)
                 test_accuracy += model.forward(
                     inputs=test_ins[from_test:to_test],
                     answers=test_ans[from_test:to_test],
+                    is_train=False,
                     updates=())
             train_accuracy /= n_batch
             test_accuracy /= n_batch

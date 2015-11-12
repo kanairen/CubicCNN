@@ -21,7 +21,7 @@ class MLP(object):
             self.output = layer.output(self.output)
             self.regularization_term += abs(layer.W).sum()
 
-    def forward(self, inputs, answers, updates=None, givens={}):
+    def forward(self, inputs, answers, is_train, updates=None, givens={}):
 
         if updates is None:
             updates = self.update()
@@ -33,7 +33,7 @@ class MLP(object):
 
         return f(inputs, answers)
 
-    def update(self, learning_rate=0.01, regularization_rate=0.001):
+    def update(self, learning_rate=0.01, regularization_rate=0.00):
         cost = self.negative_log_likelihood(self.output,
                                             self.answers_symbol) + regularization_rate * self.regularization_term
         updates = []
