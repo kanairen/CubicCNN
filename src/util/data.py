@@ -60,3 +60,145 @@ def cifar10(data_home=path_res_2d):
     return x_train, x_test, y_train, y_test
 
 
+def pattern50_rotate(img_size, is_binary, is_flatten,
+                     data_home=path_res_2d_pattern,
+                     test_size=0.2, rotate_angle=20, step=1, dtype=np.int8):
+    return pattern50(img_size, 'rotate', is_binary, is_flatten, data_home,
+                     test_size, rotate_angle=rotate_angle, step=step,
+                     dtype=dtype)
+
+
+def pattern50_trans(img_size, is_binary, is_flatten,
+                    data_home=path_res_2d_pattern,
+                    test_size=0.2, trans_x=(-4, 4), trans_y=(-5, 5),
+                    dtype=np.int8):
+    return pattern50(img_size, 'trans', is_binary, is_flatten, data_home,
+                     test_size, trans_x=trans_x, trans_y=trans_y, dtype=dtype)
+
+
+def pattern50_distort(img_size, is_binary, is_flatten,
+                      data_home=path_res_2d_pattern, test_size=0.2,
+                      distorted_size=(64, 64), n_images=4, dtype=np.int8):
+    return pattern50(img_size, 'distort', is_binary, is_flatten, data_home,
+                     test_size, distorted_size=distorted_size,
+                     n_images=n_images, dtype=dtype)
+
+
+def pattern50(img_size, process, is_binary, is_flatten,
+              data_home=path_res_2d_pattern, test_size=0.2, step=1,
+              rotate_angle=20, trans_x=(-4, 4), trans_y=(-5, 5),
+              distorted_size=(64, 64), n_images=4,
+              dtype=np.int8):
+    # 入力データリスト
+    x = []
+    # 正解データリスト
+    y = []
+
+    # 指定された変換を画像に適用し、変換結果をリストで受け取る
+
+    for i, f_name in enumerate(os.listdir(data_home)):
+        # 元画像
+        image = PIL.Image.open(data_home + "/" + f_name)
+
+        # 二値画像に変換
+        if is_binary:
+            image = image.convert('1')
+
+        # 画像サイズ変更
+        image = image.resize(img_size)
+
+        # 処理後の
+        if process == 'rotate':
+            images = rotate_images(image, rotate_angle, step)
+        elif process == 'trans':
+            images = translate_images(image, trans_x, trans_y, step)
+        elif process == 'distort':
+            images = distort_images(image, distorted_size, n_images)
+        else:
+            images = [image]
+
+        if is_flatten:
+            images = [np.asarray(img).astype(dtype).flatten() for img in images]
+        else:
+            images = [np.asarray(img).astype(dtype) for img in images]
+
+        # 入力リストに画像データを追加
+        x.extend(images)
+        # 正解リストに正解ラベルを追加
+        y.extend([i] * len(images))
+
+    x = np.array(x, dtype=dtype)
+    y = np.array(y, dtype=np.int32)
+
+    if is_binary and not is_flatten:
+        x = x.reshape((len(x), 1, x.shape[1], x.shape[2]))
+
+    return train_test_split(x, y, test_size=test_size)
+
+
+def rotate_images(image, angle, step):
+    return [image.rotate(r) for r in range(angle)]
+
+
+def translate_images(image, trans_x, trans_y, step):
+    assert len(trans_x) == 2
+    assert len(trans_y) == 2
+
+    def translate(img, tx, ty):
+        return img.transform(size=img.size,
+                             method=PIL.Image.AFFINE,
+                             data=(1, 0, tx, 0, 1, ty))
+
+    # 画像の平行移動
+    t_range_x = range(trans_x[0], trans_x[1], step)
+    t_range_y = range(trans_y[0], trans_y[1], step)
+    t_imgs_2d = [[translate(image, w, h) for w in t_range_x] for h in
+                 t_range_y]
+    return list(itertools.chain(*t_imgs_2d))
+
+
+def distort_images(image, newsize, n_images=4):
+    def distort(img, newsize):
+        w, h = img.size
+        new_w, new_h = newsize
+
+        assert w > new_w and h > new_h
+
+        new_array = np.zeros(newsize)
+
+        rnd = np.random.RandomState()
+
+        kw = w / new_w
+        kh = h / new_h
+
+        for j in xrange(new_h):
+            for i in xrange(new_w):
+                old_i = rnd.randint(low=0, high=kw) + i * kw
+                old_j = rnd.randint(low=0, high=kh) + j * kh
+                new_array[j][i] = img.getpixel((old_j, old_i))
+
+        return PIL.Image.fromarray(new_array)
+
+    images = []
+    for i in xrange(n_images):
+        distorted_image = distort(image, newsize)
+        images.append(distorted_image)
+
+    return images
+
+
+def scale(image, pw, ph):
+    w, h = image.size
+    cropped_image = image.crop((pw, ph, w - pw, h - ph))
+    resize_image = cropped_image.resize((w, h))
+
+    return resize_image
+
+
+def translate_with_zoom(image, pw, ph, zoom=1.5):
+    w, h = image.size
+    cropped_image = image.crop(
+        (pw, ph, pw + int(w / zoom), ph + int(h / zoom)))
+    resize_image = cropped_image.resize((w, h))
+
+    return resize_image
