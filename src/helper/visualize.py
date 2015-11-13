@@ -2,6 +2,7 @@
 
 import six
 import numpy as np
+import PIL.Image
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -100,3 +101,31 @@ def plot_2d(array_dict, xlabel, ylabel, xlim=None, ylim=None,
         pyplot.ylim(ylim)
     pyplot.rcParams['font.size'] = font_size
     pyplot.show()
+
+
+def merge_images(images, img_size, mode, row=1, pad=0, bgcolor=(0, 0, 0)):
+    # 背景色はRGB
+    assert len(bgcolor) == 3
+
+    # 各画像のサイズ
+    w, h = img_size
+
+    # 大枠のサイズ
+    cw = (w + pad) * (len(images) / row) + pad
+    ch = (h + pad) * row + pad
+
+    # 複数画像をまとめた画像
+    canvas = PIL.Image.new(mode, (cw, ch), color=bgcolor)
+
+    # 複数の画像を一枚の画像に敷き詰めるように貼り付ける
+    x = pad
+    y = pad
+    for image in images:
+        image = image.resize(img_size)
+        canvas.paste(image, box=(x, y))
+        x += w + pad
+        if x >= cw:
+            x = pad
+            y += h + pad
+
+    return canvas
