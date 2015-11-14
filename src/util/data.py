@@ -21,11 +21,14 @@ def mnist(data_home=path_res_2d, test_size=0.2, is_normalized=False,
     x = mnist.data.astype(x_dtype)
     y = mnist.target.astype(y_dtype)
 
+    if is_normalized:
+        x /= max(x)
+
     x_train, x_test, y_train, y_test = train_test_split(x, y,
                                                         test_size=test_size)
-
-    x_test = x_test.reshape(len(x_test), 1, 24, 24)
-    x_train = x_train.reshape(len(x_train, 1, 24, 24))
+    print x_test.shape
+    x_test = x_test.reshape((len(x_test), 1, 28, 28))
+    x_train = x_train.reshape((len(x_train), 1, 28, 28))
 
     return x_train, x_test, y_train, y_test
 
