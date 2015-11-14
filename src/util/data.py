@@ -44,7 +44,7 @@ def cifar10(data_home=path_res_2d):
 
     for i in xrange(1, 6):
         data_dictionary = unpickle(path + "/data_batch_%d" % i)
-        if x_train == None:
+        if x_train is None:
             x_train = data_dictionary['data']
         else:
             x_train = np.vstack((x_train, data_dictionary['data']))
@@ -78,16 +78,17 @@ def pattern50_trans(img_size, is_binary, is_flatten,
 
 def pattern50_distort(img_size, is_binary, is_flatten,
                       data_home=path_res_2d_pattern, test_size=0.2,
-                      distorted_size=(64, 64), n_images=4, dtype=np.int8):
+                      distorted_size=(64, 64), n_images=4, fix_distort=False,
+                      dtype=np.int8):
     return pattern50(img_size, 'distort', is_binary, is_flatten, data_home,
                      test_size, distorted_size=distorted_size,
-                     n_images=n_images, dtype=dtype)
+                     n_images=n_images, fix_distort=fix_distort, dtype=dtype)
 
 
 def pattern50(img_size, process, is_binary, is_flatten,
               data_home=path_res_2d_pattern, test_size=0.2, step=1,
               rotate_angle=20, trans_x=(-4, 4), trans_y=(-5, 5),
-              distorted_size=(64, 64), n_images=4,
+              distorted_size=(64, 64), n_images=4, fix_distort=False,
               dtype=np.int8):
     # 入力データリスト
     x = []
@@ -113,7 +114,8 @@ def pattern50(img_size, process, is_binary, is_flatten,
         elif process == 'trans':
             images = translate_images(image, trans_x, trans_y, step)
         elif process == 'distort':
-            images = distort_images(image, distorted_size, n_images)
+            images = distort_images(image, distorted_size, n_images,
+                                    fix_distort)
         else:
             images = [image]
 
@@ -157,31 +159,40 @@ def translate_images(image, trans_x, trans_y, step):
     return list(itertools.chain(*t_imgs_2d))
 
 
-def distort_images(image, newsize, n_images=4):
-    def distort(img, newsize):
-        w, h = img.size
-        new_w, new_h = newsize
+def distort_images(image, newsize, n_images=4, fix_distort=False):
+    # 圧縮前の画像サイズ
+    w, h = image.size
 
-        assert w > new_w and h > new_h
+    # 圧縮後の画像サイズ
+    new_w, new_h = newsize
+
+    # 圧縮時の画素選択範囲サイズ
+    kw = w / new_w
+    kh = h / new_h
+
+    assert w > new_w and h > new_h
+
+    rnd = np.random.RandomState()
+
+    if fix_distort:
+        seeds = np.random.randint(low=0, high=9999, size=(n_images,))
+
+    images = []
+
+    for k in xrange(n_images):
 
         new_array = np.zeros(newsize)
 
-        rnd = np.random.RandomState()
-
-        kw = w / new_w
-        kh = h / new_h
+        if fix_distort:
+            rnd.seed(seeds[k])
 
         for j in xrange(new_h):
             for i in xrange(new_w):
                 old_i = rnd.randint(low=0, high=kw) + i * kw
                 old_j = rnd.randint(low=0, high=kh) + j * kh
-                new_array[j][i] = img.getpixel((old_j, old_i))
+                new_array[j][i] = image.getpixel((old_j, old_i))
 
-        return PIL.Image.fromarray(new_array)
-
-    images = []
-    for i in xrange(n_images):
-        distorted_image = distort(image, newsize)
+        distorted_image = PIL.Image.fromarray(new_array)
         images.append(distorted_image)
 
     return images
