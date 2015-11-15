@@ -12,7 +12,7 @@ from src.util.config import path_res_2d, path_res_2d_pattern
 __author__ = 'ren'
 
 
-def mnist(data_home=path_res_2d, test_size=0.2, is_normalized=False,
+def mnist(data_home=path_res_2d, test_size=0.2, is_normalized=True,
           x_dtype=np.float32, y_dtype=np.int32):
     # MNIST手書き文字データ data_homeのデータを読み込む
     # データがない場合はWEB上からダウンロード
@@ -22,18 +22,17 @@ def mnist(data_home=path_res_2d, test_size=0.2, is_normalized=False,
     y = mnist.target.astype(y_dtype)
 
     if is_normalized:
-        x /= max(x)
+        x /= x.max()
 
     x_train, x_test, y_train, y_test = train_test_split(x, y,
                                                         test_size=test_size)
-    print x_test.shape
     x_test = x_test.reshape((len(x_test), 1, 28, 28))
     x_train = x_train.reshape((len(x_train), 1, 28, 28))
 
     return x_train, x_test, y_train, y_test
 
 
-def cifar10(data_home=path_res_2d):
+def cifar10(data_home=path_res_2d, is_normalized=True):
     def unpickle(file):
         fo = open(file, 'rb')
         dict = cPickle.load(fo)
@@ -59,6 +58,10 @@ def cifar10(data_home=path_res_2d):
     y_train = np.array(y_train)
     x_train = x_train.reshape((len(x_train), 3, 32, 32))
     y_test = np.array(test_data_dictionary['labels'])
+
+    if is_normalized:
+        x_test /= x_test.max()
+        x_train /= x_train.max()
 
     return x_train, x_test, y_train, y_test
 
