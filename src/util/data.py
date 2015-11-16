@@ -112,7 +112,8 @@ def pattern50(img_size, process, is_binary, is_flatten,
             image = image.convert('1')
 
         # 画像サイズ変更
-        image = image.resize(img_size)
+        if img_size is not None:
+            image = image.resize(img_size)
 
         # 処理後の
         if process == 'rotate':

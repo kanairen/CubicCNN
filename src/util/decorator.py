@@ -19,4 +19,4 @@ def client(func):
         stop = time.clock()
         print "process time : ", stop - start, " s"
 
-    return lambda : timer_func(func)
+    return lambda: timer_func(func)
