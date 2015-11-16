@@ -21,22 +21,17 @@ class HiddenLayer(BaseLayer):
 
         # 重み行列
         if W is None:
-            W = shared(np.asarray(
-                self.rnd.uniform(low=-np.sqrt(6. / (n_in + n_out)),
-                                 high=np.sqrt(6. / (n_in + n_out)),
-                                 size=(n_out, n_in)),
-                dtype=dtype
-            ), name='W', borrow=True)
-
+            W = np.asarray(self.rnd.uniform(low=-np.sqrt(6. / (n_in + n_out)),
+                                            high=np.sqrt(6. / (n_in + n_out)),
+                                            size=(n_out, n_in)), dtype=dtype)
             if activation == T.nnet.sigmoid:
                 W *= 4.
-        self.W = W
+        self.W = shared(W, name='W', borrow=True)
 
         # バイアスベクトル
         if b is None:
-            b = shared(np.zeros(shape=(n_out,), dtype=dtype), name='b',
-                       borrow=True)
-        self.b = b
+            b = np.zeros(shape=(n_out,), dtype=dtype)
+        self.b = shared(b, name='b', borrow=True)
 
         # 活性化関数
         if activation is None:
@@ -45,7 +40,7 @@ class HiddenLayer(BaseLayer):
 
         self.params = self.W, self.b
 
-    def update(self, cost, learning_rate=0.01):
+    def update(self, cost, learning_rate=0.1):
         grads = T.grad(cost, self.params)
         return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
 
