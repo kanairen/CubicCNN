@@ -1,10 +1,11 @@
 # coding:utf-8
 
 import os
+
 import numpy as np
 
 from src.util.config import path_res_numpy_array
-from src.helper.visualize import plot_2d
+from src.util.visualize import plot_2d
 
 __author__ = 'ren'
 
