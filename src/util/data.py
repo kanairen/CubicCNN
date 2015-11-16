@@ -55,26 +55,38 @@ def cifar10(data_home=path_res_2d, is_normalized=True, is_grayscale=False,
 
     test_data_dictionary = unpickle(path + "/test_batch")
 
-    x_train = x_train.astype(x_dtype)
-    x_test = test_data_dictionary['data'].astype(x_dtype)
-    y_train = np.array(y_train).astype(y_dtype)
-    y_test = np.array(test_data_dictionary['labels']).astype(y_dtype)
+    x_test = test_data_dictionary['data']
+    y_train = np.array(y_train)
+    y_test = np.array(test_data_dictionary['labels'])
+
+    x_test = x_test.reshape(len(x_test), 3, 32, 32)
+    x_train = x_train.reshape((len(x_train), 3, 32, 32))
 
     if is_grayscale:
-        x_test = x_test.mean(axis=1).reshape((len(x_test), 1, 32, 32))
-        x_train = x_train.mean(axis=1).reshape((len(x_train), 1, 32, 32))
-    else:
-        x_test = x_test.reshape(len(x_test), 3, 32, 32)
-        x_train = x_train.reshape((len(x_train), 3, 32, 32))
+        c, h, w = x_test.shape[1:]
+        x_test_mean = np.zeros((len(x_test), h, w))
+        x_train_mean = np.zeros((len(x_train), h, w))
+        for i in xrange(c):
+            x_test_mean += x_test[:, i, :, :]
+            x_train_mean += x_train[:, i, :, :]
+        x_test_mean /= c
+        x_train_mean /= c
+        x_test = x_test_mean.reshape((len(x_test), 1, 32, 32))
+        x_train = x_train_mean.reshape((len(x_train), 1, 32, 32))
 
     if is_normalized:
         x_test /= x_test.max()
         x_train /= x_train.max()
 
+    x_test = x_test.astype(x_dtype)
+    x_train = x_train.astype(x_dtype)
+    y_test = y_test.astype(y_dtype)
+    y_train = y_train.astype(y_dtype)
+
     return x_train, x_test, y_train, y_test
 
 
-def pattern50_rotate(img_size, is_binary, is_flatten,
+def pattern50_rotate(img_size=None, is_binary=True, is_flatten=False,
                      data_home=path_res_2d_pattern,
                      test_size=0.2, rotate_angle=20, step=1, dtype=np.int8):
     return pattern50(img_size, 'rotate', is_binary, is_flatten, data_home,
@@ -82,7 +94,7 @@ def pattern50_rotate(img_size, is_binary, is_flatten,
                      dtype=dtype)
 
 
-def pattern50_trans(img_size, is_binary, is_flatten,
+def pattern50_trans(img_size=None, is_binary=True, is_flatten=False,
                     data_home=path_res_2d_pattern,
                     test_size=0.2, trans_x=(-4, 4), trans_y=(-5, 5),
                     dtype=np.int8):
@@ -90,9 +102,9 @@ def pattern50_trans(img_size, is_binary, is_flatten,
                      test_size, trans_x=trans_x, trans_y=trans_y, dtype=dtype)
 
 
-def pattern50_distort(img_size, is_binary, is_flatten,
+def pattern50_distort(img_size=None, is_binary=True, is_flatten=False,
                       data_home=path_res_2d_pattern, test_size=0.2,
-                      distorted_size=(64, 64), n_images=4, fix_distort=False,
+                      distorted_size=(64, 64), n_images=20, fix_distort=False,
                       dtype=np.int8):
     return pattern50(img_size, 'distort', is_binary, is_flatten, data_home,
                      test_size, distorted_size=distorted_size,
