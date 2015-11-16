@@ -32,7 +32,8 @@ def mnist(data_home=path_res_2d, test_size=0.2, is_normalized=True,
     return x_train, x_test, y_train, y_test
 
 
-def cifar10(data_home=path_res_2d, is_normalized=True):
+def cifar10(data_home=path_res_2d, is_normalized=True, is_grayscale=False,
+            x_dtype=np.float32, y_dtype=np.int32):
     def unpickle(file):
         fo = open(file, 'rb')
         dict = cPickle.load(fo)
@@ -53,11 +54,18 @@ def cifar10(data_home=path_res_2d, is_normalized=True):
         y_train = y_train + data_dictionary['labels']
 
     test_data_dictionary = unpickle(path + "/test_batch")
-    x_test = test_data_dictionary['data']
-    x_test = x_test.reshape(len(x_test), 3, 32, 32)
-    y_train = np.array(y_train)
-    x_train = x_train.reshape((len(x_train), 3, 32, 32))
-    y_test = np.array(test_data_dictionary['labels'])
+
+    x_train = x_train.astype(x_dtype)
+    x_test = test_data_dictionary['data'].astype(x_dtype)
+    y_train = np.array(y_train).astype(y_dtype)
+    y_test = np.array(test_data_dictionary['labels']).astype(y_dtype)
+
+    if is_grayscale:
+        x_test = x_test.mean(axis=1).reshape((len(x_test), 1, 32, 32))
+        x_train = x_train.mean(axis=1).reshape((len(x_train), 1, 32, 32))
+    else:
+        x_test = x_test.reshape(len(x_test), 3, 32, 32)
+        x_train = x_train.reshape((len(x_train), 3, 32, 32))
 
     if is_normalized:
         x_test /= x_test.max()
