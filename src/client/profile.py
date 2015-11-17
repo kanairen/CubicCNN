@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import cProfile
-from main import cubic_cnn
+from main import image_recognition
 
 __author__ = 'ren'
 

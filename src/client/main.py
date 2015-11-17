@@ -14,7 +14,7 @@ from src.util.visualize import plot_2d
 
 
 @client
-def cubic_cnn(n_div=50, type='distort'):
+def image_recognition(n_div=50, type='distort'):
     # 入力画像の決定
     if type == 'distort':
         x_train, x_test, y_train, y_test = pattern50_distort()
@@ -45,7 +45,7 @@ def cubic_cnn(n_div=50, type='distort'):
     l3 = HiddenLayer(l2.n_out, 1000, activation=relu)
     l4 = HiddenLayer(l3.n_out, 500, activation=relu)
 
-    model = MLP(l1=l1, l2=l2, l3=l3,l4=l4)
+    model = MLP(l1=l1, l2=l2, l3=l3, l4=l4)
     """
     TRAIN
     """
@@ -111,4 +111,4 @@ def cubic_cnn(n_div=50, type='distort'):
 
 
 if __name__ == '__main__':
-    cubic_cnn()
+    image_recognition()
