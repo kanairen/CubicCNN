@@ -1,41 +1,34 @@
 # coding:utf-8
 
 import numpy as np
-from src.helper.decorator import client
-from src.data.psb import PSB
-from src.data.image import Image
-from src.helper.visualize import plot_2d
-from src.model.layer.hiddenlayer import HiddenLayer
+from src.util.decorator import client
 from src.model.layer.conv import ConvLayer2d
+from src.model.layer.hiddenlayer import HiddenLayer
 from src.model.layer.pool import PoolLayer
 from src.model.layerset.mlp import MLP
 from src.util.activation import relu
-from src.util.config import path_res_2d_pattern, path_res_numpy_array
-from src.util.time import ymdt
+from src.util.config import path_res_numpy_array
+from src.util.data import mnist, cifar10, pattern50_distort
+from src.util.date import ymdt
+from src.util.visualize import plot_2d
 
 
 @client
-def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
-    """
-    DATA
-    """
-    print "loading data..."
-    if is_boxel:
-        # 点群データ
-        x_train, y_train = PSB.load_boxels(is_test=False)
-        x_test, y_test = PSB.load_boxels(is_test=True)
-    else:
-        x, y, images, r_images = Image.image_set(path_res_2d_pattern,
-                                                 Image.TRANS,
-                                                 size=img_size)
-        x_train, x_test, y_train, y_test, perm = Image.hold_out(x, y,
-                                                                train_rate=0.8)
+def cubic_cnn(n_div=50, type='distort'):
+    # 入力画像の決定
+    if type == 'distort':
+        x_train, x_test, y_train, y_test = pattern50_distort()
+    elif type == 'cifar':
+        x_train, x_test, y_train, y_test = cifar10()
+    elif type == 'mnist':
+        x_train, x_test, y_train, y_test = mnist()
 
-    # numpy配列にしておくと、スライシングでコピーが発生しない
-    x_train = np.array([x.flatten() for x in x_train])
-    x_test = np.array([x.flatten() for x in x_test])
-    y_train = np.array(y_train)
-    y_test = np.array(y_test)
+    # 入力画像のチャネルとサイズ
+    n, c, h, w = x_train.shape
+
+    # 入力データの平坦化
+    x_train = x_train.reshape(len(x_train), c * w * h)
+    x_test = x_test.reshape(len(x_test), c * w * h)
 
     print "train data : ", len(x_train)
     print "test data : ", len(x_test)
@@ -47,24 +40,21 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
 
     print "preparing models..."
 
-    n_in = n_div ** 3 if is_boxel else img_size
+    l1 = ConvLayer2d((h, w), c, 8, k_size=4, activation=relu)
+    l2 = PoolLayer(l1.output_img_size(), 8, k_size=4, activation=relu)
+    l3 = HiddenLayer(l2.n_out, 1000, activation=relu)
+    l4 = HiddenLayer(l3.n_out, 500, activation=relu)
 
-    l1 = ConvLayer2d(n_in, in_channel=1, out_channel=8, k_size=4,
-                     activation=relu, is_dropout=True)
-    l2 = PoolLayer(l1.output_img_size(), in_channel=8, k_size=4)
-    l3 = HiddenLayer(l2.n_out, 1000)
-    l4 = HiddenLayer(l3.n_out, 500)
-
-    model = MLP(l1=l1, l2=l2, l3=l3, l4=l4)
+    model = MLP(l1=l1, l2=l2, l3=l3,l4=l4)
     """
     TRAIN
     """
 
     # トレーニング繰り返し回数
-    n_iter = 1000
+    n_iter = 100
 
     # バッチ数
-    n_batch = 1
+    n_batch = 50
 
     # バッチサイズ
     batch_size_train = len(x_train) / n_batch
@@ -113,7 +103,7 @@ def cubic_cnn(n_div=50, img_size=(64, 64), is_boxel=False):
 
     # グラフの描画
     plot_2d({"train": train_accuracies, "test": test_accuracies},
-            xlabel="iteration", ylabel="accuracy", ylim=(0, 1))
+            x_label="iteration", y_label="accuracy", y_lim=(0, 1))
 
     # 精度の保存
     np.save(path_res_numpy_array + "/" + ymdt() + "_train", train_accuracies)
