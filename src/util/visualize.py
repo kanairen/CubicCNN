@@ -3,6 +3,7 @@
 import six
 import numpy as np
 import PIL.Image
+import date
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -87,19 +88,40 @@ def plot_boxel(boxels,
     pyplot.show()
 
 
-def plot_2d(array_dict, xlabel, ylabel, xlim=None, ylim=None,
-            locate="lower right", font_size=20):
+def plot_2d(array_dict, x_label, y_label, x_lim=None, y_lim=None, grid=True,
+            locate="lower right", font_size=20, seaborn=False, save=False):
+    if seaborn:
+        import seaborn
+
     # グラフの描画
     for name, value in six.iteritems(array_dict):
         pyplot.plot(value, label=name)
     pyplot.legend(loc=locate)
-    pyplot.xlabel(xlabel)
-    pyplot.ylabel(ylabel)
-    if xlim:
-        pyplot.xlim(xlim)
-    if ylim:
-        pyplot.ylim(ylim)
-    pyplot.rcParams['font.size'] = font_size
+    pyplot.xlabel(x_label)
+    pyplot.ylabel(y_label)
+
+    # 表示範囲
+    if x_lim:
+        pyplot.xlim(x_lim)
+    if y_lim:
+        pyplot.ylim(y_lim)
+
+    # グリッド
+    if grid:
+        if seaborn:
+            seaborn.set_style('whitegrid')
+        else:
+            pyplot.grid()
+
+    # フォントサイズ
+    if seaborn:
+        seaborn.set(font_scale=font_size)
+    else:
+        pyplot.rcParams['font.size'] = font_size
+
+    if save:
+        pyplot.savefig(date.ymdt() + ".png")
+
     pyplot.show()
 
 
