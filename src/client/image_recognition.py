@@ -49,6 +49,8 @@ def image_recognition(n_div=50, type='distort'):
     """
     TRAIN
     """
+    # 学習開始時刻文字列(精度保存時に使う)
+    start = ymdt()
 
     # トレーニング繰り返し回数
     n_iter = 100
@@ -68,16 +70,17 @@ def image_recognition(n_div=50, type='distort'):
 
         print "{}st learning...".format(i)
 
-        train_accuracy = 0
-        test_accuracy = 0
-
         if n_batch == 1:
             train_accuracy = model.forward(x_train, y_train, True)
             test_accuracy = model.forward(x_test, y_test, False, updates=())
         else:
+            train_accuracy = 0
+            test_accuracy = 0
+
             # バッチごとに学習
             for j in range(n_batch):
                 print "{}st batch...".format(j)
+
                 from_train = j * batch_size_train
                 from_test = j * batch_size_test
                 to_train = (j + 1) * batch_size_train
@@ -92,6 +95,7 @@ def image_recognition(n_div=50, type='distort'):
                     answers=y_test[from_test:to_test],
                     is_train=False,
                     updates=())
+
             train_accuracy /= n_batch
             test_accuracy /= n_batch
 
@@ -101,13 +105,13 @@ def image_recognition(n_div=50, type='distort'):
         train_accuracies.append(train_accuracy)
         test_accuracies.append(test_accuracy)
 
+        # 精度の保存（途中で終了しても良いように、一回ごとに更新）
+        np.save(path_res_numpy_array + "/" + start + "_train", train_accuracies)
+        np.save(path_res_numpy_array + "/" + start + "_test", test_accuracies)
+
     # グラフの描画
     plot_2d({"train": train_accuracies, "test": test_accuracies},
             x_label="iteration", y_label="accuracy", y_lim=(0, 1))
-
-    # 精度の保存
-    np.save(path_res_numpy_array + "/" + ymdt() + "_train", train_accuracies)
-    np.save(path_res_numpy_array + "/" + ymdt() + "_test", test_accuracies)
 
 
 if __name__ == '__main__':
