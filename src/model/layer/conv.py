@@ -1,6 +1,7 @@
 # coding:utf-8
 
 import numpy as np
+import PIL.Image
 from theano import config, tensor as T
 from filterlayer import FilterLayer
 
@@ -19,7 +20,7 @@ class ConvLayer2d(FilterLayer):
                                           dtype, activation, cover_all,
                                           is_dropout)
 
-    def update(self, cost, learning_rate=0.001):
+    def update(self, cost, learning_rate=0.1):
         grads = T.grad(cost, self.params)
         return [(p, p - learning_rate * g) for p, g in zip(self.params, grads)]
 
@@ -48,3 +49,11 @@ class ConvLayer2d(FilterLayer):
                 z *= 0.5
 
         return z
+
+    def filter_image(self):
+        filters = self.W.get_value().copy()
+        f_images = []
+        for f in filters:
+            f_img = PIL.Image.fromarray(f, mode='RGB')
+            f_images.append(f_img)
+        return f_images
