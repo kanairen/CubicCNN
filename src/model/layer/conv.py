@@ -4,6 +4,7 @@ import numpy as np
 import PIL.Image
 from theano import config, tensor as T
 from filterlayer import FilterLayer
+from src.util.image import gradation_8bit
 
 __author__ = 'ren'
 
@@ -51,9 +52,11 @@ class ConvLayer2d(FilterLayer):
         return z
 
     def filter_image(self):
-        filters = self.W.get_value().copy()
+        filters = gradation_8bit(self.W.get_value().copy())
         f_images = []
-        for f in filters:
-            f_img = PIL.Image.fromarray(f, mode='RGB')
-            f_images.append(f_img)
+        for out_c in xrange(self.out_channel):
+            for in_c in xrange(self.in_channel):
+                f = filters[out_c][in_c]
+                f_img = PIL.Image.fromarray(f)
+                f_images.append(f_img)
         return f_images

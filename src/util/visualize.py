@@ -125,10 +125,7 @@ def plot_2d(array_dict, x_label, y_label, x_lim=None, y_lim=None, grid=True,
     pyplot.show()
 
 
-def merge_images(images, img_size, mode, row=1, pad=0, bgcolor=(0, 0, 0)):
-    # 背景色はRGB
-    assert len(bgcolor) == 3
-
+def merge_images(images, img_size, row=1, pad=0, bgcolor=0):
     # 各画像のサイズ
     w, h = img_size
 
@@ -137,7 +134,7 @@ def merge_images(images, img_size, mode, row=1, pad=0, bgcolor=(0, 0, 0)):
     ch = (h + pad) * row + pad
 
     # 複数画像をまとめた画像
-    canvas = PIL.Image.new(mode, (cw, ch), color=bgcolor)
+    canvas = PIL.Image.new(images[0].mode, (cw, ch), bgcolor)
 
     # 複数の画像を一枚の画像に敷き詰めるように貼り付ける
     x = pad

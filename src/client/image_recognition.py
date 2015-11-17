@@ -10,7 +10,7 @@ from src.util.activation import relu
 from src.util.config import path_res_numpy_array
 from src.util.data import mnist, cifar10, pattern50_distort
 from src.util.date import ymdt
-from src.util.visualize import plot_2d
+from src.util.visualize import plot_2d, merge_images
 
 
 @client
@@ -108,6 +108,9 @@ def image_recognition(n_div=50, type='distort'):
         # 精度の保存（途中で終了しても良いように、一回ごとに更新）
         np.save(path_res_numpy_array + "/" + start + "_train", train_accuracies)
         np.save(path_res_numpy_array + "/" + start + "_test", test_accuracies)
+
+    # 畳み込み層のフィルタ画像を保存
+    merge_images(l1.filter_image(), (w, h), pad=10).save(ymdt() + ".png")
 
     # グラフの描画
     plot_2d({"train": train_accuracies, "test": test_accuracies},
