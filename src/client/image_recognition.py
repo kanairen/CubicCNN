@@ -15,7 +15,7 @@ from src.util.visualize import plot_2d, merge_images
 
 
 @client
-def image_recognition(n_div=50, type='distort'):
+def image_recognition(n_div=50, type='cifar', show_batch_accuracies=True):
     # 入力画像の決定
     if type == 'distort':
         x_train, x_test, y_train, y_test = pattern50_distort()
@@ -98,6 +98,10 @@ def image_recognition(n_div=50, type='distort'):
                     answers=y_test[from_test:to_test],
                     is_train=False,
                     updates=())
+
+                if show_batch_accuracies:
+                    print "train : ", train_accuracy / (j + 1)
+                    print "test : ", test_accuracy / (j + 1)
 
             train_accuracy /= n_batch
             test_accuracy /= n_batch
