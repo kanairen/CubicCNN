@@ -14,7 +14,7 @@ class PoolLayer(FilterLayer):
     POOL_AVERAGE = 1
 
     def __init__(self, img_size, in_channel, k_size, stride=None, T=None,
-                 W=None, pad=0, dtype=config.floatX, activation=relu,
+                 W=None, pad=0, dtype=config.floatX, activation=lambda x: x,
                  is_dropout=False, cover_all=False, pool_type=POOL_MAX):
 
         # フィルタサイズ
