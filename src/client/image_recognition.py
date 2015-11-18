@@ -1,5 +1,6 @@
 # coding:utf-8
 
+import time
 import numpy as np
 from src.util.decorator import client
 from src.model.layer.conv import ConvLayer2d
@@ -50,13 +51,13 @@ def image_recognition(n_div=50, type='distort'):
     TRAIN
     """
     # 学習開始時刻文字列(精度保存時に使う)
-    start = ymdt()
+    ts = ymdt()
 
     # トレーニング繰り返し回数
     n_iter = 100
 
     # バッチ数
-    n_batch = 50
+    n_batch = 10
 
     # バッチサイズ
     batch_size_train = len(x_train) / n_batch
@@ -69,6 +70,8 @@ def image_recognition(n_div=50, type='distort'):
     for i in range(n_iter):
 
         print "{}st learning...".format(i)
+
+        start = time.clock()
 
         if n_batch == 1:
             train_accuracy = model.forward(x_train, y_train, True)
@@ -99,6 +102,10 @@ def image_recognition(n_div=50, type='distort'):
             train_accuracy /= n_batch
             test_accuracy /= n_batch
 
+        # 一回の学習時間
+        print "time : ", time.clock() - start, "s"
+
+        # 精度
         print "train : ", train_accuracy
         print "test : ", test_accuracy
 
@@ -106,8 +113,8 @@ def image_recognition(n_div=50, type='distort'):
         test_accuracies.append(test_accuracy)
 
         # 精度の保存（途中で終了しても良いように、一回ごとに更新）
-        np.save(path_res_numpy_array + "/" + start + "_train", train_accuracies)
-        np.save(path_res_numpy_array + "/" + start + "_test", test_accuracies)
+        np.save(path_res_numpy_array + "/" + ts + "_train", train_accuracies)
+        np.save(path_res_numpy_array + "/" + ts + "_test", test_accuracies)
 
     # 畳み込み層のフィルタ画像を保存
     merge_images(l1.filter_image(), (w, h), pad=10).save(ymdt() + ".png")
