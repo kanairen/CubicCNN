@@ -12,9 +12,8 @@ __author__ = 'ren'
 
 class FilterLayer(BaseLayer):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
-                 T=None, b=None, no_bias=False, W=None,
-                 dtype=config.floatX, activation=None, cover_all=False,
-                 is_dropout=False):
+                 b=None, no_bias=False, W=None, dtype=config.floatX,
+                 activation=None, cover_all=False, is_dropout=False):
 
         super(FilterLayer, self).__init__(is_dropout)
 

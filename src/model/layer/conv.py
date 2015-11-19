@@ -11,15 +11,14 @@ __author__ = 'ren'
 
 class ConvLayer2d(FilterLayer):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
-                 T=None, b=None, no_bias=False, W=None, dtype=config.floatX,
+                 b=None, no_bias=False, W=None, dtype=config.floatX,
                  activation=None, cover_all=False, is_dropout=False):
         """
         note:画像サイズに対してフィルタサイズが大きいと、後ろの層でエラーが起こる
         """
         super(ConvLayer2d, self).__init__(img_size, in_channel, out_channel,
-                                          k_size, stride, T, b, no_bias, W,
-                                          dtype, activation, cover_all,
-                                          is_dropout)
+                                          k_size, stride, b, no_bias, W, dtype,
+                                          activation, cover_all, is_dropout)
 
     def update(self, cost, learning_rate=0.1):
         grads = T.grad(cost, self.params)

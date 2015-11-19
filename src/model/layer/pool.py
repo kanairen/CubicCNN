@@ -13,9 +13,9 @@ class PoolLayer(FilterLayer):
     POOL_MAX = 0
     POOL_AVERAGE = 1
 
-    def __init__(self, img_size, in_channel, k_size, stride=None, T=None,
-                 W=None, pad=0, dtype=config.floatX, activation=lambda x: x,
-                 is_dropout=False, cover_all=False, pool_type=POOL_MAX):
+    def __init__(self, img_size, in_channel, k_size, stride=None, W=None, pad=0,
+                 dtype=config.floatX, activation=lambda x: x, is_dropout=False,
+                 cover_all=False, pool_type=POOL_MAX):
 
         # フィルタサイズ
         kw, kh = pair(k_size)
@@ -32,7 +32,7 @@ class PoolLayer(FilterLayer):
         self.W = shared(W, name='W', borrow=True)
 
         super(PoolLayer, self).__init__(img_size, in_channel, in_channel,
-                                        k_size, stride, T, None, True, W,
+                                        k_size, stride, None, True, W,
                                         dtype, activation, cover_all,
                                         is_dropout)
 
