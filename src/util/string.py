@@ -30,8 +30,8 @@ def istuple(string):
     return _isset(string, '(', ')')
 
 
-def _isset(string, first, last):
-    return string.find(first) == 0 and string.find(last) == len(string) - 1
+def _isset(string, start, end):
+    return string.startswith(start) and string.endswith(end)
 
 
 def tolist(string):
@@ -42,7 +42,6 @@ def totuple(string):
     return _toset(string, '(', ')')
 
 
-def _toset(string, first, last):
-    str_list = string.replace(first, "").replace(last, '').replace('.', '')
+def _toset(string, start, end):
+    str_list = string.replace(start, "").replace(end, '').replace('.', '')
     return list(map(int, str_list))
-
