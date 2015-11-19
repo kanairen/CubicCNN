@@ -1,6 +1,7 @@
 # coding:utf-8
 
 import ConfigParser
+import collections
 import string
 
 __author__ = 'ren'
@@ -10,7 +11,7 @@ def parse_ini(ini_file):
     ini = ConfigParser.SafeConfigParser()
     ini.read(ini_file)
 
-    item_list = []
+    item_set = collections.OrderedDict()
     for section in ini.sections():
         items = {}
 
@@ -27,6 +28,7 @@ def parse_ini(ini_file):
 
             items.setdefault(option, value)
 
-        item_list.append(items)
+        item_set.setdefault(section, items)
 
-    return item_list
+    return item_set
+
