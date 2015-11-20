@@ -43,5 +43,5 @@ def totuple(string):
 
 
 def _toset(string, start, end):
-    str_list = string.replace(start, "").replace(end, '').replace('.', '')
+    str_list = string.replace(start, '').replace(end, '').split(',')
     return list(map(int, str_list))
