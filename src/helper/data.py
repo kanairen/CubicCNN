@@ -10,6 +10,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.datasets import fetch_mldata
 
 from src.helper.config import path_res_2d, path_res_2d_pattern
+from src.util.image import translate, distort
 
 __author__ = 'ren'
 
@@ -175,11 +176,6 @@ def translate_images(image, trans_x, trans_y, step):
     assert len(trans_x) == 2
     assert len(trans_y) == 2
 
-    def translate(img, tx, ty):
-        return img.transform(size=img.size,
-                             method=PIL.Image.AFFINE,
-                             data=(1, 0, tx, 0, 1, ty))
-
     # 画像の平行移動
     t_range_x = range(trans_x[0], trans_x[1], step)
     t_range_y = range(trans_y[0], trans_y[1], step)
@@ -191,13 +187,8 @@ def translate_images(image, trans_x, trans_y, step):
 def distort_images(image, newsize, n_images=4, fix_distort=False):
     # 圧縮前の画像サイズ
     w, h = image.size
-
     # 圧縮後の画像サイズ
     new_w, new_h = newsize
-
-    # 圧縮時の画素選択範囲サイズ
-    kw = w / new_w
-    kh = h / new_h
 
     assert w > new_w and h > new_h
 
@@ -209,36 +200,9 @@ def distort_images(image, newsize, n_images=4, fix_distort=False):
     images = []
 
     for k in xrange(n_images):
-
-        new_array = np.zeros(newsize)
-
         if fix_distort:
             rnd.seed(seeds[k])
-
-        for j in xrange(new_h):
-            for i in xrange(new_w):
-                old_i = rnd.randint(low=0, high=kw) + i * kw
-                old_j = rnd.randint(low=0, high=kh) + j * kh
-                new_array[j][i] = image.getpixel((old_j, old_i))
-
-        distorted_image = PIL.Image.fromarray(new_array)
+        distorted_image = distort(image, newsize, rnd=rnd)
         images.append(distorted_image)
 
     return images
-
-
-def scale(image, pw, ph):
-    w, h = image.size
-    cropped_image = image.crop((pw, ph, w - pw, h - ph))
-    resize_image = cropped_image.resize((w, h))
-
-    return resize_image
-
-
-def translate_with_zoom(image, pw, ph, zoom=1.5):
-    w, h = image.size
-    cropped_image = image.crop(
-        (pw, ph, pw + int(w / zoom), ph + int(h / zoom)))
-    resize_image = cropped_image.resize((w, h))
-
-    return resize_image
