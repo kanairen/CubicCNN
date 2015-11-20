@@ -3,8 +3,8 @@
 import numpy as np
 from theano import tensor as T, shared, config
 
+from src.helper.activation import relu
 from src.model.layer.baselayer import BaseLayer
-from src.util.activation import relu
 
 __author__ = 'ren'
 

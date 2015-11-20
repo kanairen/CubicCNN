@@ -1,13 +1,15 @@
 # coding:utf-8
 
-import os
-import itertools
-import cPickle
-import numpy as np
 import PIL.Image
-from sklearn.datasets import fetch_mldata
+import cPickle
+import itertools
+import os
+
+import numpy as np
 from sklearn.cross_validation import train_test_split
-from src.util.config import path_res_2d, path_res_2d_pattern
+from sklearn.datasets import fetch_mldata
+
+from src.helper.config import path_res_2d, path_res_2d_pattern
 
 __author__ = 'ren'
 

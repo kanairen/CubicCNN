@@ -1,8 +1,10 @@
 # coding:utf-8
 
 import time
-from src.util.config import GPU_ID
+
 from chainer import cuda
+
+from src.helper.config import GPU_ID
 
 __author__ = 'ren'
 

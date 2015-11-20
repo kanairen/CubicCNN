@@ -1,17 +1,19 @@
 # coding:utf-8
 
 import time
+
 import numpy as np
-from src.util.decorator import client
+
+from src.helper.activation import relu
+from src.helper.config import path_res_numpy_array
+from src.helper.data import mnist, cifar10, pattern50_distort
+from src.helper.decorator import client
+from src.helper.visualize import plot_2d, merge_images
 from src.model.layer.conv import ConvLayer2d
 from src.model.layer.hiddenlayer import HiddenLayer
 from src.model.layer.pool import PoolLayer
 from src.model.layerset.mlp import MLP
-from src.util.activation import relu
-from src.util.config import path_res_numpy_array
-from src.util.data import mnist, cifar10, pattern50_distort
 from src.util.date import ymdt
-from src.util.visualize import plot_2d, merge_images
 
 
 @client

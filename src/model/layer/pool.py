@@ -1,9 +1,9 @@
 # coding:utf-8
 
 import numpy as np
-from theano import config, tensor as T, scan, shared
+from theano import config, tensor as T, shared
+
 from filterlayer import FilterLayer
-from src.util.activation import relu
 from src.util.sequence import pair
 
 __author__ = 'ren'

@@ -3,7 +3,7 @@
 import six
 import numpy as np
 import PIL.Image
-import date
+import src.util.date
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -120,7 +120,7 @@ def plot_2d(array_dict, x_label, y_label, x_lim=None, y_lim=None, grid=True,
         pyplot.rcParams['font.size'] = font_size
 
     if save:
-        pyplot.savefig(date.ymdt() + ".png")
+        pyplot.savefig(src.util.date.ymdt() + ".png")
 
     pyplot.show()
 
