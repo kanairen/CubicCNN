@@ -2,7 +2,7 @@
 
 import ConfigParser
 import collections
-import string
+import stringutil
 import numpy as np
 
 __author__ = 'ren'
@@ -18,14 +18,14 @@ def parse_ini(ini_file):
 
         for option in ini.options(section):
             value = ini.get(section, option)
-            if string.isinteger(value):
+            if stringutil.isinteger(value):
                 value = int(value)
-            elif string.isfloat(value):
+            elif stringutil.isfloat(value):
                 value = float(value)
-            elif string.islist(value):
-                value = string.tolist(value)
-            elif string.istuple(value):
-                value = string.totuple(value)
+            elif stringutil.islist(value):
+                value = stringutil.tolist(value)
+            elif stringutil.istuple(value):
+                value = stringutil.totuple(value)
 
             items.setdefault(option, value)
 

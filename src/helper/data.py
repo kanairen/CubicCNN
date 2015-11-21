@@ -92,33 +92,33 @@ def cifar10(data_home=path_res_2d, is_normalized=True, is_grayscale=False,
 def pattern50_rotate(img_size=None, is_binary=True, is_flatten=False,
                      data_home=path_res_2d_pattern,
                      test_size=0.2, rotate_angle=20, step=1, dtype=np.int8):
-    return pattern50(img_size, 'rotate', is_binary, is_flatten, data_home,
-                     test_size, rotate_angle=rotate_angle, step=step,
-                     dtype=dtype)
+    return __pattern50(img_size, 'rotate', is_binary, is_flatten, data_home,
+                       test_size, rotate_angle=rotate_angle, step=step,
+                       dtype=dtype)
 
 
 def pattern50_trans(img_size=None, is_binary=True, is_flatten=False,
                     data_home=path_res_2d_pattern,
                     test_size=0.2, trans_x=(-4, 4), trans_y=(-5, 5),
                     dtype=np.int8):
-    return pattern50(img_size, 'trans', is_binary, is_flatten, data_home,
-                     test_size, trans_x=trans_x, trans_y=trans_y, dtype=dtype)
+    return __pattern50(img_size, 'trans', is_binary, is_flatten, data_home,
+                       test_size, trans_x=trans_x, trans_y=trans_y, dtype=dtype)
 
 
 def pattern50_distort(img_size=None, is_binary=True, is_flatten=False,
                       data_home=path_res_2d_pattern, test_size=0.2,
                       distorted_size=(64, 64), n_images=20, fix_distort=False,
                       dtype=np.int8):
-    return pattern50(img_size, 'distort', is_binary, is_flatten, data_home,
-                     test_size, distorted_size=distorted_size,
-                     n_images=n_images, fix_distort=fix_distort, dtype=dtype)
+    return __pattern50(img_size, 'distort', is_binary, is_flatten, data_home,
+                       test_size, distorted_size=distorted_size,
+                       n_images=n_images, fix_distort=fix_distort, dtype=dtype)
 
 
-def pattern50(img_size, process, is_binary, is_flatten,
-              data_home=path_res_2d_pattern, test_size=0.2, step=1,
-              rotate_angle=20, trans_x=(-4, 4), trans_y=(-5, 5),
-              distorted_size=(64, 64), n_images=4, fix_distort=False,
-              dtype=np.int8):
+def __pattern50(img_size, process, is_binary, is_flatten,
+                data_home=path_res_2d_pattern, test_size=0.2, step=1,
+                rotate_angle=20, trans_x=(-4, 4), trans_y=(-5, 5),
+                distorted_size=(64, 64), n_images=4, fix_distort=False,
+                dtype=np.int8):
     # 入力データリスト
     x = []
     # 正解データリスト
@@ -140,12 +140,12 @@ def pattern50(img_size, process, is_binary, is_flatten,
 
         # 処理後の
         if process == 'rotate':
-            images = rotate_images(image, rotate_angle, step)
+            images = __rotate_images(image, rotate_angle, step)
         elif process == 'trans':
-            images = translate_images(image, trans_x, trans_y, step)
+            images = __translate_images(image, trans_x, trans_y, step)
         elif process == 'distort':
-            images = distort_images(image, distorted_size, n_images,
-                                    fix_distort)
+            images = __distort_images(image, distorted_size, n_images,
+                                      fix_distort)
         else:
             images = [image]
 
@@ -168,11 +168,11 @@ def pattern50(img_size, process, is_binary, is_flatten,
     return train_test_split(x, y, test_size=test_size)
 
 
-def rotate_images(image, angle, step):
+def __rotate_images(image, angle, step):
     return [image.rotate(r) for r in range(angle)]
 
 
-def translate_images(image, trans_x, trans_y, step):
+def __translate_images(image, trans_x, trans_y, step):
     assert len(trans_x) == 2
     assert len(trans_y) == 2
 
@@ -184,7 +184,7 @@ def translate_images(image, trans_x, trans_y, step):
     return list(itertools.chain(*t_imgs_2d))
 
 
-def distort_images(image, newsize, n_images=4, fix_distort=False):
+def __distort_images(image, newsize, n_images=4, fix_distort=False):
     # 圧縮前の画像サイズ
     w, h = image.size
     # 圧縮後の画像サイズ
