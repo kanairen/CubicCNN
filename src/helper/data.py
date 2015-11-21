@@ -5,12 +5,10 @@ import cPickle
 import itertools
 import os
 import collections
-
 import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.datasets import fetch_mldata
 from theano import config
-
 from src.helper.config import path_res_2d, path_res_2d_pattern, \
     path_res_3d_shrec_target, path_res_3d_shrec_query, path_res_3d_psb, \
     path_res_3d_psb_classifier, path_res_numpy_psb_test, \
@@ -238,7 +236,7 @@ def shrec():
 class PSB(object):
     @staticmethod
     def __load_class_info(is_test=False, train_name="train.cla",
-                          test_name="test.cla"):
+                          test_name="test.cla", soft_classify=True):
 
         classifier = {}
 

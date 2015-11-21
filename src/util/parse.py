@@ -38,7 +38,7 @@ def parse_off(off_file):
     with file(off_file) as f:
         # 一行目はファイルフォーマット名
         if "OFF" not in f.readline():
-            raise IOError("psb file must be \"off\" format file.")
+            raise IOError("file must be \"off\" format file.")
 
         n_vertices, n_faces, n_edges = map(int, f.readline().split(' '))
 
@@ -55,3 +55,36 @@ def parse_off(off_file):
         faces = np.array(faces)
 
         return vertices, faces
+
+
+def parse_cla(cla_file):
+    class_tree = {}
+    class_history = []
+
+    with file(cla_file) as f:
+        if "PSB" not in f.readline():
+            raise IOError("file must be \"cla\" format file.")
+
+        n_class, n_data = map(int, f.readline().split(' '))
+
+        current_tree = class_tree
+
+        while True:
+            split = f.readline().split(' ')
+            if split == '\n':
+                continue
+
+            cls, parent, n = split
+            n = int(n)
+
+            if n > 0:
+                ids = []
+                for i in xrange(n):
+                    ids.append(int(f.readline()))
+                current_tree.setdefault(cls, ids)
+            else:
+                class_history.append(cls)
+                current_tree.setdefault(cls, {})
+                current_tree = current_tree.get(cls)
+
+            parent_node = parent
