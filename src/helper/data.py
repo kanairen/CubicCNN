@@ -9,8 +9,10 @@ import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.datasets import fetch_mldata
 
-from src.helper.config import path_res_2d, path_res_2d_pattern
+from src.helper.config import path_res_2d, path_res_2d_pattern, \
+    path_res_3d_shrec_target, path_res_3d_shrec_query
 from src.util.image import translate, distort
+from src.util.parse import parse_off
 
 __author__ = 'ren'
 
@@ -206,3 +208,21 @@ def __distort_images(image, newsize, n_images=4, fix_distort=False):
         images.append(distorted_image)
 
     return images
+
+
+"""
+3D
+"""
+
+
+def shrec():
+    target_list = os.listdir(path_res_3d_shrec_target)
+    query_list = os.listdir(path_res_3d_shrec_query)
+    targets = []
+    queries = []
+    for f_target, f_query in zip(target_list, query_list):
+        target_vertices = parse_off(path_res_3d_shrec_target + f_target)[0]
+        query_vertices = parse_off(path_res_3d_shrec_query + f_query)[1]
+        targets.append(target_vertices)
+        queries.append(query_vertices)
+    return targets, queries
