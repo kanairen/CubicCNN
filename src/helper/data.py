@@ -323,26 +323,18 @@ class PSB(object):
     @staticmethod
     def __load_vertices(f_name, dir=path_res_3d_psb, is_test=False):
 
-        # saved numpy array
-        np_dir = path_res_numpy_psb_test if is_test else path_res_numpy_psb_train
+        if is_test:
+            np_dir = path_res_numpy_psb_test
+        else:
+            np_dir = path_res_numpy_psb_train
+
         np_path = np_dir + "/" + f_name.split(".")[0] + ".npy"
+
+        # キャッシュがあれば、それを返す
         if os.path.exists(np_path):
             return np.load(np_path)
 
-        with file(dir + "/" + f_name) as f:
-
-            lines = f.readlines()
-
-            # 一行目はファイルフォーマット名
-            if "OFF" not in lines[0]:
-                raise IOError("psb file must be \"off\" format file.")
-            else:
-                # 二行目は頂点数、面数、エッジ数
-                n_ver, n_faces, n_edges = map(int, lines[1].split(" "))
-
-            # 三行目以降の頂点座標情報のみ取得
-            vertices = np.array(
-                [map(float, line.split(" ")) for line in lines[2:n_ver]])
+        vertices, faces = parse_off(dir + "/" + f_name)
 
         return vertices
 
