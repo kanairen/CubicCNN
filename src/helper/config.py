@@ -22,7 +22,14 @@ path_res_2d_pattern = path_res_2d + "/pattern"
 
 # res/3d
 path_res_3d_psb = path_res_3d + "/psb"
+path_res_3d_shrec = path_res_3d + "/shrec"
+
+# res/3d/psb
 path_res_3d_psb_classifier = path_res_3d_psb + "/classifier"
+
+# res/3d/shrec
+path_res_3d_shrec_query = path_res_3d_shrec + "/query"
+path_res_3d_shrec_target = path_res_3d_shrec + "/target"
 
 # res/numpy
 path_res_numpy_psb = path_res_numpy + "/psb"
