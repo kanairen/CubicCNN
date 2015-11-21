@@ -4,6 +4,7 @@ import PIL.Image
 import cPickle
 import itertools
 import os
+import collections
 
 import numpy as np
 from sklearn.cross_validation import train_test_split
@@ -233,13 +234,8 @@ def shrec():
     return targets, queries
 
 
+# TODO Refactor
 class PSB(object):
-    @classmethod
-    def load_class_info_all(cls):
-        test_classes = cls.__load_class_info(is_test=True)
-        train_classes = cls.__load_class_info(is_test=False)
-        return joint_dict(test_classes, train_classes)
-
     @staticmethod
     def __load_class_info(is_test=False, train_name="train.cla",
                           test_name="test.cla"):
@@ -279,46 +275,47 @@ class PSB(object):
         return classifier
 
     @classmethod
+    def __label_info(cls):
+        train_class_info = cls.__load_class_info(False)
+        test_class_info = cls.__load_class_info(True)
+        class_labels = list(
+            set(train_class_info.keys() + test_class_info.keys()))
+
+        train_label_info = collections.OrderedDict()
+        test_label_info = collections.OrderedDict()
+
+        for label, ids in train_class_info.items():
+            for id in ids:
+                label_index = class_labels.index(label)
+                train_label_info.setdefault(id, label_index)
+
+        for label, ids in test_class_info.items():
+            for id in ids:
+                label_index = class_labels.index(label)
+                test_label_info.setdefault(id, label_index)
+
+        return train_label_info, test_label_info, class_labels
+
+    @classmethod
     def load_vertices_all(cls, dir=path_res_3d_psb):
         train_vertices = []
         test_vertices = []
-        train_answers = []
-        test_answers = []
 
-        train_classes = cls.__load_class_info(is_test=False)
-        test_classes = cls.__load_class_info(is_test=True)
-        classes = cls.load_class_info_all()
+        train_label_info, test_label_info, class_labels = cls.__label_info()
 
-        train_members = list(itertools.chain(*train_classes.values()))
-        test_members = list(itertools.chain(*test_classes.values()))
+        for train_id in train_label_info.keys():
+            vertices = cls.__load_vertices("{}.off".format(train_id), dir,
+                                           False)
+            train_vertices.append(vertices)
 
-        for f in os.listdir(dir):
+        for test_id in test_label_info.keys():
+            vertices = cls.__load_vertices("{}.off".format(test_id), dir, True)
+            test_vertices.append(vertices)
 
-            if not os.path.isfile(dir + "/" + f):
-                continue
+        train_answers = train_label_info.values()
+        test_answers = test_label_info.values()
 
-            id = int(f.split(".")[0])
-
-            if id in test_members:
-                v_list = test_vertices
-                a_list = test_answers
-                is_test = True
-            elif id in train_members:
-                v_list = train_vertices
-                a_list = train_answers
-                is_test = False
-
-            # データの格納
-            v_list.append(cls.__load_vertices(f, dir, is_test=is_test))
-
-            # 正解ラベルの探索と格納
-            keys = classes.keys()
-            for key in keys:
-                if id in classes.get(key):
-                    a_list.append(keys.index(key))
-                    break
-
-        return train_vertices, test_vertices, train_answers, test_answers, train_members, test_members
+        return train_vertices, test_vertices, train_answers, test_answers, class_labels
 
     @staticmethod
     def __load_vertices(f_name, dir=path_res_3d_psb, is_test=False):
@@ -389,20 +386,23 @@ class PSB(object):
         return np.load(path)
 
     @classmethod
-    def load_boxels(cls, is_test=False):
+    def load_boxels(cls):
 
-        boxels = []
-        answers = []
+        train_label_info, test_label_info, class_labels = cls.__label_info()
 
-        classes = cls.__load_class_info(is_test=is_test)
-        all_classes = cls.load_class_info_all()
+        train_ids = train_label_info.keys()
+        test_ids = test_label_info.keys()
 
-        for id_list in classes.values():
-            for id in id_list:
-                boxels.append(cls.__load_boxel(id, is_test=is_test))
-                for class_label, class_ids in enumerate(all_classes.values()):
-                    if id in class_ids:
-                        answers.append(class_label)
-                        break
+        train_boxels = []
+        test_boxels = []
 
-        return boxels, answers
+        for train_id, test_id in zip(train_ids, test_ids):
+            train_boxel = cls.__load_boxel(train_id, False)
+            test_boxel = cls.__load_boxel(test_id, True)
+            train_boxels.append(train_boxel)
+            test_boxels.append(test_boxel)
+
+        train_anewers = train_label_info.values()
+        test_answers = test_label_info.values()
+
+        return train_boxels, test_boxels, train_anewers, test_answers, class_labels
