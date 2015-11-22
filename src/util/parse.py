@@ -4,6 +4,7 @@ import ConfigParser
 import collections
 import stringutil
 import numpy as np
+import itertools
 
 __author__ = 'ren'
 
@@ -58,8 +59,11 @@ def parse_off(off_file):
 
 
 def parse_cla(cla_file):
-    class_tree = {}
-    class_history = []
+    # クラス階層情報を保持するツリー
+    tree = ClaTree('0')
+
+    # クラスラベルと属するデータIDのマップ
+    classifier = {}
 
     with file(cla_file) as f:
         if "PSB" not in f.readline():
@@ -67,24 +71,73 @@ def parse_cla(cla_file):
 
         n_class, n_data = map(int, f.readline().split(' '))
 
-        current_tree = class_tree
-
         while True:
-            split = f.readline().split(' ')
-            if split == '\n':
-                continue
+            line = f.readline()
 
-            cls, parent, n = split
-            n = int(n)
+            if line == '':
+                break
 
-            if n > 0:
-                ids = []
-                for i in xrange(n):
-                    ids.append(int(f.readline()))
-                current_tree.setdefault(cls, ids)
+            split_line = line.split(' ')
+
+            if len(split_line) == 3:
+                # ツリーへクラスを登録
+                name, parent_name, n = split_line
+                tree.add(name, parent_name)
+
+                # 葉ノードの場合、データIDリストを取得
+                if int(n) > 0:
+                    ids = [int(f.readline()) for i in xrange(int(n))]
+                    classifier.setdefault(name, ids)
+
+        return classifier, tree
+
+
+class ClaTree(object):
+    def __init__(self, root_name):
+        self.root = self.ClaNode(root_name, None, 0)
+
+    def __str__(self):
+        return self.root.__str__()
+
+    def add(self, name, parent_name):
+        self.root.add(name, parent_name, 1)
+
+    class ClaNode(object):
+        def __init__(self, name, parent_name, degree, last_node=False):
+            self.name = name
+            self.parent_name = parent_name
+            self.children = []
+            self.degree = degree
+            self.last_node = last_node
+
+        def __str__(self):
+            string = self.name
+            if self.last_node:
+                edge = '\n' + '|   ' * (self.degree - 1) + '    ∟---'
             else:
-                class_history.append(cls)
-                current_tree.setdefault(cls, {})
-                current_tree = current_tree.get(cls)
+                edge = '\n' + ('|   ' * self.degree) + '∟---'
+            for c in self.children:
+                string += edge + c.__str__()
+            return string
 
-            parent_node = parent
+        def add(self, name, parent_name, degree):
+            if parent_name == self.name:
+                if len(self.children) > 0:
+                    self.children[-1].last_node = False
+                node = self.__class__(name, parent_name, degree, True)
+                self.children.append(node)
+            else:
+                for c in self.children:
+                    c.add(name, parent_name, degree + 1)
+
+        def has_child(self, name):
+            if self.name == name:
+                return True
+            else:
+                return bool(sum([c.haschild(c) for c in self.children]))
+
+
+if __name__ == '__main__':
+    from src.helper.config import path_res_3d_psb_classifier
+
+    classifier, tree = parse_cla(path_res_3d_psb_classifier + '/test.cla')
