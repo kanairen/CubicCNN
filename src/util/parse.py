@@ -136,9 +136,12 @@ class ClaTree(object):
         def search(self, name):
             if self.name == name:
                 return self
-            else:
-                node = itertools.chain(*[c.search(name) for c in self.children])
-                return no
+
+            for c in self.children:
+                node = c.search(name)
+                if node is not None:
+                    return node
+            return None
 
         def parent(self, degree):
             if self.parent is None:
