@@ -7,7 +7,7 @@ __author__ = 'ren'
 
 
 class MLP(object):
-    def __init__(self, **layers):
+    def __init__(self, learning_rate=0.01, regularization_rate=0.00, **layers):
 
         self.inputs_symbol = T.fmatrix('inputs')
         self.answers_symbol = T.lvector('answers')
@@ -21,6 +21,9 @@ class MLP(object):
             self.output = layer.output(self.output)
             self.regularization_term += abs(layer.W).sum()
 
+        self.learning_rate = learning_rate
+        self.regularization_term = regularization_rate
+
     def forward(self, inputs, answers, is_train, updates=None, givens={}):
 
         if updates is None:
@@ -33,12 +36,12 @@ class MLP(object):
 
         return f(inputs, answers)
 
-    def update(self, learning_rate=0.01, regularization_rate=0.00):
+    def update(self, ):
         cost = self.negative_log_likelihood(self.output,
-                                            self.answers_symbol) + regularization_rate * self.regularization_term
+                                            self.answers_symbol) + self.regularization_term * self.regularization_term
         updates = []
         for layer in self.layers:
-            update = layer.update(cost, learning_rate)
+            update = layer.update(cost, self.learning_rate)
             if update is not None:
                 updates.extend(update)
         return updates
