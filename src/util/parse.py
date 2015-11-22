@@ -102,10 +102,13 @@ class ClaTree(object):
     def add(self, name, parent_name):
         self.root.add(name, parent_name, 1)
 
+    def parent(self, name, degree):
+        return self.root.search(name).parent(degree)
+
     class ClaNode(object):
-        def __init__(self, name, parent_name, degree, last_node=False):
+        def __init__(self, name, parent, degree, last_node=False):
             self.name = name
-            self.parent_name = parent_name
+            self.parent = parent
             self.children = []
             self.degree = degree
             self.last_node = last_node
@@ -124,20 +127,31 @@ class ClaTree(object):
             if parent_name == self.name:
                 if len(self.children) > 0:
                     self.children[-1].last_node = False
-                node = self.__class__(name, parent_name, degree, True)
+                node = self.__class__(name, self, degree, True)
                 self.children.append(node)
             else:
                 for c in self.children:
                     c.add(name, parent_name, degree + 1)
 
-        def has_child(self, name):
+        def search(self, name):
             if self.name == name:
-                return True
+                return self
             else:
-                return bool(sum([c.haschild(c) for c in self.children]))
+                node = itertools.chain(*[c.search(name) for c in self.children])
+                return no
+
+        def parent(self, degree):
+            if self.parent is None:
+                return None
+            elif self.parent.degree == degree:
+                return self.parent
+            else:
+                return self.parent.parent(degree)
 
 
 if __name__ == '__main__':
     from src.helper.config import path_res_3d_psb_classifier
 
     classifier, tree = parse_cla(path_res_3d_psb_classifier + '/test.cla')
+
+    print tree.parent('tie_fighter', degree=1)

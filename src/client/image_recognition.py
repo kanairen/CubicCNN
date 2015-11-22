@@ -42,14 +42,16 @@ def image_recognition(n_div=50, type='cifar', show_batch_accuracies=True,
 
     print "preparing models..."
 
-    l1 = ConvLayer2d((h, w), c, 32, k_size=3, activation=relu)
-    l2 = PoolLayer(l1.output_img_size(), 32, k_size=3, activation=lambda x: x)
-    l3 = ConvLayer2d(l2.output_img_size(), 32, 64, k_size=2,
-                     activation=lambda x: x)
-    l4 = PoolLayer(l3.output_img_size(), 64, k_size=2, activation=relu)
-    l5 = HiddenLayer(l4.n_out, 1024, activation=relu)
+    l1 = ConvLayer2d((h, w), c, 16, k_size=4, activation=relu)
+    l2 = PoolLayer(l1.output_img_size(), 16, k_size=2, activation=lambda x: x)
+    l3 = ConvLayer2d(l2.output_img_size(), 16, 32, k_size=4, activation=relu)
+    l4 = PoolLayer(l3.output_img_size(), 32, k_size=2, activation=lambda x: x)
+    l5 = ConvLayer2d(l4.output_img_size(), 32, 32, k_size=4, activation=relu)
+    l6 = PoolLayer(l5.output_img_size(), 32, k_size=2, activation=lambda x: x)
+    l7 = HiddenLayer(l6.n_out, 10)
 
-    model = MLP(l1=l1, l2=l2, l3=l3, l4=l4, l5=l5)
+    model = MLP(learning_rate=0.01, L1_rate=0.0001, L2_rate=0.001,
+                l1=l1, l2=l2, l3=l3, l4=l4, l5=l5, l6=l6, l7=l7)
     """
     TRAIN
     """
@@ -60,7 +62,7 @@ def image_recognition(n_div=50, type='cifar', show_batch_accuracies=True,
     n_iter = 100
 
     # バッチ数
-    n_batch = 1000
+    n_batch = 100
 
     # バッチサイズ
     batch_size_train = len(x_train) / n_batch

@@ -15,7 +15,7 @@ from src.helper.config import path_res_2d, path_res_2d_pattern, \
     path_res_numpy_psb_train, path_res_numpy_boxel_test, \
     path_res_numpy_boxel_train
 from src.util.image import translate, distort
-from src.util.parse import parse_off
+from src.util.parse import parse_off, parse_cla
 from src.util.sequence import joint_dict
 
 __author__ = 'ren'
@@ -234,48 +234,14 @@ def shrec():
 
 # TODO Refactor
 class PSB(object):
-    @staticmethod
-    def __load_class_info(is_test=False, train_name="train.cla",
-                          test_name="test.cla", soft_classify=True):
-
-        classifier = {}
-
-        f_name = test_name if is_test else train_name
-        path = path_res_3d_psb_classifier + "/" + f_name
-
-        with file(path) as f:
-
-            line = f.readline()
-
-            if "PSB" not in line:
-                raise IOError("PSB class file must be \"cls\" format file.")
-            else:
-                n_class, n_model = map(int, f.readline().split(" "))
-
-            while line:
-
-                line = f.readline()
-
-                if line == "\n":
-                    continue
-
-                s_line = line.split(" ")
-
-                if len(s_line) == 3:
-                    main_name, sub_name, n_id = s_line
-                    n_id = int(n_id)
-
-                    if n_id > 0:
-                        ids = [int(f.readline()) for i in range(n_id)]
-                        prefix = "" if sub_name == "0" else sub_name + "/"
-                        classifier.setdefault(prefix + main_name, ids)
-
-        return classifier
 
     @classmethod
-    def __label_info(cls):
-        train_class_info = cls.__load_class_info(False)
-        test_class_info = cls.__load_class_info(True)
+    def __label_info(cls, train_name='train.cla', test_name='test.cla'):
+        train_class_info, train_tree = parse_cla(
+            path_res_3d_psb_classifier + "/" + train_name)
+        test_class_info, test_tree = parse_cla(
+            path_res_3d_psb_classifier + "/" + test_name)
+
         class_labels = list(
             set(train_class_info.keys() + test_class_info.keys()))
 
