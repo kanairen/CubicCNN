@@ -18,7 +18,7 @@ if __name__ == '__main__':
         y_label = "accuracy"
         y_lim = (0, 1)
         location = 'upper right'
-        keyword = '11-14'
+        keyword = '11-23 13:15'
         show_np_array(x_label, y_label, y_lim, location=location,
                       keyword=keyword)
 

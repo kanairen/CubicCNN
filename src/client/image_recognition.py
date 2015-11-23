@@ -9,13 +9,13 @@ from src.helper.decorator import client
 from src.helper.visualize import plot_2d, merge_images
 from src.model.layer.conv import ConvLayer2d
 from src.model.layer.hiddenlayer import HiddenLayer
-from src.model.layer.pool import PoolLayer
+from src.model.layer.pool import PoolLayer2d
 from src.model.layerset.mlp import MLP
 from src.util.date import ymdt
 
 
 @client
-def image_recognition(n_div=50, type='cifar', show_batch_accuracies=True,
+def image_recognition(n_div=50, type='mnist', show_batch_accuracies=True,
                       save_batch_accuracies=True):
     # 入力画像の決定
     if type == 'distort':
@@ -42,12 +42,12 @@ def image_recognition(n_div=50, type='cifar', show_batch_accuracies=True,
 
     print "preparing models..."
 
-    l1 = ConvLayer2d((h, w), c, 16, k_size=4, activation=relu)
-    l2 = PoolLayer(l1.output_img_size(), 16, k_size=2, activation=lambda x: x)
-    l3 = ConvLayer2d(l2.output_img_size(), 16, 32, k_size=4, activation=relu)
-    l4 = PoolLayer(l3.output_img_size(), 32, k_size=2, activation=lambda x: x)
-    l5 = ConvLayer2d(l4.output_img_size(), 32, 32, k_size=4, activation=relu)
-    l6 = PoolLayer(l5.output_img_size(), 32, k_size=2, activation=lambda x: x)
+    l1 = ConvLayer2d((h, w), c, 16, k_size=3, activation=relu)
+    l2 = PoolLayer2d(l1.output_img_size(), 16, k_size=2, activation=lambda x: x)
+    l3 = ConvLayer2d(l2.output_img_size(), 16, 32, k_size=3, activation=relu)
+    l4 = PoolLayer2d(l3.output_img_size(), 32, k_size=2, activation=lambda x: x)
+    l5 = ConvLayer2d(l4.output_img_size(), 32, 32, k_size=3, activation=relu)
+    l6 = PoolLayer2d(l5.output_img_size(), 32, k_size=2, activation=lambda x: x)
     l7 = HiddenLayer(l6.n_out, 10)
 
     model = MLP(learning_rate=0.01, L1_rate=0.0001, L2_rate=0.001,

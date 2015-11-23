@@ -3,6 +3,8 @@
 import time
 import numpy as np
 from src.model.layer.hiddenlayer import HiddenLayer
+from src.model.layer.conv import ConvLayer3d
+from src.model.layer.pool import PoolLayer3d
 from src.model.layerset.mlp import MLP
 from src.helper.decorator import client
 from src.helper.data import PSB
@@ -16,7 +18,8 @@ __author__ = 'ren'
 
 @client
 def solid_recognition(n_div=50, show_batch_accuracies=True):
-    x_train, x_test, y_train, y_test, class_labels = PSB.load_boxels()
+    x_train, x_test, y_train, y_test, class_labels = PSB.load_boxels(degree=1,
+                                                                     is_mixed=True)
 
     x_train = np.array(x_train)
     x_test = np.array(x_test)
@@ -35,10 +38,15 @@ def solid_recognition(n_div=50, show_batch_accuracies=True):
 
     print "preparing models..."
 
-    l1 = HiddenLayer(n_in, 1000, activation=relu)
-    l2 = HiddenLayer(l1.n_out, 500, activation=relu)
+    l1 = ConvLayer3d((50, 50, 50), in_channel=1, out_channel=4, k_size=3,
+                     stride=2)
+    print l1.output_box_size()
+    l2 = PoolLayer3d(l1.output_box_size(), in_channel=4, k_size=3)
+    print l2.output_box_size()
+    l3 = HiddenLayer(l2.n_out, 500, activation=relu)
 
-    model = MLP(l1=l1, l2=l2)
+    model = MLP(l1=l1, l2=l2, l3=l3, learning_rate=0.01, L1_rate=0.01,
+                L2_rate=0.01)
 
     """
     # TRAIN

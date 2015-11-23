@@ -36,3 +36,9 @@ def pair(x):
     if hasattr(x, '__getitem__'):
         return x
     return (x, x)
+
+
+def trio(x):
+    if hasattr(x, '__getitem__'):
+        return x
+    return (x, x, x)

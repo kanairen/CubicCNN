@@ -3,9 +3,8 @@
 import numpy as np
 import six
 from theano import config, shared, tensor as T
-
 from src.model.layer.baselayer import BaseLayer
-from src.util.sequence import pair
+from src.util.sequence import pair, trio
 
 __author__ = 'ren'
 
@@ -42,8 +41,8 @@ class FilterLayer(BaseLayer):
         self.ph = ph
 
         # 出力画像サイズ
-        out_h = self.conv_outsize(img_h, kh, sh, ph, cover_all)
-        out_w = self.conv_outsize(img_w, kw, sw, pw, cover_all)
+        out_h = conv_outsize(img_h, kh, sh, ph, cover_all)
+        out_w = conv_outsize(img_w, kw, sw, pw, cover_all)
         self.out_h = out_h
         self.out_w = out_w
 
@@ -87,13 +86,6 @@ class FilterLayer(BaseLayer):
     def output_img_size(self):
         return self.out_w, self.out_h
 
-    @staticmethod
-    def conv_outsize(size, k, s, p, cover_all=False):
-        if cover_all:
-            return (size + p * 2 - k + s - 1) // s + 1
-        else:
-            return (size + p * 2 - k) // s + 1
-
     def im2col(self, img, pval=0):
         n, c, h, w = img.shape
 
@@ -113,3 +105,112 @@ class FilterLayer(BaseLayer):
                                       j:j_lim:self.sw])
 
         return col
+
+
+class CubicLayer(BaseLayer):
+    def __init__(self, box_size, in_channel, out_channel, k_size, stride=1,
+                 b=None, no_bias=False, W=None, dtype=config.floatX,
+                 activation=None, cover_all=False, is_dropout=False):
+
+        super(CubicLayer, self).__init__(is_dropout)
+
+        # 画像サイズ
+        box_x, box_y, box_z = trio(box_size)
+        self.box_x = box_x
+        self.box_y = box_y
+        self.box_z = box_z
+
+        # チャネル数
+        self.in_channel = in_channel
+        self.out_channel = out_channel
+
+        # フィルタサイズ
+        kx, ky, kz = trio(k_size)
+        self.kx = kx
+        self.ky = ky
+        self.kz = kz
+
+        # ストライド
+        sx, sy, sz = trio(stride)
+        self.sx = sx
+        self.sy = sy
+        self.sz = sz
+
+        # パディング
+        px, py, pz = trio(0)
+        self.px = px
+        self.py = py
+        self.pz = pz
+
+        # 出力画像サイズ
+        out_x = conv_outsize(box_x, kx, sx, px, cover_all)
+        out_y = conv_outsize(box_y, ky, sy, py, cover_all)
+        out_z = conv_outsize(box_z, kz, sz, pz, cover_all)
+        self.out_x = out_x
+        self.out_y = out_y
+        self.out_z = out_z
+
+        # 入力・出力ユニット数
+        n_in = box_x * box_y * box_z * in_channel
+        n_out = out_x * out_y * out_z * out_channel
+        self.n_in = n_in
+        self.n_out = n_out
+
+        # フィルタベクトル
+        if W is None:
+            W = np.asarray(
+                self.rnd.uniform(low=-np.sqrt(1. / in_channel * kx * ky * kz),
+                                 high=np.sqrt(1. / in_channel * kx * ky * kz),
+                                 size=(out_channel, in_channel, kx, ky, kz)),
+                dtype=dtype)
+        self.W = shared(W, name='W', borrow=True)
+
+        # バイアスベクトル
+        if not no_bias:
+            if b is None:
+                b = np.zeros(shape=(out_channel,), dtype=dtype)
+            self.b = shared(b, name='b', borrow=True)
+
+        # 活性化関数
+        if activation is None:
+            activation = lambda x: x
+        self.activation = activation
+
+        # 更新対象パラメタ
+        self.params = [self.W, ]
+        if not no_bias:
+            self.params.append(self.b)
+
+    def update(self, cost, learning_rate):
+        super(CubicLayer, self).update(cost, learning_rate)
+
+    def output(self, inputs_symbol):
+        super(CubicLayer, self).output(inputs_symbol)
+
+    def output_box_size(self):
+        return self.out_x, self.out_y, self.out_z
+
+    def box2col(self, box, pval=0):
+        n, c, z, y, x = box.shape
+
+        col = T.zeros((n, c, self.kz, self.ky, self.kx, self.out_z, self.out_y,
+                       self.out_x), dtype=box.dtype)
+
+        for i in six.moves.range(self.kz):
+            i_lim = i + self.sz * self.out_z
+            for j in six.moves.range(self.ky):
+                j_lim = j + self.sy * self.out_y
+                for k in six.moves.range(self.kx):
+                    k_lim = k + self.sx * self.out_x
+                    col = T.set_subtensor(col[:, :, i, j, k, :, :, :],
+                                          box[:, :, i:i_lim:self.sz,
+                                          j:j_lim:self.sy, k:k_lim:self.sx])
+
+        return col
+
+
+def conv_outsize(size, k, s, p, cover_all=False):
+    if cover_all:
+        return (size + p * 2 - k + s - 1) // s + 1
+    else:
+        return (size + p * 2 - k) // s + 1
