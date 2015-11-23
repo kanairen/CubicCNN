@@ -9,7 +9,7 @@ from src.util.sequence import pair
 __author__ = 'ren'
 
 
-class PoolLayer(FilterLayer):
+class PoolLayer2d(FilterLayer):
     POOL_MAX = 0
     POOL_AVERAGE = 1
 
@@ -31,18 +31,18 @@ class PoolLayer(FilterLayer):
             W = np.ones((in_channel, in_channel, kh, kw), dtype=dtype)
         self.W = shared(W, name='W', borrow=True)
 
-        super(PoolLayer, self).__init__(img_size, in_channel, in_channel,
-                                        k_size, stride, None, True, W,
-                                        dtype, activation, cover_all,
-                                        is_dropout)
+        super(PoolLayer2d, self).__init__(img_size, in_channel, in_channel,
+                                          k_size, stride, None, True, W,
+                                          dtype, activation, cover_all,
+                                          is_dropout)
 
     def update(self, cost, learning_rate=0.001):
         return None
 
     def output(self, inputs_symbol):
-        if self.pool_type == PoolLayer.POOL_MAX:
+        if self.pool_type == PoolLayer2d.POOL_MAX:
             output = self.max_pooling(inputs_symbol)
-        elif self.pool_type == PoolLayer.POOL_AVERAGE:
+        elif self.pool_type == PoolLayer2d.POOL_AVERAGE:
             output = self.averate_pooling(inputs_symbol)
         else:
             raise RuntimeError("pool_type is invalid.")
