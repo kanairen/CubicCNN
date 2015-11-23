@@ -234,38 +234,40 @@ def shrec():
 
 # TODO Refactor
 class PSB(object):
-
     @classmethod
-    def __label_info(cls, train_name='train.cla', test_name='test.cla'):
-        train_class_info, train_tree = parse_cla(
+    def __label_info(cls, degree, train_name='train.cla', test_name='test.cla'):
+        train_info, train_tree = parse_cla(
             path_res_3d_psb_classifier + "/" + train_name)
-        test_class_info, test_tree = parse_cla(
+        test_info, test_tree = parse_cla(
             path_res_3d_psb_classifier + "/" + test_name)
 
-        class_labels = list(
-            set(train_class_info.keys() + test_class_info.keys()))
+        classes = set()
+        for train_label, test_label in zip(train_info.keys(), test_info.keys()):
+            classes.add(train_tree.parent(train_label, degree).name)
+            classes.add(test_tree.parent(test_label, degree).name)
+        classes = list(classes)
 
-        train_label_info = collections.OrderedDict()
-        test_label_info = collections.OrderedDict()
+        def new_info(info_old, tree):
+            info_new = collections.OrderedDict()
+            for label, ids in info_old.items():
+                label = tree.parent(label, degree).name
+                info_ids = info_new.get(label, [])
+                info_ids.extend(ids)
+                info_new[label] = info_ids
+            return info_new
 
-        for label, ids in train_class_info.items():
-            for id in ids:
-                label_index = class_labels.index(label)
-                train_label_info.setdefault(id, label_index)
+        train_info_new = new_info(train_info, train_tree)
+        test_info_new = new_info(test_info, test_tree)
 
-        for label, ids in test_class_info.items():
-            for id in ids:
-                label_index = class_labels.index(label)
-                test_label_info.setdefault(id, label_index)
-
-        return train_label_info, test_label_info, class_labels
+        return train_info_new, test_info_new, classes
 
     @classmethod
-    def load_vertices_all(cls, dir=path_res_3d_psb):
+    def load_vertices_all(cls, degree, dir=path_res_3d_psb):
         train_vertices = []
         test_vertices = []
 
-        train_label_info, test_label_info, class_labels = cls.__label_info()
+        train_label_info, test_label_info, class_labels = cls.__label_info(
+            degree)
 
         for train_id in train_label_info.keys():
             vertices = cls.__load_vertices("{}.off".format(train_id), dir,
@@ -350,23 +352,29 @@ class PSB(object):
         return np.load(path)
 
     @classmethod
-    def load_boxels(cls):
+    def load_boxels(cls, degree, is_mixed=False, test_size=0.2):
 
-        train_label_info, test_label_info, class_labels = cls.__label_info()
-
-        train_ids = train_label_info.keys()
-        test_ids = test_label_info.keys()
+        train_label_info, test_label_info, class_labels = cls.__label_info(
+            degree)
 
         train_boxels = []
         test_boxels = []
+        train_anewers = []
+        test_answers = []
 
-        for train_id, test_id in zip(train_ids, test_ids):
-            train_boxel = cls.__load_boxel(train_id, False)
-            test_boxel = cls.__load_boxel(test_id, True)
-            train_boxels.append(train_boxel)
-            test_boxels.append(test_boxel)
+        for label, ids in train_label_info.items():
+            for id in ids:
+                train_boxels.append(cls.__load_boxel(id, False))
+            train_anewers += [class_labels.index(label)] * len(ids)
 
-        train_anewers = train_label_info.values()
-        test_answers = test_label_info.values()
+        for label, ids in test_label_info.items():
+            for id in ids:
+                test_boxels.append(cls.__load_boxel(id, True))
+            test_answers += [class_labels.index(label)] * len(ids)
+
+        if is_mixed:
+            x = train_boxels + test_boxels
+            y = train_anewers + test_answers
+            return train_test_split(x, y, test_size=test_size) + [class_labels]
 
         return train_boxels, test_boxels, train_anewers, test_answers, class_labels
