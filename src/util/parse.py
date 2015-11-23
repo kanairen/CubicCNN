@@ -158,7 +158,7 @@ class ClaTree(object):
         def get_parent(self, degree):
             if self.parent is None:
                 return None
-            elif self.parent.degree == degree:
+            elif self.parent.degree <= degree:
                 return self.parent
             else:
                 return self.parent.get_parent(degree)
