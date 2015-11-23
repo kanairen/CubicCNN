@@ -263,23 +263,26 @@ class PSB(object):
 
     @classmethod
     def load_vertices_all(cls, degree, dir=path_res_3d_psb):
-        train_vertices = []
-        test_vertices = []
 
         train_label_info, test_label_info, class_labels = cls.__label_info(
             degree)
 
-        for train_id in train_label_info.keys():
-            vertices = cls.__load_vertices("{}.off".format(train_id), dir,
-                                           False)
-            train_vertices.append(vertices)
+        train_vertices = []
+        test_vertices = []
+        train_answers = []
+        test_answers = []
 
-        for test_id in test_label_info.keys():
-            vertices = cls.__load_vertices("{}.off".format(test_id), dir, True)
-            test_vertices.append(vertices)
+        for label, ids in train_label_info.items():
+            for id in ids:
+                vertices = cls.__load_vertices("{}.off".format(id), dir, False)
+                train_vertices.append(vertices)
+            train_answers += [class_labels.index(label)] * len(ids)
 
-        train_answers = train_label_info.values()
-        test_answers = test_label_info.values()
+        for label, ids in test_label_info.items():
+            for id in ids:
+                vertices = cls.__load_vertices("{}.off".format(id), dir, True)
+                test_vertices.append(vertices)
+            test_answers += [class_labels.index(label)] * len(ids)
 
         return train_vertices, test_vertices, train_answers, test_answers, class_labels
 
