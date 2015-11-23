@@ -74,7 +74,7 @@ def image_recognition(n_div=50, type='cifar', show_batch_accuracies=True,
 
     for i in range(n_iter):
 
-        print "{}st learning...".format(i)
+        print "{}th learning...".format(i)
 
         start = time.clock()
 
@@ -84,7 +84,7 @@ def image_recognition(n_div=50, type='cifar', show_batch_accuracies=True,
         # バッチごとに学習
         for j in range(n_batch):
 
-            print "{}st batch...".format(j)
+            print "{}th batch...".format(j)
 
             from_train = j * batch_size_train
             from_test = j * batch_size_test
