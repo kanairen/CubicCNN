@@ -89,7 +89,7 @@ def parse_cla(cla_file):
                     ids = [int(f.readline()) for i in xrange(int(n))]
                     classifier.setdefault(name, ids)
 
-        return classifier, tree
+    return classifier, tree
 
 
 class ClaTree(object):
@@ -103,7 +103,10 @@ class ClaTree(object):
         self.root.add(name, parent_name, 1)
 
     def parent(self, name, degree):
-        return self.root.search(name).parent(degree)
+        node = self.root.search(name)
+        if node.degree <= degree:
+            return node
+        return node.get_parent(degree)
 
     class ClaNode(object):
         def __init__(self, name, parent, degree, last_node=False):
@@ -143,18 +146,21 @@ class ClaTree(object):
                     return node
             return None
 
-        def parent(self, degree):
+        def leaf(self):
+            if len(self.children) == 0:
+                return [self]
+            else:
+                leaves = []
+                for c in self.children:
+                    leaves.extend(c.leaf())
+                return leaves
+
+        def get_parent(self, degree):
             if self.parent is None:
                 return None
             elif self.parent.degree == degree:
                 return self.parent
             else:
-                return self.parent.parent(degree)
+                return self.parent.get_parent(degree)
 
 
-if __name__ == '__main__':
-    from src.helper.config import path_res_3d_psb_classifier
-
-    classifier, tree = parse_cla(path_res_3d_psb_classifier + '/test.cla')
-
-    print tree.parent('tie_fighter', degree=1)
