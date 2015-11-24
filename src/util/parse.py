@@ -4,6 +4,7 @@ import ConfigParser
 import collections
 import stringutil
 import numpy as np
+import warnings
 import itertools
 
 __author__ = 'ren'
@@ -36,7 +37,7 @@ def parse_ini(ini_file):
 
 
 def parse_off(off_file):
-    with file(off_file) as f:
+    with open(off_file) as f:
         # 一行目はファイルフォーマット名
         if "OFF" not in f.readline():
             raise IOError("file must be \"off\" format file.")
@@ -58,6 +59,37 @@ def parse_off(off_file):
         return vertices, faces
 
 
+def parse_obj(obj_file):
+    with open(obj_file) as f:
+
+        vertices = []
+
+        for line in f:
+
+            split = line.split(' ')
+
+            if split[0] == 'v':
+                p = list(map(float, split[1:]))
+                vertices.append(p)
+            elif split[0] == 'vt':
+                warnings.warn(
+                    "vt row's of .obj file are ignored."
+                    " if you want to get vt row's, please edit \'parse.py\'")
+                break
+            elif split[0] == 'vn':
+                warnings.warn(
+                    "vn row's of .obj file are ignored."
+                    " if you want to get f row's, please edit \'parse.py\'")
+                break
+            elif split[0] == 'f':
+                warnings.warn(
+                    "f row's of .obj file are ignored. "
+                    "if you want to get f row's, please edit \'parse.py\'")
+                break
+
+    return vertices
+
+
 def parse_cla(cla_file):
     # クラス階層情報を保持するツリー
     tree = ClaTree('0')
@@ -65,7 +97,7 @@ def parse_cla(cla_file):
     # クラスラベルと属するデータIDのマップ
     classifier = {}
 
-    with file(cla_file) as f:
+    with open(cla_file) as f:
         if "PSB" not in f.readline():
             raise IOError("file must be \"cla\" format file.")
 
