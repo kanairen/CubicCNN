@@ -13,17 +13,27 @@ class MLP(object):
         self.inputs_symbol = T.fmatrix('inputs')
         self.answers_symbol = T.lvector('answers')
 
-        self.layers = []
-        self.output = self.inputs_symbol
-        self.L1 = 0
-        self.L2 = 0
+        output = self.inputs_symbol
+        L1 = 0.
+        L2 = 0.
+
         for name, layer in sorted(six.iteritems(layers)):
             setattr(self, name, layer)
-            self.layers.append(layer)
-            self.output = layer.output(self.output)
-            self.L1 += abs(layer.W).sum()
-            self.L2 += (layer.W ** 2).sum()
+            output = layer.output(output)
+            L1 += abs(layer.W).sum()
+            L2 += (layer.W ** 2).sum()
 
+        # レイヤリスト
+        self.layers = layers.values()
+
+        # 出力シンボル
+        self.output = output
+
+        # 正則化項
+        self.L1 = L1
+        self.L2 = L2
+
+        # 学習時パラメタ
         self.learning_rate = learning_rate
         self.L1_rate = L1_rate
         self.L2_rate = L2_rate
@@ -41,8 +51,8 @@ class MLP(object):
         return f(inputs, answers)
 
     def update(self, ):
-        cost = self.negative_log_likelihood(self.output,
-                                            self.answers_symbol) + self.L1_rate * self.L1 + self.L2_rate * self.L2
+        cost = self.negative_log_likelihood(self.output, self.answers_symbol) + \
+               self.L1_rate * self.L1 + self.L2_rate * self.L2
         updates = []
         for layer in self.layers:
             update = layer.update(cost, self.learning_rate)

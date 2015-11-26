@@ -138,6 +138,3 @@ def image_recognition(n_div=50, type='mnist', show_batch_accuracies=True,
     plot_2d({"train": train_accuracies, "test": test_accuracies},
             x_label="iteration", y_label="accuracy", y_lim=(0, 1))
 
-
-if __name__ == '__main__':
-    image_recognition()

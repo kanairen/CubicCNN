@@ -5,7 +5,6 @@ import collections
 import stringutil
 import numpy as np
 import warnings
-import itertools
 
 __author__ = 'ren'
 
@@ -136,8 +135,6 @@ class ClaTree(object):
 
     def parent(self, name, degree):
         node = self.root.search(name)
-        if node.degree <= degree:
-            return node
         return node.get_parent(degree)
 
     class ClaNode(object):
@@ -189,10 +186,9 @@ class ClaTree(object):
 
         def get_parent(self, degree):
             if self.parent is None:
-                return None
-            elif self.parent.degree <= degree:
-                return self.parent
+                return self
+            elif self.degree <= degree:
+                return self
             else:
                 return self.parent.get_parent(degree)
-
 

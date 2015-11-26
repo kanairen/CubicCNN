@@ -1,32 +1,45 @@
 # coding:utf-8
 
 import time
+import itertools
 import numpy as np
 from src.model.layer.hiddenlayer import HiddenLayer
 from src.model.layer.conv import ConvLayer3d
 from src.model.layer.pool import PoolLayer3d
 from src.model.layerset.mlp import MLP
 from src.helper.decorator import client
-from src.helper.data import PSB
+from src.helper.data3d import load_psb_boxels, primitive_rotate, \
+    primitive_trans, boxel_all
 from src.helper.activation import relu
-from src.helper.config import path_res_numpy_array
-from src.helper.visualize import plot_2d
+from src.helper.config import path_res_numpy_array,path_res_numpy_boxel_primitive
+from src.helper.visualize import plot_2d, plot_3d
 from src.util.date import ymdt
 
 __author__ = 'ren'
 
 
 @client
-def solid_recognition(n_div=50, show_batch_accuracies=True):
-    x_train, x_test, y_train, y_test, class_labels = PSB.load_boxels(degree=1,
-                                                                     is_mixed=True)
+def solid_recognition(show_batch_accuracies=False, **kwargs):
+    data_type = kwargs['data_type']
 
-    x_train = np.array(x_train)
-    x_test = np.array(x_test)
+    if data_type == 'psb':
+        x_train, x_test, y_train, y_test, class_labels = load_psb_boxels(4)
+    elif data_type == 'primitive_rotate':
+        x_train, x_test, y_train, y_test = primitive_rotate()
+        x_train = boxel_all(x_train)
+        x_test = boxel_all(x_test)
+    elif data_type == 'primitive_trans':
+        x_train, x_test, y_train, y_test = primitive_trans()
+        x_train = boxel_all(x_train)
+        x_test = boxel_all(x_test)
+
+    box_size = (100, 100, 100)
+    n_in = reduce(lambda x, y: x * y, box_size)
+
+    x_train = np.array(x_train).reshape(len(x_train), n_in)
+    x_test = np.array(x_test).reshape(len(x_test), n_in)
     y_train = np.array(y_train)
     y_test = np.array(y_test)
-
-    n, n_in = x_train.shape
 
     print "train data : ", len(x_train)
     print "test data : ", len(x_test)
@@ -38,15 +51,12 @@ def solid_recognition(n_div=50, show_batch_accuracies=True):
 
     print "preparing models..."
 
-    l1 = ConvLayer3d((50, 50, 50), in_channel=1, out_channel=4, k_size=3,
-                     stride=2)
-    print l1.output_box_size()
-    l2 = PoolLayer3d(l1.output_box_size(), in_channel=4, k_size=3)
-    print l2.output_box_size()
-    l3 = HiddenLayer(l2.n_out, 500, activation=relu)
+    # l1 = ConvLayer3d(box_size, 1, 16, 4, stride=3, activation=relu)
+    # l2 = PoolLayer3d(l1.output_box_size(), 16, 4)
+    l1 = HiddenLayer(n_in, 512,is_dropout=True)
+    l2 = HiddenLayer(l1.n_out, 512,is_dropout=True)
 
-    model = MLP(l1=l1, l2=l2, l3=l3, learning_rate=0.01, L1_rate=0.01,
-                L2_rate=0.01)
+    model = MLP(l1=l1, l2=l2, L1_rate=0.0001)
 
     """
     # TRAIN
@@ -58,7 +68,7 @@ def solid_recognition(n_div=50, show_batch_accuracies=True):
     n_iter = 100
 
     # バッチ数
-    n_batch = 10
+    n_batch = 50
 
     # バッチサイズ
     batch_size_train = len(x_train) / n_batch
@@ -124,7 +134,3 @@ def solid_recognition(n_div=50, show_batch_accuracies=True):
     # グラフの描画
     plot_2d({"train": train_accuracies, "test": test_accuracies},
             x_label="iteration", y_label="accuracy", y_lim=(0, 1))
-
-
-if __name__ == '__main__':
-    solid_recognition()

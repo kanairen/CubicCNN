@@ -21,6 +21,7 @@ path_res_numpy = path_res + "/numpy"
 path_res_2d_pattern = path_res_2d + "/pattern"
 
 # res/3d
+path_res_3d_primitive = path_res_3d + "/primitive"
 path_res_3d_psb = path_res_3d + "/psb"
 path_res_3d_shrec = path_res_3d + "/shrec"
 
@@ -32,18 +33,21 @@ path_res_3d_shrec_query = path_res_3d_shrec + "/query"
 path_res_3d_shrec_target = path_res_3d_shrec + "/target"
 
 # res/numpy
-path_res_numpy_psb = path_res_numpy + "/psb"
-path_res_numpy_boxel = path_res_numpy + "/boxel"
 path_res_numpy_array = path_res_numpy + "/array"
+path_res_numpy_boxel = path_res_numpy + "/boxel"
+path_res_numpy_psb = path_res_numpy + "/psb"
+
+# res/numpy/boxel
+path_res_numpy_boxel_primitive = path_res_numpy_boxel + "/primitive"
+path_res_numpy_boxel_psb = path_res_numpy_boxel + "/psb"
+
+# res/numpy/boxel/psb
+path_res_numpy_boxel_psb_test = path_res_numpy_boxel_psb + "/test"
+path_res_numpy_boxel_psb_train = path_res_numpy_boxel_psb + "/train"
 
 # res/numpy/psb
 path_res_numpy_psb_test = path_res_numpy_psb + "/test"
 path_res_numpy_psb_train = path_res_numpy_psb + "/train"
-
-# res/numpy/boxel
-path_res_numpy_boxel_test = path_res_numpy_boxel + "/test"
-path_res_numpy_boxel_train = path_res_numpy_boxel + "/train"
-
 '''
 CUDA
 '''

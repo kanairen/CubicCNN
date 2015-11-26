@@ -2,23 +2,16 @@
 
 import time
 
-from chainer import cuda
-
-from src.helper.config import GPU_ID
-
 __author__ = 'ren'
 
 
 def client(func):
-    print "Run Client..."
 
-    # use gpu
-    cuda.get_device(GPU_ID).use()
-
-    def timer_func(f):
+    def timer_func(**kwargs):
+        print "Run Client..."
         start = time.clock()
-        f()
+        func(**kwargs)
         stop = time.clock()
         print "process time : ", stop - start, " s"
 
-    return lambda: timer_func(func)
+    return timer_func
