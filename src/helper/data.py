@@ -4,18 +4,11 @@ import PIL.Image
 import cPickle
 import itertools
 import os
-import collections
 import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.datasets import fetch_mldata
-from theano import config
-from src.helper.config import path_res_2d, path_res_2d_pattern, \
-    path_res_3d_shrec_target, path_res_3d_shrec_query, path_res_3d_psb, \
-    path_res_3d_psb_classifier, path_res_numpy_psb_test, \
-    path_res_numpy_psb_train, path_res_numpy_boxel_psb_test, \
-    path_res_numpy_boxel_psb_train
+from src.helper.config import path_res_2d, path_res_2d_pattern
 from src.util.image import translate, distort
-from src.util.parse import parse_off, parse_cla
 
 __author__ = 'ren'
 
@@ -40,8 +33,7 @@ def mnist(data_home=path_res_2d, test_size=0.2, is_normalized=True,
     return x_train, x_test, y_train, y_test
 
 
-def cifar10(data_home=path_res_2d, is_normalized=True, is_grayscale=False,
-            x_dtype=np.float32, y_dtype=np.int32):
+def cifar10(data_home=path_res_2d, is_normalized=False, is_grayscale=False):
     def unpickle(file):
         fo = open(file, 'rb')
         dict = cPickle.load(fo)
@@ -85,11 +77,6 @@ def cifar10(data_home=path_res_2d, is_normalized=True, is_grayscale=False,
     if is_normalized:
         x_test /= x_test.max()
         x_train /= x_train.max()
-
-    x_test = x_test.astype(x_dtype)
-    x_train = x_train.astype(x_dtype)
-    y_test = y_test.astype(y_dtype)
-    y_train = y_train.astype(y_dtype)
 
     return x_train, x_test, y_train, y_test
 
@@ -211,11 +198,3 @@ def __distort_images(image, newsize, n_images=4, fix_distort=False):
         images.append(distorted_image)
 
     return images
-
-
-"""
-3D
-"""
-
-
-
