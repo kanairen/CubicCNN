@@ -39,7 +39,11 @@ class MLP(object):
         self.L1_rate = L1_rate
         self.L2_rate = L2_rate
 
-    def forward(self, inputs, answers, updates=None, givens={}):
+    def forward(self, inputs, answers, is_train, updates=None, givens={}):
+
+        # Dropoutの挙動変更のため、レイヤに訓練かどうかを設定
+        for layer in self.layers:
+            layer.is_train = is_train
 
         if updates is None:
             updates = self.update()
