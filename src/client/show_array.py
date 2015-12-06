@@ -16,7 +16,7 @@ def show_np_array(x_label, y_label, y_lim, location="lower right", keyword=None,
     for f in os.listdir(path_res_numpy_array):
         if keyword is not None and keyword not in f:
             continue
-        array = np.load(path_res_numpy_array + "/" + f)
+        array = np.load(os.path.join(path_res_numpy_array, f))
         arrays.setdefault(str(f), array)
 
     plot_2d(arrays, x_label, y_label, locate=location, y_lim=y_lim,

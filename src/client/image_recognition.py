@@ -7,7 +7,6 @@ from src.model.layer.pool import PoolLayer2d
 from src.model.layerset.mlp import MLP
 from src.helper.data import mnist, cifar10, pattern50_distort
 from src.helper.activation import relu
-from src.helper.decorator import client
 
 
 def image_recognition(data_type, n_iter, n_batch, show_batch_accuracies=True,

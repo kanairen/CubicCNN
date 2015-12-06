@@ -9,7 +9,7 @@ from src.helper.config import *
 __author__ = 'Ren'
 
 
-def learning(model, x_train, x_test, y_train, y_test,n_iter,n_batch,
+def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
              show_batch_accuracies=True, save_batch_accuracies=True):
     """
     TRAIN
@@ -61,9 +61,9 @@ def learning(model, x_train, x_test, y_train, y_test,n_iter,n_batch,
             if save_batch_accuracies:
                 train_accuracies.append(train_accuracy / (j + 1))
                 test_accuracies.append(test_accuracy / (j + 1))
-                np.save(path_res_numpy_array + "/" + ts + "_train",
+                np.save(os.path.join(path_res_numpy_array, ts + "_train"),
                         train_accuracies)
-                np.save(path_res_numpy_array + "/" + ts + "_test",
+                np.save(os.path.join(path_res_numpy_array, ts + "_test"),
                         test_accuracies)
 
         train_accuracy /= n_batch
@@ -80,9 +80,10 @@ def learning(model, x_train, x_test, y_train, y_test,n_iter,n_batch,
             train_accuracies.append(train_accuracy)
             test_accuracies.append(test_accuracy)
             # 精度の保存（途中で終了しても良いように、一回ごとに更新）
-            np.save(path_res_numpy_array + "/" + ts + "_train",
+            np.save(os.path.join(path_res_numpy_array, ts + "_train"),
                     train_accuracies)
-            np.save(path_res_numpy_array + "/" + ts + "_test", test_accuracies)
+            np.save(os.path.join(path_res_numpy_array, ts + "_test"),
+                    test_accuracies)
 
     # グラフの描画
     plot_2d({"train": train_accuracies, "test": test_accuracies},
