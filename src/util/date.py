@@ -4,7 +4,7 @@ import datetime
 
 __author__ = 'ren'
 
-TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+TIME_FORMAT = "%Y-%m-%d_%Hh%Mm%Ss"
 
 
 def ymdt():
