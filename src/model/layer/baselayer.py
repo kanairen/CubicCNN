@@ -29,3 +29,6 @@ class BaseLayer(object):
     def output(self, inputs_symbol):
         raise NotImplementedError(
             "layer objects should be implemented 'output'.")
+
+    def __str__(self):
+        return "[{:^13}]".format(self.__class__.__name__)

@@ -55,3 +55,8 @@ class HiddenLayer(BaseLayer):
                 z *= 0.5
 
         return z
+
+    def __str__(self):
+        return super(HiddenLayer, self).__str__() + \
+               " n_in : {:<5}".format(self.n_in) + \
+               " n_out : {:<5}".format(self.n_out)

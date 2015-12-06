@@ -11,6 +11,9 @@ __author__ = 'Ren'
 
 def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
              show_batch_accuracies=True, save_batch_accuracies=True):
+
+    print model
+
     """
     TRAIN
     """

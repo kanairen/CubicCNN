@@ -17,14 +17,15 @@ class MLP(object):
         L1 = 0.
         L2 = 0.
 
+        # レイヤリスト
+        self.layers = []
+
         for name, layer in sorted(six.iteritems(layers)):
+            self.layers.append(layer)
             setattr(self, name, layer)
             output = layer.output(output)
             L1 += abs(layer.W).sum()
             L2 += (layer.W ** 2).sum()
-
-        # レイヤリスト
-        self.layers = layers.values()
 
         # 出力シンボル
         self.output = output
@@ -38,7 +39,7 @@ class MLP(object):
         self.L1_rate = L1_rate
         self.L2_rate = L2_rate
 
-    def forward(self, inputs, answers, is_train, updates=None, givens={}):
+    def forward(self, inputs, answers, updates=None, givens={}):
 
         if updates is None:
             updates = self.update()
@@ -50,7 +51,7 @@ class MLP(object):
 
         return f(inputs, answers)
 
-    def update(self, ):
+    def update(self):
         cost = self.negative_log_likelihood(self.output, self.answers_symbol) + \
                self.L1_rate * self.L1 + self.L2_rate * self.L2
         updates = []
@@ -75,3 +76,9 @@ class MLP(object):
     @classmethod
     def negative_log_likelihood(cls, x, y):
         return -T.mean(T.log(cls.softmax(x))[T.arange(y.shape[0]), y])
+
+    def __str__(self):
+        string = ""
+        for layer in self.layers:
+            string += layer.__str__() + "\n"
+        return string

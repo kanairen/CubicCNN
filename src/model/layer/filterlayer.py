@@ -106,6 +106,14 @@ class FilterLayer(BaseLayer):
 
         return col
 
+    def __str__(self):
+        return super(FilterLayer, self).__str__() + \
+               " n_in : {:<5}".format(self.n_in) + \
+               " n_out : {:<5}".format(self.n_out) + \
+               " kernel : {:<5}".format((self.kw, self.kh)) + \
+               " stride : {:<5}".format((self.sw, self.sh)) + \
+               " pad : {:<5}".format((self.pw, self.ph))
+
 
 class CubicLayer(BaseLayer):
     def __init__(self, box_size, in_channel, out_channel, k_size, stride=1,
