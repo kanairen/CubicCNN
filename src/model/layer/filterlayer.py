@@ -112,7 +112,8 @@ class FilterLayer(BaseLayer):
                " n_out : {:<5}".format(self.n_out) + \
                " kernel : {:<5}".format((self.kw, self.kh)) + \
                " stride : {:<5}".format((self.sw, self.sh)) + \
-               " pad : {:<5}".format((self.pw, self.ph))
+               " pad : {:<5}".format((self.pw, self.ph)) + \
+               " out_img_size : {:<5}".format(self.output_img_size())
 
 
 class CubicLayer(BaseLayer):
