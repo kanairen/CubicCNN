@@ -7,7 +7,7 @@ __author__ = 'ren'
 
 
 class BaseLayer(object):
-    def __init__(self, is_dropout=False):
+    def __init__(self, is_dropout, dropout_rate):
         seed = 1111
 
         # 乱数生成器
@@ -18,6 +18,9 @@ class BaseLayer(object):
 
         # ドロップアウト
         self.is_dropout = is_dropout
+
+        # ドロップアウトされるユニットの割合
+        self.dropout_rate = dropout_rate
 
         # 学習フラグ
         self.is_train = False

@@ -12,9 +12,10 @@ __author__ = 'ren'
 class FilterLayer(BaseLayer):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
                  b=None, no_bias=False, W=None, dtype=config.floatX,
-                 activation=None, cover_all=False, is_dropout=False):
+                 activation=None, cover_all=False, is_dropout=False,
+                 dropout_rate=0.5):
 
-        super(FilterLayer, self).__init__(is_dropout)
+        super(FilterLayer, self).__init__(is_dropout, dropout_rate)
 
         # 画像サイズ
         img_w, img_h = pair(img_size)
@@ -119,9 +120,10 @@ class FilterLayer(BaseLayer):
 class CubicLayer(BaseLayer):
     def __init__(self, box_size, in_channel, out_channel, k_size, stride=1,
                  b=None, no_bias=False, W=None, dtype=config.floatX,
-                 activation=None, cover_all=False, is_dropout=False):
+                 activation=None, cover_all=False, is_dropout=False,
+                 dropout_rate=0.5):
 
-        super(CubicLayer, self).__init__(is_dropout)
+        super(CubicLayer, self).__init__(is_dropout, dropout_rate)
 
         # 画像サイズ
         box_x, box_y, box_z = trio(box_size)

@@ -47,7 +47,7 @@ class ConvLayer2d(FilterLayer):
             if self.is_train:
                 z *= self.srnd.binomial(size=z.shape, p=0.5)
             else:
-                z *= 0.5
+                z *= self.dropout_rate
 
         return z
 
@@ -102,6 +102,6 @@ class ConvLayer3d(CubicLayer):
             if self.is_train:
                 z *= self.srnd.binomial(size=z.shape, p=0.5)
             else:
-                z *= 0.5
+                z *= self.dropout_rate
 
         return z

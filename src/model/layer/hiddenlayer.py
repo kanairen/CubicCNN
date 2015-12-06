@@ -11,9 +11,9 @@ __author__ = 'ren'
 
 class HiddenLayer(BaseLayer):
     def __init__(self, n_in, n_out, W=None, b=None, dtype=config.floatX,
-                 activation=None, is_dropout=False):
+                 activation=None, is_dropout=False, dropout_rate=0.5):
 
-        super(HiddenLayer, self).__init__(is_dropout)
+        super(HiddenLayer, self).__init__(is_dropout, dropout_rate)
 
         # 入出力ユニット数
         self.n_in = n_in
@@ -52,7 +52,7 @@ class HiddenLayer(BaseLayer):
             if self.is_train:
                 z *= self.srnd.binomial(size=z.shape, p=0.5)
             else:
-                z *= 0.5
+                z *= self.dropout_rate
 
         return z
 
