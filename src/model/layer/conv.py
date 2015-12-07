@@ -12,13 +12,15 @@ __author__ = 'ren'
 class ConvLayer2d(FilterLayer):
     def __init__(self, img_size, in_channel, out_channel, k_size, stride=1,
                  b=None, no_bias=False, W=None, dtype=config.floatX,
-                 activation=None, cover_all=False, is_dropout=False):
+                 activation=None, cover_all=False, is_dropout=False,
+                 dropout_rate=0.5):
         """
         note:画像サイズに対してフィルタサイズが大きいと、後ろの層でエラーが起こる
         """
         super(ConvLayer2d, self).__init__(img_size, in_channel, out_channel,
                                           k_size, stride, b, no_bias, W, dtype,
-                                          activation, cover_all, is_dropout)
+                                          activation, cover_all, is_dropout,
+                                          dropout_rate)
 
     def update(self, cost, learning_rate=0.1):
         grads = T.grad(cost, self.params)
@@ -45,7 +47,7 @@ class ConvLayer2d(FilterLayer):
 
         if self.is_dropout:
             if self.is_train:
-                z *= self.srnd.binomial(size=z.shape, p=0.5)
+                z *= self.srnd.binomial(size=z.shape, p=self.dropout_rate)
             else:
                 z *= self.dropout_rate
 
@@ -65,13 +67,15 @@ class ConvLayer2d(FilterLayer):
 class ConvLayer3d(CubicLayer):
     def __init__(self, box_size, in_channel, out_channel, k_size, stride=1,
                  b=None, no_bias=False, W=None, dtype=config.floatX,
-                 activation=None, cover_all=False, is_dropout=False):
+                 activation=None, cover_all=False, is_dropout=False,
+                 dropout_rate=0.5):
         """
         note:画像サイズに対してフィルタサイズが大きいと、後ろの層でエラーが起こる
         """
         super(ConvLayer3d, self).__init__(box_size, in_channel, out_channel,
                                           k_size, stride, b, no_bias, W, dtype,
-                                          activation, cover_all, is_dropout)
+                                          activation, cover_all, is_dropout,
+                                          dropout_rate)
 
     def update(self, cost, learning_rate=0.1):
         grads = T.grad(cost, self.params)
@@ -100,7 +104,7 @@ class ConvLayer3d(CubicLayer):
 
         if self.is_dropout:
             if self.is_train:
-                z *= self.srnd.binomial(size=z.shape, p=0.5)
+                z *= self.srnd.binomial(size=z.shape, p=self.dropout_rate)
             else:
                 z *= self.dropout_rate
 

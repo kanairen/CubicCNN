@@ -15,7 +15,7 @@ POOL_AVERAGE = 1
 class PoolLayer2d(FilterLayer):
     def __init__(self, img_size, in_channel, k_size, stride=None, W=None, pad=0,
                  dtype=config.floatX, activation=lambda x: x, is_dropout=False,
-                 cover_all=False, pool_type=POOL_MAX):
+                 dropout_rate=0.5, cover_all=False, pool_type=POOL_MAX):
 
         # フィルタサイズ
         kw, kh = pair(k_size)
@@ -34,7 +34,7 @@ class PoolLayer2d(FilterLayer):
         super(PoolLayer2d, self).__init__(img_size, in_channel, in_channel,
                                           k_size, stride, None, True, W,
                                           dtype, activation, cover_all,
-                                          is_dropout)
+                                          is_dropout, dropout_rate)
 
     def update(self, cost, learning_rate=0.001):
         return None
@@ -51,7 +51,7 @@ class PoolLayer2d(FilterLayer):
 
         if self.is_dropout:
             if self.is_train:
-                z *= self.srnd.binomial(size=z.shape, p=0.5)
+                z *= self.srnd.binomial(size=z.shape, p=self.dropout_rate)
             else:
                 z *= self.dropout_rate
 
@@ -80,7 +80,7 @@ class PoolLayer2d(FilterLayer):
 class PoolLayer3d(CubicLayer):
     def __init__(self, box_size, in_channel, k_size, stride=None, W=None, pad=0,
                  dtype=config.floatX, activation=lambda x: x, is_dropout=False,
-                 cover_all=False, pool_type=POOL_MAX):
+                 dropout_rate=0.5, cover_all=False, pool_type=POOL_MAX):
 
         # フィルタサイズ
         kx, ky, kz = trio(k_size)
@@ -99,7 +99,7 @@ class PoolLayer3d(CubicLayer):
         super(PoolLayer3d, self).__init__(box_size, in_channel, in_channel,
                                           k_size, stride, None, True, W,
                                           dtype, activation, cover_all,
-                                          is_dropout)
+                                          is_dropout, dropout_rate)
 
     def update(self, cost, learning_rate=0.001):
         return None
@@ -116,7 +116,7 @@ class PoolLayer3d(CubicLayer):
 
         if self.is_dropout:
             if self.is_train:
-                z *= self.srnd.binomial(size=z.shape, p=0.5)
+                z *= self.srnd.binomial(size=z.shape, p=self.dropout_rate)
             else:
                 z *= self.dropout_rate
 
