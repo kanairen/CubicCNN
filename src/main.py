@@ -3,11 +3,13 @@
 import sys
 from src.client.image_recognition import image_recognition
 from src.client.solid_recognition import solid_recognition
+from src.helper.decorator import client
 
 __author__ = 'ren'
 
-if __name__ == '__main__':
 
+@client
+def main():
     # コマンドライン引数
     param = sys.argv
     # クライアントタイプ
@@ -38,3 +40,6 @@ if __name__ == '__main__':
         data_type = param[2]
         solid_recognition(data_type=data_type)
 
+
+if __name__ == '__main__':
+    main()

@@ -6,7 +6,6 @@ __author__ = 'ren'
 
 
 def client(func):
-
     def timer_func(**kwargs):
         print "Run Client..."
         start = time.clock()
