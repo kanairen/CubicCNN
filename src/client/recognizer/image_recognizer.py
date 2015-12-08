@@ -1,9 +1,8 @@
 # coding:utf-8
 
-import recognition
+import recognizer
 from src.client.structure.image_structure import cnn
 from src.helper.data import mnist, cifar10, pattern50_distort
-
 
 def image_recognition(data_type, n_iter, n_batch,
                       show_batch_accuracies=True, save_batch_accuracies=True):
@@ -34,5 +33,5 @@ def image_recognition(data_type, n_iter, n_batch,
 
     model = cnn((w, h), c)
 
-    recognition.learning(model, x_train, x_test, y_train, y_test, n_iter,
+    recognizer.learning(model, x_train, x_test, y_train, y_test, n_iter,
                          n_batch, show_batch_accuracies, save_batch_accuracies)

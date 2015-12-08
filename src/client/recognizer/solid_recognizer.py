@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import numpy as np
-import recognition
+import recognizer
 from src.model.layer.hiddenlayer import HiddenLayer
 from src.model.layerset.mlp import MLP
 from src.helper.decorator import client
@@ -56,5 +56,5 @@ def solid_recognition(n_iter, n_batch, show_batch_accuracies=False,
     # TRAIN
     # """
 
-    recognition.learning(model, x_train, x_test, y_train, y_test, n_iter,
+    recognizer.learning(model, x_train, x_test, y_train, y_test, n_iter,
                          n_batch, show_batch_accuracies, save_batch_accuracies)

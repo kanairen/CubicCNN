@@ -1,8 +1,8 @@
 # coding:utf-8
 
 import sys
-from src.client.recognizer.image_recognition import image_recognition
-from src.client.recognizer.solid_recognition import solid_recognition
+from src.client.recognizer.image_recognizer import image_recognition
+from src.client.recognizer.solid_recognizer import solid_recognition
 from src.helper.decorator import client
 
 __author__ = 'ren'
