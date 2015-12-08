@@ -3,7 +3,6 @@
 import sys
 from src.client.image_recognition import image_recognition
 from src.client.solid_recognition import solid_recognition
-from src.client.show_array import show_np_array
 
 __author__ = 'ren'
 
@@ -38,11 +37,4 @@ if __name__ == '__main__':
     elif client == 'solid_recognition':
         data_type = param[2]
         solid_recognition(data_type=data_type)
-    elif client == 'show_np_array':
-        x_label = "iteration"
-        y_label = "accuracy"
-        y_lim = (0, 1)
-        location = 'upper left'
-        keyword = '11-25'
-        show_np_array(x_label, y_label, y_lim, location=location,
-                      keyword=keyword, save=True)
+
