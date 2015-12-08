@@ -1,8 +1,8 @@
 # coding:utf-8
 
 import sys
-from src.client.image_recognition import image_recognition
-from src.client.solid_recognition import solid_recognition
+from src.client.recognizer.image_recognition import image_recognition
+from src.client.recognizer.solid_recognition import solid_recognition
 from src.helper.decorator import client
 
 __author__ = 'ren'
@@ -34,8 +34,8 @@ def main():
         print "save_batch_accuracies : ", save_batch_accuracies
 
         # 画像認識実験
-        image_recognition(data_type, n_iter, n_batch, show_batch_accuracies,
-                          save_batch_accuracies)
+        image_recognition(data_type, n_iter, n_batch,
+                          show_batch_accuracies, save_batch_accuracies)
     elif client == 'solid_recognition':
         data_type = param[2]
         solid_recognition(data_type=data_type)

@@ -72,7 +72,7 @@ class PoolLayer2d(FilterLayer):
         reshape_col = T.reshape(col, (
             n, self.in_channel, self.kh * self.kw, self.out_h, self.out_w))
 
-        max_col = T.flatten(T.max(reshape_col, axis=2), outdim=2)
+        max_col = T.flatten(T.mean(reshape_col, axis=2), outdim=2)
 
         return max_col
 

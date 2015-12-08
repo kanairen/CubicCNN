@@ -1,20 +1,12 @@
 # coding:utf-8
 
-import time
 import numpy as np
 import recognition
 from src.model.layer.hiddenlayer import HiddenLayer
-from src.model.layer.conv import ConvLayer3d
-from src.model.layer.pool import PoolLayer3d
 from src.model.layerset.mlp import MLP
 from src.helper.decorator import client
 from src.helper.data3d import load_psb_boxels, primitive_rotate, \
     primitive_trans, boxel_all
-from src.helper.activation import relu
-from src.helper.config import path_res_numpy_array, \
-    path_res_numpy_boxel_primitive
-from src.helper.visualize import plot_2d, plot_3d
-from src.util.date import ymdt
 
 __author__ = 'ren'
 
