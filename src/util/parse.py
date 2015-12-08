@@ -51,7 +51,7 @@ def parse_off(off_file):
 
         faces = []
         for i in xrange(n_faces):
-            c, r, g, b = map(int, f.readline().split(' '))
+            c, r, g, b = map(int, f.readline().rstrip().split(' '))
             faces.append([c, r, g, b])
         faces = np.array(faces)
 
@@ -94,7 +94,7 @@ def parse_cla(cla_file):
     tree = ClaTree('0')
 
     # クラスラベルと属するデータIDのマップ
-    classifier = {}
+    classifier = collections.OrderedDict()
 
     with open(cla_file) as f:
         if "PSB" not in f.readline():

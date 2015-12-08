@@ -2,7 +2,7 @@
 
 import sys
 from src.client.recognizer.image_recognizer import image_recognition
-from src.client.recognizer.solid_recognizer import solid_recognition
+from src.client.recognizer.solid_recognizer import psb_recognition
 from src.helper.decorator import client
 
 __author__ = 'ren'
@@ -39,8 +39,9 @@ def main():
 
     elif client == 'solid_recognition':
         # 三次元形状認識実験
-        solid_recognition(n_iter, n_batch, show_batch_accuracies,
-                          save_batch_accuracies)
+        if data_type == 'psb':
+            psb_recognition(n_iter, n_batch, show_batch_accuracies,
+                            save_batch_accuracies)
 
 
 if __name__ == '__main__':
