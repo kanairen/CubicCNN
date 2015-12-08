@@ -2,8 +2,7 @@
 
 import numpy as np
 import recognizer
-from src.model.layer.hiddenlayer import HiddenLayer
-from src.model.layerset.mlp import MLP
+from src.client.structure.solid_structure import cnn
 from src.helper.decorator import client
 from src.helper.data3d import load_psb_boxels, primitive_rotate, \
     primitive_trans, boxel_all
@@ -39,22 +38,13 @@ def solid_recognition(n_iter, n_batch, show_batch_accuracies=False,
     print "test data : ", len(x_test)
     print "classes : ", len(set(y_train.tolist() + y_test.tolist()))
 
-    """
-    MODEL
-    """
-
     print "preparing models..."
 
-    # l1 = ConvLayer3d(box_size, 1, 16, 4, stride=3, activation=relu)
-    # l2 = PoolLayer3d(l1.output_box_size(), 16, 4)
-    l1 = HiddenLayer(n_in, 512, is_dropout=True)
-    l2 = HiddenLayer(l1.n_out, 512, is_dropout=True)
-
-    model = MLP(l1=l1, l2=l2, L1_rate=0.0001)
+    model = cnn(box_size)
 
     """
     # TRAIN
     # """
 
     recognizer.learning(model, x_train, x_test, y_train, y_test, n_iter,
-                         n_batch, show_batch_accuracies, save_batch_accuracies)
+                        n_batch, show_batch_accuracies, save_batch_accuracies)
