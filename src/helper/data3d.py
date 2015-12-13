@@ -8,9 +8,30 @@ from sklearn.cross_validation import train_test_split
 from config import path_res_3d_primitive, path_res_3d_shrec_query, \
     path_res_3d_shrec_target, path_res_3d_psb, path_res_3d_psb_classifier
 from src.util.parse import parse_obj, parse_cla, parse_off
-from src.util.solid import rotate_3d, trans_3d
+from src.util.shape import rotate_3d, trans_3d
 
 __author__ = 'ren'
+
+
+def rotate_shapes(shape, r_range, rotate_priority=[0, 1, 2]):
+    r_shapes = []
+    for rx in xrange(r_range[0]):
+        for ry in xrange(r_range[1]):
+            for rz in xrange(r_range[2]):
+                r_shape = rotate_3d(shape, (rx, ry, rz), rotate_priority)
+                r_shapes.append(r_shape)
+    return r_shapes
+
+
+def trans_shapes(shape, t_range):
+    t_shapes = []
+    for tx in xrange(t_range[0]):
+        for ty in xrange(t_range[1]):
+            for tz in xrange(t_range[2]):
+                t_shape = trans_3d(shape, (tx, ty, tz))
+                t_shapes.append(t_shape)
+    return t_shapes
+
 
 """
 PRIMITIVE
@@ -102,6 +123,7 @@ def psbs(ids, path=path_res_3d_psb):
             raise IndexError("psb id:{} is not found!".format(id))
 
     return x_train, x_test, y_train, y_test
+
 
 """
 BOXEL
