@@ -219,6 +219,15 @@ class CubicLayer(BaseLayer):
 
         return col
 
+    def __str__(self):
+        return super(CubicLayer, self).__str__() + \
+               " n_in : {:<8}".format(self.n_in) + \
+               " n_out : {:<8}".format(self.n_out) + \
+               " kernel : {:<8}".format((self.kx, self.ky, self.kz)) + \
+               " stride : {:<8}".format((self.sx, self.sy, self.sz)) + \
+               " pad : {:<8}".format((self.px, self.py, self.pz)) + \
+               " out_img_size : {:<8}".format(self.output_box_size())
+
 
 def conv_outsize(size, k, s, p, cover_all=False):
     if cover_all:
