@@ -13,8 +13,8 @@ from src.util.image import translate, distort
 __author__ = 'ren'
 
 
-def mnist(data_home=path_res_2d, test_size=0.2, is_normalized=True,
-          x_dtype=np.float32, y_dtype=np.int32):
+def mnist(data_home=path_res_2d, is_normalized=True, is_formal=True,
+          test_size=0.2, x_dtype=np.float32, y_dtype=np.int32):
     # MNIST手書き文字データ data_homeのデータを読み込む
     # データがない場合はWEB上からダウンロード
     mnist = fetch_mldata('MNIST original', data_home=data_home)
@@ -25,8 +25,14 @@ def mnist(data_home=path_res_2d, test_size=0.2, is_normalized=True,
     if is_normalized:
         x /= x.max()
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y,
-                                                        test_size=test_size)
+    if is_formal:
+        # MNISTベンチマークと同じ形式
+        n_tr = 60000
+        x_train, x_test, y_train, y_test = x[:n_tr], x[n_tr:], y[:n_tr], y[
+                                                                         n_tr:]
+    else:
+        x_train, x_test, y_train, y_test = train_test_split(x, y,
+                                                            test_size=test_size)
     x_test = x_test.reshape((len(x_test), 1, 28, 28))
     x_train = x_train.reshape((len(x_train), 1, 28, 28))
 
