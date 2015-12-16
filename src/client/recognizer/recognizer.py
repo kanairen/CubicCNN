@@ -10,8 +10,9 @@ __author__ = 'Ren'
 
 
 def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
-             show_batch_accuracies=True, save_batch_accuracies=True):
-
+             show_batch_accuracies=True, save_batch_accuracies=True,
+             is_batch_test=False):
+    # モデル内訳
     print model
 
     """
@@ -34,8 +35,8 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
 
         start = time.clock()
 
-        train_accuracy = 0
-        test_accuracy = 0
+        sum_train_accuracy = 0
+        sum_test_accuracy = 0
 
         # バッチごとに学習
         for j in range(n_batch):
@@ -43,45 +44,58 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             print "{}th batch...".format(j)
 
             from_train = j * batch_size_train
-            from_test = j * batch_size_test
             to_train = (j + 1) * batch_size_train
-            to_test = (j + 1) * batch_size_test
+            from_test = j * batch_size_test if is_batch_test else 0
+            to_test = (j + 1) * batch_size_test if is_batch_test else len(
+                x_test)
 
-            train_accuracy += model.forward(
+            train_accuracy = model.forward(
                 inputs=x_train[from_train:to_train],
                 answers=y_train[from_train:to_train],
                 is_train=True)
-            test_accuracy += model.forward(
+            test_accuracy = model.forward(
                 inputs=x_test[from_test:to_test],
                 answers=y_test[from_test:to_test],
                 is_train=False,
                 updates=())
 
-            if show_batch_accuracies:
-                print "train : ", train_accuracy / (j + 1)
-                print "test : ", test_accuracy / (j + 1)
+            # 累積精度
+            sum_train_accuracy += train_accuracy
+            sum_test_accuracy += test_accuracy
 
+            # 平均精度
+            ave_train_accuracy = sum_train_accuracy / (j + 1)
+            ave_test_accuracy = sum_test_accuracy / (j + 1)
+
+            # バッチテストするかどうかによって出力する精度を変える
+            out_test_accuracy = ave_test_accuracy if is_batch_test else test_accuracy
+
+            # バッチごとの精度出力
+            if show_batch_accuracies:
+                print "train : ", ave_train_accuracy
+                print "test : ", out_test_accuracy
+
+            # 精度配列を保存（バッチごと）
             if save_batch_accuracies:
-                train_accuracies.append(train_accuracy / (j + 1))
-                test_accuracies.append(test_accuracy / (j + 1))
+                train_accuracies.append(ave_train_accuracy)
+                test_accuracies.append(out_test_accuracy)
                 np.save(os.path.join(path_res_numpy_array, ts + "_train"),
                         train_accuracies)
                 np.save(os.path.join(path_res_numpy_array, ts + "_test"),
                         test_accuracies)
 
-        train_accuracy /= n_batch
-        test_accuracy /= n_batch
-
         # 一回の学習時間
         print "time : ", time.clock() - start, "s"
 
         # 精度
-        print "train : ", train_accuracy
-        print "test : ", test_accuracy
+        if not show_batch_accuracies:
+            print "train : ", sum_train_accuracy / n_batch
+            print "test : ", sum_test_accuracy / n_batch
 
+        # 精度配列を保存（データセット一周ごと）
         if not save_batch_accuracies:
-            train_accuracies.append(train_accuracy)
-            test_accuracies.append(test_accuracy)
+            train_accuracies.append(sum_train_accuracy / n_batch)
+            test_accuracies.append(sum_test_accuracy / n_batch)
             # 精度の保存（途中で終了しても良いように、一回ごとに更新）
             np.save(os.path.join(path_res_numpy_array, ts + "_train"),
                     train_accuracies)
