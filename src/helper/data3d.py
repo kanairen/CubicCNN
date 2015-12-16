@@ -4,7 +4,6 @@ import os
 import itertools
 import numpy as np
 from collections import OrderedDict
-from sklearn.cross_validation import train_test_split
 from config import path_res_3d_primitive, path_res_3d_shrec_query, \
     path_res_3d_shrec_target, path_res_3d_psb, path_res_3d_psb_classifier
 from src.util.parse import parse_obj, parse_cla, parse_off
@@ -41,26 +40,7 @@ PRIMITIVE
 """
 
 
-def primitive_rotate(rotate_priority=[0, 1, 2], to=(5, 5, 4), step=(1, 1, 1),
-                     test_size=0.2):
-    primitives = __primitive()
-    r_primitives = []
-    for prim in primitives:
-        r_primitives.extend(rotate_3d(prim, rotate_priority, to, step))
-    ids = [i / len(primitives) for i in xrange(len(r_primitives))]
-    return train_test_split(r_primitives, ids, test_size=test_size)
-
-
-def primitive_trans(to=(5, 5, 4), step=(1, 1, 1), test_size=0.2):
-    primitives = __primitive()
-    t_primitives = []
-    for prim in primitives:
-        t_primitives.extend(trans_3d(prim, to, step))
-    ids = [i / len(primitives) for i in xrange(len(t_primitives))]
-    return train_test_split(t_primitives, ids, test_size=test_size)
-
-
-def __primitive(path=path_res_3d_primitive):
+def primitive(path=path_res_3d_primitive):
     primitives = []
     for f_name in os.listdir(path):
         prim = parse_obj(path + "/" + f_name)
