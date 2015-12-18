@@ -5,8 +5,9 @@ import itertools
 import numpy as np
 from collections import OrderedDict
 from config import path_res_3d_primitive, path_res_3d_shrec_query, \
-    path_res_3d_shrec_target, path_res_3d_psb, path_res_3d_psb_classifier
-from src.util.parse import parse_obj, parse_cla, parse_off
+    path_res_3d_shrec_target, path_res_3d_psb, path_res_3d_psb_classifier, \
+    path_res_3d_psb_binvox
+from src.util.parse import parse_obj, parse_cla, parse_off, parse_binvox
 from src.util.shape import rotate_3d, trans_3d
 from src.util.sequence import trio
 
@@ -101,6 +102,47 @@ def psbs(ids, path=path_res_3d_psb):
             y_train.append(class_label(train_cls, id))
         elif id in test_ids:
             x_test.append(psb(id, path))
+            y_test.append(class_label(test_cls, id))
+        else:
+            raise IndexError("psb id:{} is not found!".format(id))
+
+    return x_train, x_test, y_train, y_test
+
+
+def psb_binvox(id, path=path_res_3d_psb_binvox):
+    return parse_binvox(os.path.join(path, "m{}.binvox".format(id)))
+
+
+def psb_binvoxs(ids, path=path_res_3d_psb_binvox):
+    # クラス情報
+    path_cls = path_res_3d_psb_classifier
+    train_cls = parse_cla(os.path.join(path_cls, "train.cla"))[0]
+    test_cls = parse_cla(os.path.join(path_cls, "test.cla"))[0]
+    all_cls = reduce(lambda x, y: OrderedDict(x, **y), (train_cls, test_cls))
+
+    # 各データセット別IDリスト
+    train_ids = sorted(list(itertools.chain(*train_cls.values())))
+    test_ids = sorted(list(itertools.chain(*test_cls.values())))
+
+    # IDから、データのクラスラベルを取得
+    # クラスラベルは全クラスリスト中でのIndex
+    def class_label(cls, id):
+        for cls_name, cls_ids in cls.items():
+            if id in cls_ids:
+                return all_cls.keys().index(cls_name)
+        raise IndexError("psb id:{} is not found!".format(id))
+
+    x_train = []
+    x_test = []
+    y_train = []
+    y_test = []
+
+    for id in ids:
+        if id in train_ids:
+            x_train.append(psb_binvox(id, path))
+            y_train.append(class_label(train_cls, id))
+        elif id in test_ids:
+            x_test.append(psb_binvox(id, path))
             y_test.append(class_label(test_cls, id))
         else:
             raise IndexError("psb id:{} is not found!".format(id))

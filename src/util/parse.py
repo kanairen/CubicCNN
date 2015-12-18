@@ -73,18 +73,18 @@ def parse_obj(obj_file):
                 vertices.append(p)
             elif split[0] == 'vt':
                 warnings.warn(
-                    "vt row's of .obj file are ignored."
-                    " if you want to get vt row's, please edit \'parse.py\'")
+                        "vt row's of .obj file are ignored."
+                        " if you want to get vt row's, please edit \'parse.py\'")
                 break
             elif split[0] == 'vn':
                 warnings.warn(
-                    "vn row's of .obj file are ignored."
-                    " if you want to get f row's, please edit \'parse.py\'")
+                        "vn row's of .obj file are ignored."
+                        " if you want to get f row's, please edit \'parse.py\'")
                 break
             elif split[0] == 'f':
                 warnings.warn(
-                    "f row's of .obj file are ignored. "
-                    "if you want to get f row's, please edit \'parse.py\'")
+                        "f row's of .obj file are ignored. "
+                        "if you want to get f row's, please edit \'parse.py\'")
                 break
 
     return vertices
@@ -194,7 +194,7 @@ class ClaTree(object):
                 return self.parent.get_parent(degree)
 
 
-def parse_binvox(binvox_file):
+def parse_binvox(binvox_file, show_params=False):
     """
 
     .binvoxファイルを読み込み、3Dボクセル配列を返す
@@ -207,23 +207,25 @@ def parse_binvox(binvox_file):
 
         # binvox 1
         binvox = f.readline().strip()
-        print binvox
 
         # 分割数
         dim = tuple(map(int, f.readline().strip().split()[1:]))
-        print dim
 
         # 標準化の際の平行移動
         trans = tuple(map(float, f.readline().strip().split()[1:]))
-        print trans
 
         # 標準化の際のスケール
         scale = float(f.readline().strip().split()[1])
-        print scale
 
         # data（バイナリスタート）
         data = f.readline()
-        print data
+
+        if show_params:
+            print binvox
+            print dim
+            print trans
+            print scale
+            print data
 
         # ボクセル配列
         array = np.zeros(shape=(dim[0] * dim[1] * dim[2]), dtype=np.uint8)
@@ -254,4 +256,3 @@ def parse_binvox(binvox_file):
 
     # 3Dにして返戻
     return np.rollaxis(array.reshape(dim), 2)
-

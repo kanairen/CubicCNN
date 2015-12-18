@@ -23,6 +23,7 @@ path_res_2d_pattern = os.path.join(path_res_2d, "pattern")
 # res/3d
 path_res_3d_primitive = os.path.join(path_res_3d, "primitive")
 path_res_3d_psb = os.path.join(path_res_3d, "psb")
+path_res_3d_psb_binvox = os.path.join(path_res_3d, "psb_binvox")
 path_res_3d_shrec = os.path.join(path_res_3d, "shrec")
 
 # res/3d/psb
