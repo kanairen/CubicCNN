@@ -4,7 +4,7 @@ import os
 import numpy as np
 import itertools
 import recognizer
-from src.client.structure.solid_structure import cnn
+from src.client.structure.shape_structure import cnn
 from src.helper.data3d import rotate_shapes, psbs, voxel_all
 from src.helper.config import path_res_numpy_cache_psb
 

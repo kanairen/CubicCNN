@@ -2,7 +2,7 @@
 
 import sys
 from src.client.recognizer.image_recognizer import image_recognition
-from src.client.recognizer.solid_recognizer import psb_recognition
+from src.client.recognizer.shape_recognizer import psb_recognition
 from src.helper.decorator import client
 
 __author__ = 'ren'
