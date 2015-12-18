@@ -36,20 +36,20 @@ path_res_3d_shrec_target = os.path.join(path_res_3d_shrec, "target")
 # res/numpy
 path_res_numpy_array = os.path.join(path_res_numpy, "array")
 path_res_numpy_cache = os.path.join(path_res_numpy, "cache")
-path_res_numpy_boxel = os.path.join(path_res_numpy, "boxel")
+path_res_numpy_voxel = os.path.join(path_res_numpy, "voxel")
 path_res_numpy_psb = os.path.join(path_res_numpy, "psb")
 
-# res/numpy/boxel
-path_res_numpy_boxel_primitive = os.path.join(path_res_numpy_boxel, "primitive")
-path_res_numpy_boxel_psb = os.path.join(path_res_numpy_boxel, "psb")
+# res/numpy/voxel
+path_res_numpy_voxel_primitive = os.path.join(path_res_numpy_voxel, "primitive")
+path_res_numpy_voxel_psb = os.path.join(path_res_numpy_voxel, "psb")
 
 # res/numpy/cache
 path_res_numpy_cache_cifar = os.path.join(path_res_numpy_cache, "cache")
 path_res_numpy_cache_psb = os.path.join(path_res_numpy_cache, "psb")
 
-# res/numpy/boxel/psb
-path_res_numpy_boxel_psb_test = os.path.join(path_res_numpy_boxel_psb, "test")
-path_res_numpy_boxel_psb_train = os.path.join(path_res_numpy_boxel_psb, "train")
+# res/numpy/voxel/psb
+path_res_numpy_voxel_psb_test = os.path.join(path_res_numpy_voxel_psb, "test")
+path_res_numpy_voxel_psb_train = os.path.join(path_res_numpy_voxel_psb, "train")
 
 # res/numpy/psb
 path_res_numpy_psb_test = os.path.join(path_res_numpy_psb, "test")

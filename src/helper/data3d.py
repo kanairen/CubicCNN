@@ -151,26 +151,26 @@ def psb_binvoxs(ids, path=path_res_3d_psb_binvox):
 
 
 """
-BOXEL
+VOXEL
 """
 
 
-def boxel(points, n_div=100):
+def voxel(points, n_div=100):
     # -0.5~0.5
     points = __standard(points)
-    boxel = np.zeros(shape=(n_div, n_div, n_div), dtype=np.float32)
+    voxel = np.zeros(shape=(n_div, n_div, n_div), dtype=np.float32)
     for p in points:
         x, y, z = p
         bz = int(z * n_div + n_div) / 2
         by = int(y * n_div + n_div) / 2
         bx = int(x * n_div + n_div) / 2
-        boxel[bz][by][bx] = 1
+        voxel[bz][by][bx] = 1
 
-    return boxel
+    return voxel
 
 
-def boxel_all(points_list, n_div=100):
-    return np.array([boxel(points, n_div) for points in points_list],
+def voxel_all(points_list, n_div=100):
+    return np.array([voxel(points, n_div) for points in points_list],
                     dtype=np.float32)
 
 
