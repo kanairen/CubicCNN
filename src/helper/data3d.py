@@ -41,12 +41,12 @@ PRIMITIVE
 """
 
 
-def primitive(path=path_res_3d_primitive):
-    primitives = []
+def primitives(path=path_res_3d_primitive):
+    prim_list = []
     for f_name in os.listdir(path):
-        prim = parse_obj(path + "/" + f_name)
-        primitives.append(prim)
-    return primitives
+        prim = parse_obj(os.path.join(path, f_name))
+        prim_list.append(prim)
+    return prim_list
 
 
 """
