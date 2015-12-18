@@ -46,8 +46,7 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             from_train = j * batch_size_train
             to_train = (j + 1) * batch_size_train
             from_test = j * batch_size_test if is_batch_test else 0
-            to_test = (j + 1) * batch_size_test if is_batch_test else len(
-                x_test)
+            to_test = (j + 1) * batch_size_test if is_batch_test else len(x_test)
 
             train_accuracy = model.forward(
                 inputs=x_train[from_train:to_train],
