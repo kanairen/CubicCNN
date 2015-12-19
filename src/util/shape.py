@@ -64,7 +64,7 @@ def rotate_voxel(boxel, r, rotate_priority=[0, 1, 2]):
                     continue
                 rx, ry, rz = np.dot(np.dot(np.dot((x, y, z), mtr_a), mtr_b),
                                     mtr_c)
-                if 0 <= rx <= dx and 0 <= ry <= dy and 0 <= rz <= dz:
+                if 0 <= rx < dx and 0 <= ry < dy and 0 <= rz < dz:
                     r_boxel[rz][ry][rx] = 1
 
     return r_boxel
