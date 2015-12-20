@@ -10,6 +10,7 @@ if __name__ == '__main__':
     # data3d.test_psb()
     # data3d.test_psb_binvox()
     # data3d.test_psb_binvoxs()
+    data3d.test_voxelize()
 
     # util/shape.py
     # shape.test_rotate_voxel()
