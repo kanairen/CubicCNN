@@ -47,7 +47,7 @@ def plot_3d(points,
     pyplot.show()
 
 
-def plot_boxel(boxels,
+def plot_voxel(voxels,
                x_label="X",
                y_label="Y",
                z_label="Z"):
@@ -67,12 +67,12 @@ def plot_boxel(boxels,
     ax.set_zlabel(z_label)
 
     # 描画
-    rx, ry, rz = boxels.shape
+    rx, ry, rz = voxels.shape
     px, py, pz = [], [], []
     for z in range(rz):
         for y in range(ry):
             for x in range(rx):
-                if boxels[z][y][x] == 1:
+                if voxels[z][y][x] == 1:
                     px.append(x)
                     py.append(y)
                     pz.append(z)

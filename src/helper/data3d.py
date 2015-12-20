@@ -8,32 +8,9 @@ from config import path_res_3d_primitive, path_res_3d_shrec_query, \
     path_res_3d_shrec_target, path_res_3d_psb, path_res_3d_psb_classifier, \
     path_res_3d_psb_binvox
 from src.util.parse import parse_obj, parse_cla, parse_off, parse_binvox
-from src.util.shape import rotate_3d, trans_3d
-from src.util.sequence import trio
 
 __author__ = 'ren'
 
-
-def rotate_shapes(shape, r_range, step, rotate_priority=[0, 1, 2]):
-    sx, sy, sz = trio(step)
-    r_shapes = []
-    for rx in xrange(0, r_range[0], sx):
-        for ry in xrange(0, r_range[1], sy):
-            for rz in xrange(0, r_range[2], sz):
-                r_shape = rotate_3d(shape, (rx, ry, rz), rotate_priority)
-                r_shapes.append(r_shape)
-    return r_shapes
-
-
-def trans_shapes(shape, t_range, step):
-    sx, sy, sz = trio(step)
-    t_shapes = []
-    for tx in xrange(0, t_range[0], sx):
-        for ty in xrange(0, t_range[1], sy):
-            for tz in xrange(0, t_range[2], sz):
-                t_shape = trans_3d(shape, (tx, ty, tz))
-                t_shapes.append(t_shape)
-    return t_shapes
 
 
 """
@@ -155,7 +132,7 @@ VOXEL
 """
 
 
-def voxel(points, n_div=100):
+def voxelize(points, n_div=100):
     # -0.5~0.5
     points = __standard(points)
     voxel = np.zeros(shape=(n_div, n_div, n_div), dtype=np.float32)
@@ -169,8 +146,8 @@ def voxel(points, n_div=100):
     return voxel
 
 
-def voxel_all(points_list, n_div=100):
-    return np.array([voxel(points, n_div) for points in points_list],
+def voxelize_all(points_list, n_div=100):
+    return np.array([voxelize(points, n_div) for points in points_list],
                     dtype=np.float32)
 
 

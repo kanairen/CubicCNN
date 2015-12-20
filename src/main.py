@@ -2,7 +2,8 @@
 
 import sys
 from src.client.recognizer.image_recognizer import image_recognition
-from src.client.recognizer.shape_recognizer import psb_recognition
+from src.client.recognizer.shape_recognizer import psb_recognition, \
+    psb_binvox_recognition
 from src.helper.decorator import client
 
 __author__ = 'ren'
@@ -42,6 +43,9 @@ def main():
         if data_type == 'psb':
             psb_recognition(n_iter, n_batch, show_batch_accuracies,
                             save_batch_accuracies)
+        elif data_type == 'psb_binvox':
+            psb_binvox_recognition(n_iter, n_batch, show_batch_accuracies,
+                                   save_batch_accuracies)
 
 
 if __name__ == '__main__':
