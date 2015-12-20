@@ -16,12 +16,3 @@ def test_psb_binvoxs():
         plot_voxel(x)
     for x in x_test:
         plot_voxel(x)
-
-
-def test_centerize_voxels():
-    ids = [1, 2, 3]
-    x_train, x_test, y_train, y_test = psb_binvoxs(ids)
-    plot_voxel(x_test[0])
-    c_binvoxs = centerize_voxels(np.array(x_test), center=(50, 50, 50))
-    for b in c_binvoxs:
-        plot_voxel(b)

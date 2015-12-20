@@ -9,12 +9,11 @@ if __name__ == '__main__':
     # helper/data3d
     # data3d.test_psb_binvox()
     # data3d.test_psb_binvoxs()
-    # data3d.test_centerize_voxels()
 
     # util/shape.py
     # shape.test_rotate_voxel()
     # shape.test_trans_voxel()
-
+    shape.test_centerize_voxels()
 
 
 

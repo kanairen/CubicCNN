@@ -1,5 +1,5 @@
 from src.util.shape import *
-from src.helper.data3d import psb_binvox
+from src.helper.data3d import psb_binvox, psb_binvoxs
 from src.helper.visualize import plot_voxel
 
 __author__ = 'ren'
@@ -22,3 +22,10 @@ def test_trans_voxel():
     plot_voxel(trans_voxel(boxel, t_x))
     plot_voxel(trans_voxel(boxel, t_y))
     plot_voxel(trans_voxel(boxel, t_z))
+
+def test_centerize_voxels():
+    ids = [0, 1, 2, 3]
+    x_train, x_test, y_train, y_test = psb_binvoxs(ids)
+    c_binvoxs = centerize_voxels(np.array(x_test), center=(50, 50, 50))
+    for b in c_binvoxs:
+        plot_voxel(b)
