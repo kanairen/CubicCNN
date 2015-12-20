@@ -1,7 +1,12 @@
 from src.helper.data3d import *
-from src.helper.visualize import plot_voxel
+from src.helper.visualize import plot_3d, plot_voxel
 
 __author__ = 'ren'
+
+
+def test_psb():
+    p = psb(0)
+    plot_3d(p)
 
 
 def test_psb_binvox():
@@ -16,3 +21,5 @@ def test_psb_binvoxs():
         plot_voxel(x)
     for x in x_test:
         plot_voxel(x)
+
+

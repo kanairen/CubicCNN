@@ -7,13 +7,14 @@ from src.helper.visualize import plot_voxel
 if __name__ == '__main__':
     pass
     # helper/data3d
+    # data3d.test_psb()
     # data3d.test_psb_binvox()
     # data3d.test_psb_binvoxs()
 
     # util/shape.py
     # shape.test_rotate_voxel()
     # shape.test_trans_voxel()
-    shape.test_centerize_voxels()
+    # shape.test_centerize_voxels()
 
 
 
