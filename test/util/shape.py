@@ -27,6 +27,7 @@ def test_trans_voxel(id=0):
 
 def test_centerize_voxels(ids=[0, 1, 2, 3]):
     x_train, x_test, y_train, y_test = psb_binvoxs(ids)
-    c_binvoxs = centerize_voxels(np.array(x_test), center=(50, 50, 50))
+    x = x_train if len(x_train) > 0 else x_test
+    c_binvoxs = centerize_voxels(np.array(x), center=(50, 50, 50))
     for b in c_binvoxs:
         plot_voxel(b)
