@@ -56,10 +56,10 @@ class FilterLayer(BaseLayer):
         # フィルタベクトル
         if W is None:
             W = np.asarray(
-                self.rnd.uniform(low=-np.sqrt(1. / in_channel * kw * kh),
-                                 high=np.sqrt(1. / in_channel * kw * kh),
-                                 size=(out_channel, in_channel, kh, kw)),
-                dtype=dtype)
+                    self.rnd.uniform(low=-np.sqrt(1. / in_channel * kw * kh),
+                                     high=np.sqrt(1. / in_channel * kw * kh),
+                                     size=(out_channel, in_channel, kh, kw)),
+                    dtype=dtype)
         self.W = shared(W, name='W', borrow=True)
 
         # バイアスベクトル
@@ -111,6 +111,8 @@ class FilterLayer(BaseLayer):
         return super(FilterLayer, self).__str__() + \
                " n_in : {:<5}".format(self.n_in) + \
                " n_out : {:<5}".format(self.n_out) + \
+               " in_channel : {:<5}".format(self.in_channel) + \
+               " out_channel : {:<5}".format(self.out_channel) + \
                " kernel : {:<5}".format((self.kw, self.kh)) + \
                " stride : {:<5}".format((self.sw, self.sh)) + \
                " pad : {:<5}".format((self.pw, self.ph)) + \
@@ -170,10 +172,11 @@ class CubicLayer(BaseLayer):
         # フィルタベクトル
         if W is None:
             W = np.asarray(
-                self.rnd.uniform(low=-np.sqrt(1. / in_channel * kx * ky * kz),
-                                 high=np.sqrt(1. / in_channel * kx * ky * kz),
-                                 size=(out_channel, in_channel, kx, ky, kz)),
-                dtype=dtype)
+                    self.rnd.uniform(
+                            low=-np.sqrt(1. / in_channel * kx * ky * kz),
+                            high=np.sqrt(1. / in_channel * kx * ky * kz),
+                            size=(out_channel, in_channel, kx, ky, kz)),
+                    dtype=dtype)
         self.W = shared(W, name='W', borrow=True)
 
         # バイアスベクトル
@@ -223,6 +226,8 @@ class CubicLayer(BaseLayer):
         return super(CubicLayer, self).__str__() + \
                " n_in : {:<8}".format(self.n_in) + \
                " n_out : {:<8}".format(self.n_out) + \
+               " in_channel : {:<5}".format(self.in_channel) + \
+               " out_channel : {:<5}".format(self.out_channel) + \
                " kernel : {:<8}".format((self.kx, self.ky, self.kz)) + \
                " stride : {:<8}".format((self.sx, self.sy, self.sz)) + \
                " pad : {:<8}".format((self.px, self.py, self.pz)) + \
