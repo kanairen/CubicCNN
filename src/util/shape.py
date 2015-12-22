@@ -58,9 +58,9 @@ def trans_shapes(shape, t_range, step):
     return t_shapes
 
 
-def rotate_voxels(voxel, r_range, step, rotate_priority=[0, 1, 2]):
+def rotate_voxels(voxel, r_range, step, center, rotate_priority=[0, 1, 2]):
     sx, sy, sz = trio(step)
-    return [rotate_voxel(voxel, (rx, ry, rz), rotate_priority)
+    return [rotate_voxel(voxel, (rx, ry, rz), center, rotate_priority)
             for rx in xrange(0, r_range[0], sx)
             for ry in xrange(0, r_range[1], sy)
             for rz in xrange(0, r_range[2], sz)]
@@ -83,14 +83,15 @@ def centerize_voxels(voxels, center):
     return c_voxels
 
 
-
-def rotate_voxel(voxel, r, rotate_priority=[0, 1, 2]):
+def rotate_voxel(voxel, r, center, rotate_priority=[0, 1, 2]):
     assert len(r) == 3
     assert len(voxel.shape) == 3
 
     dz, dy, dx = voxel.shape
 
     r_x, r_y, r_z = np.asarray(r, dtype=np.float32) / 180. * np.pi
+
+    cx, cy, cz = center
 
     mtr_x = np.array([[1., 0., 0.],
                       [0., np.cos(r_x), np.sin(r_x)],
@@ -111,10 +112,11 @@ def rotate_voxel(voxel, r, rotate_priority=[0, 1, 2]):
             for x in xrange(dx):
                 if voxel[z][y][x] == 0:
                     continue
-                rx, ry, rz = np.dot(np.dot(np.dot((x, y, z), mtr_a), mtr_b),
-                                    mtr_c)
-                if 0 <= rx < dx and 0 <= ry < dy and 0 <= rz < dz:
-                    r_voxel[rz][ry][rx] = 1
+                rx, ry, rz = np.dot(
+                        np.dot(np.dot((x - cx, y - cy, z - cz), mtr_a), mtr_b),
+                        mtr_c)
+                if 0 <= rx + cx < dx and 0 <= ry + cy < dy and 0 <= rz + cz < dz:
+                    r_voxel[rz + cz][ry + cy][rx + cx] = 1
 
     return r_voxel
 

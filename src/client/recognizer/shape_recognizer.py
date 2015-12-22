@@ -38,10 +38,11 @@ def psb_binvox_recognition(n_iter, n_batch, show_batch_accuracies=False,
         c_train = centerize_voxel(train, (50, 50, 50))
         c_test = centerize_voxel(test, (50, 50, 50))
         print "{}s".format(time.clock() - start)
-        r_x_train.extend(rotate_voxels(c_train, r, step))
-        r_x_test.extend(rotate_voxels(c_test, r, step))
-        if len(r_x_train) == 1:
+        r_x_train.extend(rotate_voxels(c_train, r, step, (50, 50, 50)))
+        r_x_test.extend(rotate_voxels(c_test, r, step, (50, 50, 50)))
+        if i == 0:
             plot_voxel(r_x_train[0])
+            plot_voxel(r_x_train[-1])
         print "{}s".format(time.clock() - start)
 
     print "reshape..."
