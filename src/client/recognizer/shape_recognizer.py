@@ -1,27 +1,44 @@
 # coding:utf-8
 
 import os
-import time
 import numpy as np
 import itertools
 import recognizer
 from src.client.structure.shape_structure import cnn
 from src.helper.data3d import psb_binvoxs, psbs, voxelize_all
 from src.helper.config import path_res_numpy_cache_psb
-from src.helper.visualize import plot_voxel
-from src.util.shape import rotate_shapes, rotate_voxels, centerize_voxel
+from src.util.shape import rotate_shapes, rotate_voxels, trans_voxels, \
+    centerize_voxel
 
 __author__ = 'ren'
 
 
-def psb_binvox_recognition(n_iter, n_batch, show_batch_accuracies=False,
-                           save_batch_accuracies=False,
-                           box=(100, 100, 100), r=(25, 25, 5), step=5):
+def solid_recognition(data_type, n_iter, n_batch, show_batch_accuracies=False,
+                      save_batch_accuracies=False,
+                      box=(100, 100, 100), r=(1, 1, 45), step=5):
+    if data_type == "psb":
+        psb_recognition(n_iter, n_batch, box, r, step, show_batch_accuracies,
+                        save_batch_accuracies)
+    elif data_type == "psb_binvox":
+        psb_binvox_recognition(n_iter, n_batch, box, r, step,
+                               show_batch_accuracies, save_batch_accuracies)
+
+
+def psb_binvox_recognition(n_iter, n_batch, box, r, step,
+                           show_batch_accuracies=False,
+                           save_batch_accuracies=False):
+    # PSB 3DモデルのID
     ids = []
     # airplane biplane
-    ids.extend(xrange(1118, 1145, 1))
-    # airplane commercial
+    ids.extend(xrange(1118, 1145 + 1, 1))
+    # airplane commercial(test -1)
     ids.extend(xrange(1146, 1166, 1))
+    # fright jet
+    ids.extend(xrange(1167, 1266 + 1))
+    # helicopter(test -1)
+    ids.extend(xrange(1302, 1336))
+    # enterprise_like
+    ids.extend(xrange(1353, 1374 + 1))
 
     x_train, x_test, y_train, y_test = psb_binvoxs(ids)
 
@@ -32,18 +49,11 @@ def psb_binvox_recognition(n_iter, n_batch, show_batch_accuracies=False,
     r_x_test = []
 
     for i, data in enumerate(zip(x_train, x_test)):
-        print i
-        start = time.clock()
         train, test = data
         c_train = centerize_voxel(train, (50, 50, 50))
         c_test = centerize_voxel(test, (50, 50, 50))
-        print "{}s".format(time.clock() - start)
         r_x_train.extend(rotate_voxels(c_train, r, step, (50, 50, 50)))
         r_x_test.extend(rotate_voxels(c_test, r, step, (50, 50, 50)))
-        if i == 0:
-            plot_voxel(r_x_train[0])
-            plot_voxel(r_x_train[-1])
-        print "{}s".format(time.clock() - start)
 
     print "reshape..."
     x_train = np.asarray(r_x_train).reshape(len(r_x_train), n_in)
@@ -68,7 +78,7 @@ def psb_binvox_recognition(n_iter, n_batch, show_batch_accuracies=False,
                         is_batch_test=True)
 
 
-def psb_recognition(n_iter, n_batch, show_batch_accuracies=False,
+def psb_recognition(n_iter, n_batch, box, r, step, show_batch_accuracies=False,
                     save_batch_accuracies=False):
     ids = []
     # airplane biplane
@@ -78,15 +88,11 @@ def psb_recognition(n_iter, n_batch, show_batch_accuracies=False,
 
     x_train, x_test, y_train, y_test = psbs(ids)
 
-    box_size = (100, 100, 100)
-
     # x_train = np.load(os.path.join(path_res_numpy_cache_psb,"x_train_{}.npy".format(box_size)))
     # x_test = np.load(os.path.join(path_res_numpy_cache_psb,"x_test_{}.npy".format(box_size)))
     # y_train = np.load(os.path.join(path_res_numpy_cache_psb,"y_train_{}.npy".format(box_size))).astype(np.int8)
     # y_test = np.load(os.path.join(path_res_numpy_cache_psb,"y_test_{}.npy".format(box_size))).astype(np.int8)
 
-    r = (25, 25, 5)
-    step = 5
     r_x_train = []
     r_x_test = []
 
@@ -99,7 +105,7 @@ def psb_recognition(n_iter, n_batch, show_batch_accuracies=False,
     x_train = voxelize_all(r_x_train)
     x_test = voxelize_all(r_x_test)
 
-    n_in = reduce(lambda x, y: x * y, box_size)
+    n_in = reduce(lambda x, y: x * y, box)
     n_r = reduce(lambda x, y: x * y, r)
 
     print "reshape..."
@@ -108,21 +114,13 @@ def psb_recognition(n_iter, n_batch, show_batch_accuracies=False,
     y_train = np.asarray(list(itertools.chain(*[[y] * n_r for y in y_train])))
     y_test = np.asarray(list(itertools.chain(*[[y] * n_r for y in y_test])))
 
-    np.save(
-            os.path.join(path_res_numpy_cache_psb,
-                         "x_train_{}".format(box_size)),
+    np.save(os.path.join(path_res_numpy_cache_psb, "x_train_{}".format(box)),
             x_train)
-    np.save(
-            os.path.join(path_res_numpy_cache_psb,
-                         "x_test_{}".format(box_size)),
+    np.save(os.path.join(path_res_numpy_cache_psb, "x_test_{}".format(box)),
             x_test)
-    np.save(
-            os.path.join(path_res_numpy_cache_psb,
-                         "y_train_{}".format(box_size)),
+    np.save(os.path.join(path_res_numpy_cache_psb, "y_train_{}".format(box)),
             y_train)
-    np.save(
-            os.path.join(path_res_numpy_cache_psb,
-                         "y_test_{}".format(box_size)),
+    np.save(os.path.join(path_res_numpy_cache_psb, "y_test_{}".format(box)),
             y_test)
 
     print "train data : ", len(x_train)
@@ -131,7 +129,7 @@ def psb_recognition(n_iter, n_batch, show_batch_accuracies=False,
 
     print "preparing models..."
 
-    model = cnn(box_size)
+    model = cnn(box)
 
     """
     # TRAIN
