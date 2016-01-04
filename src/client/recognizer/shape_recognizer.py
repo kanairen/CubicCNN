@@ -13,7 +13,7 @@ from src.util.shape import rotate_shapes, rotate_voxels, trans_voxels, \
 __author__ = 'ren'
 
 
-def solid_recognition(data_type, n_iter, n_batch, show_batch_accuracies=False,
+def shape_recognition(data_type, n_iter, n_batch, show_batch_accuracies=False,
                       save_batch_accuracies=False,
                       box=(100, 100, 100), r=(1, 1, 45), step=5):
     if data_type == "psb":
