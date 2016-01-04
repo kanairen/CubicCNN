@@ -48,12 +48,15 @@ def psb_binvox_recognition(n_iter, n_batch, box, r, step,
     r_x_train = []
     r_x_test = []
 
+    # ボクセルの中心
+    center = (box[0] / 2, box[1] / 2, box[2] / 2)
+
     for i, data in enumerate(zip(x_train, x_test)):
         train, test = data
-        c_train = centerize_voxel(train, (50, 50, 50))
-        c_test = centerize_voxel(test, (50, 50, 50))
-        r_x_train.extend(rotate_voxels(c_train, r, step, (50, 50, 50)))
-        r_x_test.extend(rotate_voxels(c_test, r, step, (50, 50, 50)))
+        c_train = centerize_voxel(train, center)
+        c_test = centerize_voxel(test, center)
+        r_x_train.extend(rotate_voxels(c_train, r, step, center))
+        r_x_test.extend(rotate_voxels(c_test, r, step, center))
 
     print "reshape..."
     x_train = np.asarray(r_x_train).reshape(len(r_x_train), n_in)
