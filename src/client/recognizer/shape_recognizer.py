@@ -4,6 +4,7 @@ import os
 import numpy as np
 import itertools
 import recognizer
+import enum
 from src.client.structure.shape_structure import cnn
 from src.helper.data3d import psb_binvoxs, psbs, voxelize_all
 from src.helper.config import path_res_numpy_cache_psb
@@ -12,19 +13,22 @@ from src.util.shape import rotate_shapes, rotate_voxels, trans_voxels, \
 
 __author__ = 'ren'
 
+AUG_TYPE = enum.Enum("AUG_TYPE", "AUG_ROTATE AUG_TRANSLATE")
 
-def shape_recognition(data_type, n_iter, n_batch, show_batch_accuracies=False,
-                      save_batch_accuracies=False,
+
+def shape_recognition(data_type, n_iter, n_batch, aug_type,
+                      show_batch_accuracies=False, save_batch_accuracies=False,
                       box=(100, 100, 100), r=(1, 1, 45), step=5):
     if data_type == "psb":
-        psb_recognition(n_iter, n_batch, box, r, step, show_batch_accuracies,
-                        save_batch_accuracies)
+        raise NotImplementedError("you should implement aug_type option.")
+        psb_recognition(n_iter, n_batch, box, r, step,
+                        show_batch_accuracies, save_batch_accuracies)
     elif data_type == "psb_binvox":
-        psb_binvox_recognition(n_iter, n_batch, box, r, step,
+        psb_binvox_recognition(n_iter, n_batch, aug_type, box, r, step,
                                show_batch_accuracies, save_batch_accuracies)
 
 
-def psb_binvox_recognition(n_iter, n_batch, box, r, step,
+def psb_binvox_recognition(n_iter, n_batch, aug_type, box, r, step,
                            show_batch_accuracies=False,
                            save_batch_accuracies=False):
     # PSB 3DモデルのID
@@ -52,11 +56,20 @@ def psb_binvox_recognition(n_iter, n_batch, box, r, step,
     center = (box[0] / 2, box[1] / 2, box[2] / 2)
 
     for i, data in enumerate(zip(x_train, x_test)):
+        print "{}th data being created..".format(i+1)
         train, test = data
         c_train = centerize_voxel(train, center)
         c_test = centerize_voxel(test, center)
-        r_x_train.extend(rotate_voxels(c_train, r, step, center))
-        r_x_test.extend(rotate_voxels(c_test, r, step, center))
+        if aug_type == AUG_TYPE.AUG_ROTATE.name:
+            train_voxels = rotate_voxels(c_train, r, step, center)
+            test_voxels = rotate_voxels(c_test, r, step, center)
+        elif aug_type == AUG_TYPE.AUG_TRANSLATE.name:
+            train_voxels = trans_voxels(c_train, r, step)
+            test_voxels = trans_voxels(c_train, r, step)
+        else:
+            raise NotImplementedError
+        r_x_train.extend(train_voxels)
+        r_x_test.extend(test_voxels)
 
     print "reshape..."
     x_train = np.asarray(r_x_train).reshape(len(r_x_train), n_in)
