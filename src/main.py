@@ -41,7 +41,7 @@ def main():
         image_recognition(data_type, n_iter, n_batch,
                           show_batch_accuracies, save_batch_accuracies)
 
-    elif recognizer == 'solid':
+    elif recognizer == 'shape':
         # 三次元形状認識実験
         shape_recognition(data_type, n_iter, n_batch, aug_type,
                           show_batch_accuracies, save_batch_accuracies)
