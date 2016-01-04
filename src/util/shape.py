@@ -58,20 +58,20 @@ def trans_shapes(shape, t_range, step):
     return t_shapes
 
 
-def rotate_voxels(voxel, r_range, step, center, rotate_priority=[0, 1, 2]):
+def rotate_voxels(voxel, from_r, to_r, step, center, rotate_priority=[0, 1, 2]):
     sx, sy, sz = trio(step)
     return [rotate_voxel(voxel, (rx, ry, rz), center, rotate_priority)
-            for rx in xrange(0, r_range[0], sx)
-            for ry in xrange(0, r_range[1], sy)
-            for rz in xrange(0, r_range[2], sz)]
+            for rx in xrange(from_r[0], to_r[0], sx)
+            for ry in xrange(from_r[1], to_r[1], sy)
+            for rz in xrange(from_r[2], to_r[2], sz)]
 
 
-def trans_voxels(voxel, t_range, step):
+def trans_voxels(voxel, from_t, to_t, step):
     sx, sy, sz = trio(step)
     return [trans_voxel(voxel, (tx, ty, tz))
-            for tx in xrange(0, t_range[0], sx)
-            for ty in xrange(0, t_range[1], sy)
-            for tz in xrange(0, t_range[2], sz)]
+            for tx in xrange(from_t[0], to_t[0], sx)
+            for ty in xrange(from_t[1], to_t[1], sy)
+            for tz in xrange(from_t[2], to_t[2], sz)]
 
 
 def centerize_voxels(voxels, center):

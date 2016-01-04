@@ -18,17 +18,19 @@ AUG_TYPE = enum.Enum("AUG_TYPE", "AUG_ROTATE AUG_TRANSLATE")
 
 def shape_recognition(data_type, n_iter, n_batch, aug_type,
                       show_batch_accuracies=False, save_batch_accuracies=False,
-                      box=(100, 100, 100), r=(1, 1, 45), step=5):
+                      box=(100, 100, 100), from_r=(0, 0, -25), to_r=(1, 1, 20),
+                      step=5):
     if data_type == "psb":
         raise NotImplementedError("you should implement aug_type option.")
         psb_recognition(n_iter, n_batch, box, r, step,
                         show_batch_accuracies, save_batch_accuracies)
     elif data_type == "psb_binvox":
-        psb_binvox_recognition(n_iter, n_batch, aug_type, box, r, step,
-                               show_batch_accuracies, save_batch_accuracies)
+        psb_binvox_recognition(n_iter, n_batch, aug_type, box, from_r, to_r,
+                               step, show_batch_accuracies,
+                               save_batch_accuracies)
 
 
-def psb_binvox_recognition(n_iter, n_batch, aug_type, box, r, step,
+def psb_binvox_recognition(n_iter, n_batch, aug_type, box, from_r, to_r, step,
                            show_batch_accuracies=False,
                            save_batch_accuracies=False):
     # PSB 3DモデルのID
@@ -44,10 +46,12 @@ def psb_binvox_recognition(n_iter, n_batch, aug_type, box, r, step,
     # enterprise_like
     ids.extend(xrange(1353, 1374 + 1))
 
+    print "the number of 3D models : ", len(ids)
+
     x_train, x_test, y_train, y_test = psb_binvoxs(ids)
 
     n_in = reduce(lambda x, y: x * y, box)
-    n_r = reduce(lambda x, y: x * y, r)
+    n_r = reduce(lambda x, y: x * y, (t - f for f, t in zip(from_r, to_r)))
 
     r_x_train = []
     r_x_test = []
@@ -56,16 +60,16 @@ def psb_binvox_recognition(n_iter, n_batch, aug_type, box, r, step,
     center = (box[0] / 2, box[1] / 2, box[2] / 2)
 
     for i, data in enumerate(zip(x_train, x_test)):
-        print "{}th data being created..".format(i+1)
+        print "{}th data being created..".format(i + 1)
         train, test = data
         c_train = centerize_voxel(train, center)
         c_test = centerize_voxel(test, center)
         if aug_type == AUG_TYPE.AUG_ROTATE.name:
-            train_voxels = rotate_voxels(c_train, r, step, center)
-            test_voxels = rotate_voxels(c_test, r, step, center)
+            train_voxels = rotate_voxels(c_train, from_r, to_r, step, center)
+            test_voxels = rotate_voxels(c_test, from_r, to_r, step, center)
         elif aug_type == AUG_TYPE.AUG_TRANSLATE.name:
-            train_voxels = trans_voxels(c_train, r, step)
-            test_voxels = trans_voxels(c_train, r, step)
+            train_voxels = trans_voxels(c_train, from_r, to_r, step)
+            test_voxels = trans_voxels(c_train, from_r, to_r, step)
         else:
             raise NotImplementedError
         r_x_train.extend(train_voxels)
