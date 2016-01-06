@@ -94,7 +94,8 @@ def plot_2d(array_dict, x_label, y_label, x_lim=None, y_lim=None, grid=True,
         import seaborn
 
     # グラフの描画
-    for name, value in six.iteritems(array_dict):
+    sorted_dict = sorted(list(six.iteritems(array_dict)))
+    for name, value in sorted_dict:
         pyplot.plot(value, label=name)
     pyplot.legend(loc=locate)
     pyplot.xlabel(x_label)
