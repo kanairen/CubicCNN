@@ -10,6 +10,7 @@ from src.helper.data3d import psb_binvoxs, psbs, voxelize_all
 from src.helper.config import path_res_numpy_cache_psb
 from src.util.shape import rotate_shapes, rotate_voxels, trans_voxels, \
     centerize_voxel
+from src.util.shape import trio
 
 __author__ = 'ren'
 
@@ -51,7 +52,9 @@ def psb_binvox_recognition(n_iter, n_batch, aug_type, box, from_r, to_r, step,
     x_train, x_test, y_train, y_test = psb_binvoxs(ids)
 
     n_in = reduce(lambda x, y: x * y, box)
-    n_r = reduce(lambda x, y: x * y, (t - f for f, t in zip(from_r, to_r)))
+    n_r = reduce(lambda x, y: x * y,
+                 ((t - f) / s if (t - f) / s >= 1 else 1 for f, t, s in
+                  zip(from_r, to_r, trio(step))))
 
     r_x_train = []
     r_x_test = []
