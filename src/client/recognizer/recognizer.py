@@ -21,6 +21,11 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
     # 学習開始時刻文字列(精度保存時に使う)
     ts = ymdt()
 
+    # バッチ数はデータ数の約数
+    if len(x_train) % n_batch != 0 or len(x_test) % n_batch != 0:
+        raise ValueError("! could not be set n_batch which is not divisor of" +
+                         " len(x_train) or len(x_test) !")
+
     # バッチサイズ
     batch_size_train = len(x_train) / n_batch
     batch_size_test = len(x_test) / n_batch
