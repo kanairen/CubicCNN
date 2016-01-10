@@ -62,7 +62,7 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
                     answers=y_train[from_train:to_train],
                     is_train=True)
             # 学習時間
-            print "train time : ", time.clock() - train_start
+            print "train time : ", time.clock() - train_start, "s"
 
             # テスト時間計測
             test_start = time.clock()
@@ -73,7 +73,7 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
                     is_train=False,
                     updates=())
             # テスト時間
-            print "test time : ", time.clock() - test_start
+            print "test time : ", time.clock() - test_start, "s"
 
             # 累積精度
             sum_train_accuracy += train_accuracy

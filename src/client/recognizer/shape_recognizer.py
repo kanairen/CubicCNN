@@ -19,8 +19,13 @@ AUG_TYPE = enum.Enum("AUG_TYPE", "AUG_ROTATE AUG_TRANSLATE")
 
 def shape_recognition(data_type, n_iter, n_batch, aug_type,
                       show_batch_accuracies=False, save_batch_accuracies=False,
-                      box=(100, 100, 100), from_r=(0, 0, -25), to_r=(1, 1, 20),
-                      step=5):
+                      box=(100, 100, 100), from_r=(0, 0, -10), to_r=(1, 1, 10),
+                      step=2):
+    print "box : ", box
+    print "from_r : ", from_r
+    print "to_r : ", to_r
+    print "step : ", step
+
     if data_type == "psb":
         raise NotImplementedError("you should implement aug_type option.")
         psb_recognition(n_iter, n_batch, box, r, step,
