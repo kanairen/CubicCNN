@@ -44,7 +44,8 @@ def main():
     elif recognizer == 'shape':
         # 三次元形状認識実験
         shape_recognition(data_type, n_iter, n_batch, aug_type,
-                          show_batch_accuracies, save_batch_accuracies)
+                          show_batch_accuracies=show_batch_accuracies,
+                          save_batch_accuracies=save_batch_accuracies)
 
 
 if __name__ == '__main__':
