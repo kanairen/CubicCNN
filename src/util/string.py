@@ -30,6 +30,10 @@ def istuple(string):
     return _isset(string, '(', ')')
 
 
+def isnone(string):
+    return string == 'None'
+
+
 def _isset(string, start, end):
     return string.startswith(start) and string.endswith(end)
 
