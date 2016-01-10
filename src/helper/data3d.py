@@ -11,8 +11,6 @@ from src.util.parse import parse_obj, parse_cla, parse_off, parse_binvox
 
 __author__ = 'ren'
 
-
-
 """
 PRIMITIVE
 """
@@ -125,6 +123,20 @@ def psb_binvoxs(ids, path=path_res_3d_psb_binvox):
             raise IndexError("psb id:{} is not found!".format(id))
 
     return x_train, x_test, y_train, y_test
+
+
+def psb_ids(class_names):
+    assert hasattr(class_names, "__getitem__")
+    # クラス情報
+    path_cls = path_res_3d_psb_classifier
+    train_cls = parse_cla(os.path.join(path_cls, "train.cla"))[0]
+    test_cls = parse_cla(os.path.join(path_cls, "test.cla"))[0]
+
+    ids = []
+    for class_name in class_names:
+        ids.extend(train_cls[class_name])
+        ids.extend(test_cls[class_name])
+    return ids
 
 
 """
