@@ -125,7 +125,7 @@ def psb_binvoxs(ids, path=path_res_3d_psb_binvox):
     return x_train, x_test, y_train, y_test
 
 
-def psb_ids(class_names):
+def psb_ids(class_names, is_all=False, is_both=False):
     assert hasattr(class_names, "__getitem__")
     # クラス情報
     path_cls = path_res_3d_psb_classifier
@@ -133,9 +133,18 @@ def psb_ids(class_names):
     test_cls = parse_cla(os.path.join(path_cls, "test.cla"))[0]
 
     ids = []
-    for class_name in class_names:
-        ids.extend(train_cls[class_name])
-        ids.extend(test_cls[class_name])
+
+    if is_all:
+        class_names = list(set(train_cls.keys()).union(test_cls.keys()))
+
+    if is_both:
+        class_names = filter(lambda x: x in train_cls.keys() and
+                                       x in test_cls.keys(), class_names)
+
+    for c_name in class_names:
+        ids.extend(train_cls[c_name])
+        ids.extend(test_cls[c_name])
+
     return ids
 
 
