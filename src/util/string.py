@@ -48,4 +48,16 @@ def totuple(string):
 
 def _toset(string, start, end):
     str_list = string.replace(start, '').replace(end, '').split(',')
-    return list(map(int, str_list))
+    seq = []
+    for str in str_list:
+        if isinteger(str):
+            seq.append(int(str))
+        elif isfloat(str):
+            seq.append(float(str))
+        else:
+            seq.append(str)
+
+    if istuple(string):
+        seq = tuple(seq)
+
+    return seq
