@@ -10,6 +10,8 @@ def isbool(string):
 
 
 def isinteger(string):
+    if string[0] == '-':
+        string = string.replace('-', '')
     if string.isdigit():
         if len(string) > 1 and string[0] == '0':
             return False
