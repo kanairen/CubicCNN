@@ -2,12 +2,74 @@
 
 import six
 import numpy as np
+import itertools
 import PIL.Image
-import src.util.date
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
 
 __author__ = 'ren'
+
+
+def plot_2d(array_dict, title, x_label, y_label, x_lim=None, y_lim=None,
+            x_ticks=None, y_ticks=None, locate="lower right",
+            colors=["b", "g", "r", "c", "m", "y", "x", "w"], marker=" ",
+            linestyle="-", linewidth=1, marker_size=6, font_size=20,
+            bbox_to_anchor=None, legend_ncol=1, grid=True, seaborn=False):
+    # seabornグラフに変更
+    if seaborn:
+        import seaborn
+
+    # 表示範囲
+    if x_lim:
+        pyplot.xlim(x_lim)
+    if y_lim:
+        pyplot.ylim(y_lim)
+
+    # 目盛り
+    if x_ticks:
+        pyplot.xticks(*x_ticks)
+    if y_ticks:
+        pyplot.yticks(*y_ticks)
+
+    # グリッド
+    if grid:
+        if seaborn:
+            seaborn.set_style('whitegrid')
+        else:
+            pyplot.grid()
+
+    # フォントサイズ
+    if seaborn:
+        seaborn.set(font_scale=font_size / 10)
+    else:
+        pyplot.rcParams['font.size'] = font_size
+
+    # グラフの色
+    g_colors = itertools.cycle(colors)
+
+    # マーカー
+    g_markers = itertools.cycle(marker)
+
+    # ラインスタイル
+    g_ls = itertools.cycle(linestyle)
+
+    # グラフの描画
+    for name, value in sorted(six.iteritems(array_dict)):
+        pyplot.plot(value, color=g_colors.next(), marker=g_markers.next(),
+                    linestyle=g_ls.next(), linewidth=linewidth, ms=marker_size,
+                    label=name)
+
+    # レジェンド（各グラフラベルの例表示）
+    pyplot.legend(loc=locate, bbox_to_anchor=bbox_to_anchor, ncol=legend_ncol)
+
+    # タイトル
+    pyplot.title(title)
+
+    # 軸ラベル
+    pyplot.xlabel(x_label)
+    pyplot.ylabel(y_label)
+
+    pyplot.show()
 
 
 def plot_3d(points,
@@ -85,44 +147,6 @@ def plot_voxel(voxels,
     ax.plot3D(np.array(px, dtype=int),
               np.array(py, dtype=int),
               np.array(pz, dtype=int), "s")
-    pyplot.show()
-
-
-def plot_2d(array_dict, x_label, y_label, x_lim=None, y_lim=None, grid=True,
-            locate="lower right", font_size=20, seaborn=False, save=False):
-    if seaborn:
-        import seaborn
-
-    # グラフの描画
-    sorted_dict = sorted(list(six.iteritems(array_dict)))
-    for name, value in sorted_dict:
-        pyplot.plot(value, label=name)
-    pyplot.legend(loc=locate)
-    pyplot.xlabel(x_label)
-    pyplot.ylabel(y_label)
-
-    # 表示範囲
-    if x_lim:
-        pyplot.xlim(x_lim)
-    if y_lim:
-        pyplot.ylim(y_lim)
-
-    # グリッド
-    if grid:
-        if seaborn:
-            seaborn.set_style('whitegrid')
-        else:
-            pyplot.grid()
-
-    # フォントサイズ
-    if seaborn:
-        seaborn.set(font_scale=font_size)
-    else:
-        pyplot.rcParams['font.size'] = font_size
-
-    if save:
-        pyplot.savefig(src.util.date.ymdt() + ".png")
-
     pyplot.show()
 
 
