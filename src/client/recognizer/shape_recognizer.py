@@ -84,7 +84,7 @@ def psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
             test_voxels = rotate_voxels(c_test, from_r, to_r, step, center)
         elif aug_type == AUG_TYPE.AUG_TRANSLATE.name:
             train_voxels = trans_voxels(c_train, from_r, to_r, step)
-            test_voxels = trans_voxels(c_train, from_r, to_r, step)
+            test_voxels = trans_voxels(c_test, from_r, to_r, step)
         elif aug_type == AUG_TYPE.AUG_NONE.name:
             train_voxels = [c_train, ]
             test_voxels = [c_test, ]
