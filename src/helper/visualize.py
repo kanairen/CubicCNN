@@ -73,6 +73,7 @@ def plot_2d(array_dict, title, x_label, y_label, x_lim=None, y_lim=None,
 
 
 def plot_3d(points,
+            facecolor="white",
             x_label="X",
             y_label="Y",
             z_label="Z",
@@ -110,6 +111,9 @@ def plot_3d(points,
 
 
 def plot_voxel(voxels,
+               color='blue',
+               facecolor='white',
+               alpha=1.0,
                x_label="X",
                y_label="Y",
                z_label="Z"):
@@ -144,9 +148,16 @@ def plot_voxel(voxels,
     ax.set_ylim(lim_min, lim_max)
     ax.set_zlim(lim_min, lim_max)
 
+    # 背景色
+    ax.patch.set_facecolor(facecolor)
+
+    # 背景透明度
+    ax.patch.set_alpha(alpha)
+
     ax.plot3D(np.array(px, dtype=int),
               np.array(py, dtype=int),
-              np.array(pz, dtype=int), "s")
+              np.array(pz, dtype=int), "s", color=color)
+
     pyplot.show()
 
 
