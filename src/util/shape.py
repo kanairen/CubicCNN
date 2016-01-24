@@ -59,19 +59,41 @@ def trans_shapes(shape, t_range, step):
 
 
 def rotate_voxels(voxel, from_r, to_r, step, center, rotate_priority=[0, 1, 2]):
+    """
+    ボクセルを指定範囲までstep区切りで回転し、各々の結果をリストで返す
+    to_r は指定した値自体も範囲に含む
+    :param voxel:
+    :param from_r:
+    :param to_r:
+    :param step:
+    :param center:
+    :param rotate_priority:
+    :return:
+    """
     sx, sy, sz = trio(step)
     return [rotate_voxel(voxel, (rx, ry, rz), center, rotate_priority)
-            for rx in xrange(from_r[0], to_r[0], sx)
-            for ry in xrange(from_r[1], to_r[1], sy)
-            for rz in xrange(from_r[2], to_r[2], sz)]
+            for rx in xrange(from_r[0], to_r[0] + 1, sx)
+            for ry in xrange(from_r[1], to_r[1] + 1, sy)
+            for rz in xrange(from_r[2], to_r[2] + 1, sz)]
 
 
 def trans_voxels(voxel, from_t, to_t, step):
+    """
+    ボクセルを指定範囲までstep区切りで平行移動し、各々の結果をリストで返す
+    to_r は指定した値自体も範囲に含む
+    :param voxel:
+    :param from_r:
+    :param to_r:
+    :param step:
+    :param center:
+    :param rotate_priority:
+    :return:
+    """
     sx, sy, sz = trio(step)
     return [trans_voxel(voxel, (tx, ty, tz))
-            for tx in xrange(from_t[0], to_t[0], sx)
-            for ty in xrange(from_t[1], to_t[1], sy)
-            for tz in xrange(from_t[2], to_t[2], sz)]
+            for tx in xrange(from_t[0], to_t[0] + 1, sx)
+            for ty in xrange(from_t[1], to_t[1] + 1, sy)
+            for tz in xrange(from_t[2], to_t[2] + 1, sz)]
 
 
 def centerize_voxels(voxels, center):
@@ -125,6 +147,7 @@ def trans_voxel(voxel, t):
     t_voxel = np.zeros_like(voxel)
     dz, dy, dx = voxel.shape
     tx, ty, tz = t
+
     for z in xrange(dz):
         for y in xrange(dy):
             for x in xrange(dx):
@@ -133,7 +156,6 @@ def trans_voxel(voxel, t):
                                         0 <= y + ty < dy and \
                                         0 <= z + tz < dz:
                     t_voxel[z + tz][y + ty][x + tx] = 1
-
     return t_voxel
 
 
