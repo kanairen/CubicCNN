@@ -1,3 +1,5 @@
+# coding:utf-8
+
 from src.util.shape import *
 from src.helper.data3d import psb_binvox, psb_binvoxs
 from src.helper.visualize import plot_voxel
