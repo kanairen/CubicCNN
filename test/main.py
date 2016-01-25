@@ -15,7 +15,7 @@ if __name__ == '__main__':
     # util/shape.py
     # shape.test_rotate_voxel()
     # shape.test_trans_voxel()
-    # shape.test_centerize_voxels()
+    shape.test_centerize_voxels([1159,])
 
 
 

@@ -15,10 +15,10 @@ __author__ = 'ren'
 
 AUG_TYPE = enum.Enum("AUG_TYPE", "AUG_ROTATE AUG_TRANSLATE AUG_NONE")
 
-FILE_NP_CACHE_X_TRAIN = "x_train_{}_{}_f{}_t{}.npy"
-FILE_NP_CACHE_X_TEST = "x_test_{}_{}_f{}_t{}.npy"
-FILE_NP_CACHE_Y_TRAIN = "y_train_{}_{}_f{}_t{}.npy"
-FILE_NP_CACHE_Y_TEST = "y_test_{}_{}_f{}_t{}.npy"
+FILE_NP_CACHE_X_TRAIN = "x_train_{}_{}_f{}_t{}_s{}.npy"
+FILE_NP_CACHE_X_TEST = "x_test_{}_{}_f{}_t{}_s{}.npy"
+FILE_NP_CACHE_Y_TRAIN = "y_train_{}_{}_f{}_t{}_s{}.npy"
+FILE_NP_CACHE_Y_TEST = "y_test_{}_{}_f{}_t{}_s{}.npy"
 
 
 def shape_recognition(data_type, n_iter, n_batch, aug_type,
@@ -26,7 +26,9 @@ def shape_recognition(data_type, n_iter, n_batch, aug_type,
                       save_batch_accuracies=False, load_voxels=False,
                       save_voxels=False):
     if data_type == "psb_binvox":
+
         ids = psb_ids([], is_all=True, is_both=True)
+
         psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r,
                                to_r, step, show_batch_accuracies,
                                save_batch_accuracies, load_voxels, save_voxels)
@@ -36,10 +38,10 @@ def psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
                            step, show_batch_accuracies=False,
                            save_batch_accuracies=False,
                            load_voxels=False, save_voxels=False):
-    f_x_train = FILE_NP_CACHE_X_TRAIN.format(box, aug_type, from_r, to_r)
-    f_x_test = FILE_NP_CACHE_X_TEST.format(box, aug_type, from_r, to_r)
-    f_y_train = FILE_NP_CACHE_Y_TRAIN.format(box, aug_type, from_r, to_r)
-    f_y_test = FILE_NP_CACHE_Y_TEST.format(box, aug_type, from_r, to_r)
+    f_x_train = FILE_NP_CACHE_X_TRAIN.format(box, aug_type, from_r, to_r, step)
+    f_x_test = FILE_NP_CACHE_X_TEST.format(box, aug_type, from_r, to_r, step)
+    f_y_train = FILE_NP_CACHE_Y_TRAIN.format(box, aug_type, from_r, to_r, step)
+    f_y_test = FILE_NP_CACHE_Y_TEST.format(box, aug_type, from_r, to_r, step)
 
     if load_voxels:
         try:
@@ -62,11 +64,6 @@ def psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
     x_train, x_test, y_train, y_test = psb_binvoxs(ids)
 
     n_in = reduce(lambda x, y: x * y, box)
-
-    if from_r and to_r and step:
-        n_r = reduce(lambda x, y: x * y,
-                     ((t - f) / s if (t - f) / s >= 1 else 1 for f, t, s in
-                      zip(from_r, to_r, trio(step))))
 
     r_x_train = []
     r_x_test = []
@@ -93,6 +90,9 @@ def psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
 
         r_x_train.extend(train_voxels)
         r_x_test.extend(test_voxels)
+
+    n_r = len(r_x_train) / len(x_train)
+    print "n_r : ", n_r
 
     x_train = np.asarray(r_x_train).reshape(len(r_x_train), n_in)
     x_test = np.asarray(r_x_test).reshape(len(r_x_test), n_in)

@@ -16,6 +16,7 @@ def main():
     # コマンドライン引数
     kwarg = dict((tuple(arg.split("=")) for arg in sys.argv[1:]))
 
+    # 引数のキャスト
     for k, v in kwarg.items():
         if string.isinteger(v):
             kwarg[k] = int(v)
