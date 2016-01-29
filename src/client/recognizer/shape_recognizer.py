@@ -8,8 +8,7 @@ import enum
 from src.client.structure.shape_structure import cnn
 from src.helper.data3d import psb_binvoxs, psb_ids
 from src.helper.config import path_res_numpy_cache_psb
-from src.util.shape import trio, rotate_voxels, trans_voxels, \
-    centerize_voxel
+from src.util.shape import rotate_voxels, trans_voxels, centerize_voxel
 
 __author__ = 'ren'
 
@@ -26,7 +25,6 @@ def shape_recognition(data_type, n_iter, n_batch, aug_type,
                       save_batch_accuracies=False, load_voxels=False,
                       save_voxels=False):
     if data_type == "psb_binvox":
-
         ids = psb_ids([], is_all=True, is_both=True)
 
         psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r,
@@ -38,6 +36,8 @@ def psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
                            step, show_batch_accuracies=False,
                            save_batch_accuracies=False,
                            load_voxels=False, save_voxels=False):
+
+    # cache file name
     f_x_train = FILE_NP_CACHE_X_TRAIN.format(box, aug_type, from_r, to_r, step)
     f_x_test = FILE_NP_CACHE_X_TEST.format(box, aug_type, from_r, to_r, step)
     f_y_train = FILE_NP_CACHE_Y_TRAIN.format(box, aug_type, from_r, to_r, step)
