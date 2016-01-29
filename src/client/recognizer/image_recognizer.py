@@ -2,7 +2,7 @@
 
 import recognizer
 from src.client.structure.image_structure import cnn
-from src.helper.data import mnist, cifar10, pattern50_distort
+from src.helper.data2d import mnist, cifar10, pattern50_distort
 
 def image_recognition(data_type, n_iter, n_batch,
                       show_batch_accuracies=True, save_batch_accuracies=True):
