@@ -1,11 +1,12 @@
 # coding:utf-8
 
-import recognizer
+import classifier
 from src.client.structure.image_structure import cnn
 from src.helper.data2d import mnist, cifar10, pattern50_distort
 
-def image_recognition(data_type, n_iter, n_batch,
-                      show_batch_accuracies=True, save_batch_accuracies=True):
+
+def image_classification(data_type, n_iter, n_batch,
+                         show_batch_accuracies=True, save_batch_accuracies=True):
     # 入力画像の決定
     if data_type == 'distort':
         x_train, x_test, y_train, y_test = pattern50_distort()
@@ -33,5 +34,5 @@ def image_recognition(data_type, n_iter, n_batch,
 
     model = cnn((w, h), c)
 
-    recognizer.learning(model, x_train, x_test, y_train, y_test, n_iter,
-                         n_batch, show_batch_accuracies, save_batch_accuracies)
+    classifier.learning(model, x_train, x_test, y_train, y_test, n_iter,
+                        n_batch, show_batch_accuracies, save_batch_accuracies)

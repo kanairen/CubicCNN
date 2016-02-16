@@ -1,7 +1,6 @@
 # coding:utf-8
 
 import cProfile
-from image_recognition import image_recognition
 
 __author__ = 'ren'
 

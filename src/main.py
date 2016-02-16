@@ -3,8 +3,8 @@
 
 import sys
 import pprint
-from src.client.recognizer.image_recognizer import image_recognition
-from src.client.recognizer.shape_recognizer import shape_recognition
+from src.client.classifier.image_classifier import image_classification
+from src.client.classifier.shape_classifier import shape_classification
 from src.helper.decorator import client
 from src.util import string
 
@@ -33,15 +33,15 @@ def main():
 
     pprint.pprint(kwarg)
 
-    recognizer = kwarg.pop("recognizer")
+    classifier = kwarg.pop("classifier")
 
-    if recognizer == 'image':
+    if classifier == 'image':
         # 画像認識実験
-        image_recognition(**kwarg)
+        image_classification(**kwarg)
 
-    elif recognizer == 'shape':
+    elif classifier == 'shape':
         # 三次元形状認識実験
-        shape_recognition(**kwarg)
+        shape_classification(**kwarg)
 
 
 if __name__ == '__main__':

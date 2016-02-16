@@ -3,7 +3,7 @@
 import os
 import numpy as np
 import itertools
-import recognizer
+import classifier
 import enum
 from src.client.structure.shape_structure import cnn
 from src.helper.data3d import psb_binvoxs, psb_ids
@@ -20,22 +20,22 @@ FILE_NP_CACHE_Y_TRAIN = "y_train_{}_{}_f{}_t{}_s{}.npy"
 FILE_NP_CACHE_Y_TEST = "y_test_{}_{}_f{}_t{}_s{}.npy"
 
 
-def shape_recognition(data_type, n_iter, n_batch, aug_type,
-                      box, from_r, to_r, step, show_batch_accuracies=False,
-                      save_batch_accuracies=False, load_voxels=False,
-                      save_voxels=False):
+def shape_classification(data_type, n_iter, n_batch, aug_type,
+                         box, from_r, to_r, step, show_batch_accuracies=False,
+                         save_batch_accuracies=False, load_voxels=False,
+                         save_voxels=False):
     if data_type == "psb_binvox":
         ids = psb_ids([], is_all=True, is_both=True)
 
-        psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r,
-                               to_r, step, show_batch_accuracies,
-                               save_batch_accuracies, load_voxels, save_voxels)
+        psb_binvox_classification(ids, n_iter, n_batch, aug_type, box, from_r,
+                                  to_r, step, show_batch_accuracies,
+                                  save_batch_accuracies, load_voxels, save_voxels)
 
 
-def psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
-                           step, show_batch_accuracies=False,
-                           save_batch_accuracies=False,
-                           load_voxels=False, save_voxels=False):
+def psb_binvox_classification(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
+                              step, show_batch_accuracies=False,
+                              save_batch_accuracies=False,
+                              load_voxels=False, save_voxels=False):
 
     # cache file name
     f_x_train = FILE_NP_CACHE_X_TRAIN.format(box, aug_type, from_r, to_r, step)
@@ -53,7 +53,7 @@ def psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
             print "test data : ", len(x_test)
             print "classes : ", len(set(y_train.tolist() + y_test.tolist()))
             model = cnn(box)
-            recognizer.learning(model, x_train, x_test, y_train, y_test, n_iter,
+            classifier.learning(model, x_train, x_test, y_train, y_test, n_iter,
                                 n_batch, show_batch_accuracies,
                                 save_batch_accuracies, is_batch_test=True)
         except IOError:
@@ -111,6 +111,6 @@ def psb_binvox_recognition(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
 
     model = cnn(box)
 
-    recognizer.learning(model, x_train, x_test, y_train, y_test, n_iter,
+    classifier.learning(model, x_train, x_test, y_train, y_test, n_iter,
                         n_batch, show_batch_accuracies, save_batch_accuracies,
                         is_batch_test=True)
