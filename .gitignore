@@ -4,3 +4,4 @@ config/
 *.pyc
 *.txt
 __*.py
+!__*__.py
