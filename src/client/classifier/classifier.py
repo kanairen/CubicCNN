@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import os
 import time
 import numpy as np
 from src.util.date import ymdt
@@ -7,6 +8,25 @@ from src.helper.visualize import plot_2d
 from src.helper.config import *
 
 __author__ = 'Ren'
+
+
+def save_nparray(f, arr, allow_pickle=True, fix_imports=True):
+    """
+    numpy配列を保存
+    保存先パスが存在しない場合、新しくディレクトリを作成
+    :param f: 保存先パス
+    :param arr: numpy配列
+    :param allow_pickle: pickle化して保存
+    :param fix_imports: python3のオブジェクト配列をpython2に合わせてリネーム
+    :return:
+    """
+    try:
+        np.save(f, arr, allow_pickle=allow_pickle, fix_imports=fix_imports)
+    except IOError:
+        # 新しいディレクトリを作成
+        f_dir = os.path.split(f)[0]
+        os.mkdir(f_dir)
+        np.save(f, arr, allow_pickle=allow_pickle, fix_imports=fix_imports)
 
 
 def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
@@ -52,15 +72,15 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             to_train = (j + 1) * batch_size_train
             from_test = j * batch_size_test if is_batch_test else 0
             to_test = (j + 1) * batch_size_test if is_batch_test else len(
-                    x_test)
+                x_test)
 
             # 学習時間計算
             train_start = time.clock()
             # 学習
             train_accuracy = model.forward(
-                    inputs=x_train[from_train:to_train],
-                    answers=y_train[from_train:to_train],
-                    is_train=True)
+                inputs=x_train[from_train:to_train],
+                answers=y_train[from_train:to_train],
+                is_train=True)
             # 学習時間
             print "train time : ", time.clock() - train_start, "s"
 
@@ -68,10 +88,10 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             test_start = time.clock()
             # テスト
             test_accuracy = model.forward(
-                    inputs=x_test[from_test:to_test],
-                    answers=y_test[from_test:to_test],
-                    is_train=False,
-                    updates=())
+                inputs=x_test[from_test:to_test],
+                answers=y_test[from_test:to_test],
+                is_train=False,
+                updates=())
             # テスト時間
             print "test time : ", time.clock() - test_start, "s"
 
@@ -95,10 +115,10 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             if save_batch_accuracies:
                 train_accuracies.append(ave_train_accuracy)
                 test_accuracies.append(out_test_accuracy)
-                np.save(os.path.join(path_res_numpy_array, ts + "_train"),
-                        train_accuracies)
-                np.save(os.path.join(path_res_numpy_array, ts + "_test"),
-                        test_accuracies)
+                save_nparray(os.path.join(path_res_numpy_array, ts + "_train"),
+                             train_accuracies)
+                save_nparray(os.path.join(path_res_numpy_array, ts + "_test"),
+                             test_accuracies)
 
         # 一回の学習時間
         print "time : ", time.clock() - start, "s"
@@ -113,10 +133,10 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             train_accuracies.append(sum_train_accuracy / n_batch)
             test_accuracies.append(sum_test_accuracy / n_batch)
             # 精度の保存（途中で終了しても良いように、一回ごとに更新）
-            np.save(os.path.join(path_res_numpy_array, ts + "_train"),
-                    train_accuracies)
-            np.save(os.path.join(path_res_numpy_array, ts + "_test"),
-                    test_accuracies)
+            save_nparray(os.path.join(path_res_numpy_array, ts + "_train"),
+                         train_accuracies)
+            save_nparray(os.path.join(path_res_numpy_array, ts + "_test"),
+                         test_accuracies)
 
     # グラフの描画
     plot_2d({"train": train_accuracies, "test": test_accuracies},
