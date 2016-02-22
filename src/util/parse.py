@@ -60,34 +60,26 @@ def parse_off(off_file):
 
 
 def parse_obj(obj_file):
+    """
+    objファイルを読み込み、頂点情報、法線情報、面情報を取得
+    :param file_path: ファイルパス
+    :return: 頂点リスト、法線リスト、面リスト
+    """
+
+    # TODO vt属性の読み込み
+    warnings.warn("vt row's of .obj file are ignored.",
+                  "if you want to get vt row's, please edit \'parse.py\.'")
+   
     with open(obj_file) as f:
+        lines = filter(lambda x: len(x) > 0,
+                       [line.strip().split() for line in f.readlines()])
+        vertices = [list(map(float, line[1:])) for line in lines if
+                    line[0] == 'v']
+        normals = [list(map(float, line[1:])) for line in lines if
+                   line[0] == 'vn']
+        faces = [list(map(int, line[1:])) for line in lines if line[0] == 'f']
 
-        vertices = []
-
-        for line in f:
-
-            split = line.split(' ')
-
-            if split[0] == 'v':
-                p = list(map(float, split[1:]))
-                vertices.append(p)
-            elif split[0] == 'vt':
-                warnings.warn(
-                        "vt row's of .obj file are ignored."
-                        " if you want to get vt row's, please edit \'parse.py\'")
-                break
-            elif split[0] == 'vn':
-                warnings.warn(
-                        "vn row's of .obj file are ignored."
-                        " if you want to get f row's, please edit \'parse.py\'")
-                break
-            elif split[0] == 'f':
-                warnings.warn(
-                        "f row's of .obj file are ignored. "
-                        "if you want to get f row's, please edit \'parse.py\'")
-                break
-
-    return vertices
+    return vertices, normals, faces
 
 
 def parse_cla(cla_file):
