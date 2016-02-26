@@ -69,7 +69,7 @@ def parse_obj(obj_file):
     # TODO vt属性の読み込み
     warnings.warn("vt row's of .obj file are ignored.",
                   "if you want to get vt row's, please edit \'parse.py\.'")
-   
+
     with open(obj_file) as f:
         lines = filter(lambda x: len(x) > 0,
                        [line.strip().split() for line in f.readlines()])

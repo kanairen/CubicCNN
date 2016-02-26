@@ -25,18 +25,22 @@ def shape_classification(data_type, n_iter, n_batch, aug_type,
                          save_batch_accuracies=False, load_voxels=False,
                          save_voxels=False):
     if data_type == "psb_binvox":
-        ids = psb_ids([], is_all=True, is_both=True)
+        ids = sorted(
+            list(itertools.chain(*psb_ids([], is_all=True, is_both=True))))
+
+        print "ids : ", ids
+        print "len(ids) : ", len(ids)
 
         psb_binvox_classification(ids, n_iter, n_batch, aug_type, box, from_r,
                                   to_r, step, show_batch_accuracies,
-                                  save_batch_accuracies, load_voxels, save_voxels)
+                                  save_batch_accuracies, load_voxels,
+                                  save_voxels)
 
 
 def psb_binvox_classification(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
                               step, show_batch_accuracies=False,
                               save_batch_accuracies=False,
                               load_voxels=False, save_voxels=False):
-
     # cache file name
     f_x_train = FILE_NP_CACHE_X_TRAIN.format(box, aug_type, from_r, to_r, step)
     f_x_test = FILE_NP_CACHE_X_TEST.format(box, aug_type, from_r, to_r, step)
