@@ -5,9 +5,12 @@ import cPickle
 import itertools
 import os
 import numpy as np
+from collections import OrderedDict
 from sklearn.cross_validation import train_test_split
 from sklearn.datasets import fetch_mldata
-from src.helper.config import path_res_2d, path_res_2d_pattern
+from src.helper.config import path_res_2d, path_res_2d_pattern, \
+    path_res_2d_psb_depth, path_res_3d_psb_classifier
+from src.helper.data3d import parse_cla
 from src.util.image import translate, distort
 
 __author__ = 'ren'
@@ -204,3 +207,39 @@ def __distort_images(image, newsize, n_images=4, fix_distort=False):
         images.append(distorted_image)
 
     return images
+
+
+def psb_binvoxs(ids, path=path_res_2d_psb_depth):
+    # クラス情報
+    cls_path = path_res_3d_psb_classifier
+    train_cls = parse_cla(os.path.join(cls_path, "train.cla"))[0]
+    test_cls = parse_cla(os.path.join(cls_path, "test.cla"))[0]
+    all_cls = reduce(lambda x, y: OrderedDict(x, **y), (train_cls, test_cls))
+
+    # 各データセット別IDリスト
+    train_ids = sorted(list(itertools.chain(*train_cls.values())))
+    test_ids = sorted(list(itertools.chain(*test_cls.values())))
+
+    # IDから、データのクラスラベルを取得
+    # クラスラベルは全クラスリスト中でのIndex
+    def class_label(cls, id):
+        for cls_name, cls_ids in cls.items():
+            if id in cls_ids:
+                return all_cls.keys().index(cls_name)
+        raise IndexError("psb id:{} is not found!".format(id))
+
+    dir_path = os.path.join(path, "m{}")
+    x_train = [psb_depths_by_id(id) for id in ids if id in train_ids]
+    x_test = [psb_depths_by_id(id) for id in ids if id in test_ids]
+    y_train = [class_label(train_cls, id) * len(os.listdir(dir_path.format(id)))
+               for id in ids if id in train_ids]
+    y_test = [class_label(test_cls, id) * len(os.listdir(dir_path.format(id)))
+              for id in ids if id in test_ids]
+
+    return x_train, x_test, y_train, y_test
+
+
+def psb_depths_by_id(id, data_home=path_res_2d_psb_depth):
+    dir_path = os.path.join(data_home, 'm' + str(id))
+    [np.load(os.path.join(dir_path, file_name)) for file_name in
+     os.listdir(dir_path)]

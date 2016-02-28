@@ -19,6 +19,7 @@ path_res_numpy = os.path.join(path_res, "numpy")
 
 # res/2d
 path_res_2d_pattern = os.path.join(path_res_2d, "pattern")
+path_res_2d_psb_depth = os.path.join(path_res_2d, "psb_depth")
 
 # res/3d
 path_res_3d_primitive = os.path.join(path_res_3d, "primitive")
