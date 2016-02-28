@@ -120,6 +120,10 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             numpy_save(os.path.join(path_res_numpy_array, ts + "_test"),
                        test_accuracies)
 
+        # 重み・バイアスパラメタの保存
+        if save_weights_and_biases:
+            model.save_params(ts)
+
     # グラフの描画
     plot_2d({"train": train_accuracies, "test": test_accuracies},
             x_label="iteration", y_label="accuracy", y_lim=(0, 1))

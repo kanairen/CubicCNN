@@ -18,9 +18,12 @@ class MLP(object):
         L2 = 0.
 
         # レイヤリスト
+        # TODO layersとnameの一元管理
+        self.names = []
         self.layers = []
 
         for name, layer in sorted(six.iteritems(layers)):
+            self.names.append(name)
             self.layers.append(layer)
             setattr(self, name, layer)
             output = layer.output(output)
@@ -64,6 +67,11 @@ class MLP(object):
             if update is not None:
                 updates.extend(update)
         return updates
+
+    def save_params(self, file_name):
+        for name, layer in zip(self.names, self.layers):
+            layer.save_weights(file_name + "_" + name)
+            layer.save_biases(file_name + "_" + name)
 
     @staticmethod
     def softmax(x):

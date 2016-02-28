@@ -35,6 +35,8 @@ path_res_3d_shrec_target = os.path.join(path_res_3d_shrec, "target")
 
 # res/numpy
 path_res_numpy_array = os.path.join(path_res_numpy, "array")
+path_res_numpy_weights = os.path.join(path_res_numpy, "weights")
+path_res_numpy_biases = os.path.join(path_res_numpy, "biases")
 path_res_numpy_cache = os.path.join(path_res_numpy, "cache")
 path_res_numpy_voxel = os.path.join(path_res_numpy, "voxel")
 path_res_numpy_psb = os.path.join(path_res_numpy, "psb")
