@@ -9,6 +9,7 @@ from src.client.structure.shape_structure import cnn
 from src.helper.data3d import psb_binvoxs, psb_ids
 from src.helper.config import path_res_numpy_cache_psb
 from src.util.shape import rotate_voxels, trans_voxels, centerize_voxel
+from src.util.io import numpy_save
 
 __author__ = 'ren'
 
@@ -104,10 +105,10 @@ def psb_binvox_classification(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
     y_test = np.array(list(itertools.chain(*[[y] * n_r for y in y_test])))
 
     if save_voxels:
-        np.save(os.path.join(path_res_numpy_cache_psb, f_x_train), x_train)
-        np.save(os.path.join(path_res_numpy_cache_psb, f_x_test), x_test)
-        np.save(os.path.join(path_res_numpy_cache_psb, f_y_train), y_train)
-        np.save(os.path.join(path_res_numpy_cache_psb, f_y_test), y_test)
+        numpy_save(os.path.join(path_res_numpy_cache_psb, f_x_train), x_train)
+        numpy_save(os.path.join(path_res_numpy_cache_psb, f_x_test), x_test)
+        numpy_save(os.path.join(path_res_numpy_cache_psb, f_y_train), y_train)
+        numpy_save(os.path.join(path_res_numpy_cache_psb, f_y_test), y_test)
 
     print "train data : ", len(x_train)
     print "test data : ", len(x_test)

@@ -1,7 +1,9 @@
 # coding:utf-8
 
+import os
 import numpy as np
 from theano.tensor.shared_randomstreams import RandomStreams
+from src.util.io import numpy_save
 
 __author__ = 'ren'
 

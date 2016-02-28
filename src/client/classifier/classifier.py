@@ -4,34 +4,16 @@ import os
 import time
 import numpy as np
 from src.util.date import ymdt
+from src.util.io import numpy_save
 from src.helper.visualize import plot_2d
 from src.helper.config import *
 
 __author__ = 'Ren'
 
 
-def save_nparray(f, arr, allow_pickle=True, fix_imports=True):
-    """
-    numpy配列を保存
-    保存先パスが存在しない場合、新しくディレクトリを作成
-    :param f: 保存先パス
-    :param arr: numpy配列
-    :param allow_pickle: pickle化して保存
-    :param fix_imports: python3のオブジェクト配列をpython2に合わせてリネーム
-    :return:
-    """
-    try:
-        np.save(f, arr, allow_pickle=allow_pickle, fix_imports=fix_imports)
-    except IOError:
-        # 新しいディレクトリを作成
-        f_dir = os.path.split(f)[0]
-        os.mkdir(f_dir)
-        np.save(f, arr, allow_pickle=allow_pickle, fix_imports=fix_imports)
-
-
 def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
              show_batch_accuracies=True, save_batch_accuracies=True,
-             is_batch_test=False):
+             is_batch_test=False, save_weights_and_biases=True):
     # モデル内訳
     print model
 
@@ -115,10 +97,10 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             if save_batch_accuracies:
                 train_accuracies.append(ave_train_accuracy)
                 test_accuracies.append(out_test_accuracy)
-                save_nparray(os.path.join(path_res_numpy_array, ts + "_train"),
-                             train_accuracies)
-                save_nparray(os.path.join(path_res_numpy_array, ts + "_test"),
-                             test_accuracies)
+                numpy_save(os.path.join(path_res_numpy_array, ts + "_train"),
+                           train_accuracies)
+                numpy_save(os.path.join(path_res_numpy_array, ts + "_test"),
+                           test_accuracies)
 
         # 一回の学習時間
         print "time : ", time.clock() - start, "s"
@@ -133,10 +115,10 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
             train_accuracies.append(sum_train_accuracy / n_batch)
             test_accuracies.append(sum_test_accuracy / n_batch)
             # 精度の保存（途中で終了しても良いように、一回ごとに更新）
-            save_nparray(os.path.join(path_res_numpy_array, ts + "_train"),
-                         train_accuracies)
-            save_nparray(os.path.join(path_res_numpy_array, ts + "_test"),
-                         test_accuracies)
+            numpy_save(os.path.join(path_res_numpy_array, ts + "_train"),
+                       train_accuracies)
+            numpy_save(os.path.join(path_res_numpy_array, ts + "_test"),
+                       test_accuracies)
 
     # グラフの描画
     plot_2d({"train": train_accuracies, "test": test_accuracies},
