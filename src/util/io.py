@@ -6,7 +6,7 @@ import numpy as np
 __author__ = 'ren'
 
 
-def numpy_save(f, arr, allow_pickle=True, fix_imports=True):
+def numpy_save(f, arr):
     """
     numpy配列を保存
     保存先パスが存在しない場合、新しくディレクトリを作成
@@ -21,4 +21,4 @@ def numpy_save(f, arr, allow_pickle=True, fix_imports=True):
     f_dir = os.path.dirname(f)
     if not os.path.exists(f_dir):
         os.makedirs(f_dir)
-    np.save(f, arr, allow_pickle=allow_pickle, fix_imports=fix_imports)
+    np.save(f, arr)
