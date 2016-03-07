@@ -19,9 +19,19 @@ def cnn(img_size, channel):
     l5 = HiddenLayer(l4.n_out, 256, is_dropout=True)
     l6 = HiddenLayer(l5.n_out, 10, is_dropout=True, dropout_rate=0.25)
 
-    model = MLP(learning_rate=0.01,L1_rate=0.01,
+    model = MLP(learning_rate=0.01, L1_rate=0.01,
                 l1=l1, l2=l2, l3=l3, l4=l4, l5=l5, l6=l6)
 
+    return model
+
+
+def cnn_3d_imitation(img_size, channel):
+    l1 = ConvLayer2d(img_size, channel, 16, 4, stride=3, activation=relu)
+    l2 = PoolLayer2d(l1.output_img_size(), 16, 4)
+    l3 = HiddenLayer(l2.n_out, 512, is_dropout=True)
+    l4 = HiddenLayer(l3.n_out, 256, is_dropout=True)
+
+    model = MLP(l1=l1, l2=l2, l3=l3, l4=l4, L1_rate=0.0001)
     return model
 
 
@@ -30,4 +40,3 @@ def for_mnist(img_size):
     l2 = HiddenLayer(l1.n_out, 10, is_dropout=True)
     model = MLP(learning_rate=0.01, l1=l1, l2=l2)
     return model
-

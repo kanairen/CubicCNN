@@ -209,7 +209,8 @@ def __distort_images(image, newsize, n_images=4, fix_distort=False):
     return images
 
 
-def psb_binvoxs(ids, path=path_res_2d_psb_depth):
+def psb_depths(ids, path=path_res_2d_psb_depth):
+    ids = sorted(ids)
     # クラス情報
     cls_path = path_res_3d_psb_classifier
     train_cls = parse_cla(os.path.join(cls_path, "train.cla"))[0]
@@ -228,18 +229,36 @@ def psb_binvoxs(ids, path=path_res_2d_psb_depth):
                 return all_cls.keys().index(cls_name)
         raise IndexError("psb id:{} is not found!".format(id))
 
-    dir_path = os.path.join(path, "m{}")
-    x_train = [psb_depths_by_id(id) for id in ids if id in train_ids]
-    x_test = [psb_depths_by_id(id) for id in ids if id in test_ids]
-    y_train = [class_label(train_cls, id) * len(os.listdir(dir_path.format(id)))
-               for id in ids if id in train_ids]
-    y_test = [class_label(test_cls, id) * len(os.listdir(dir_path.format(id)))
-              for id in ids if id in test_ids]
+    dir_path = os.path.join(path, "{}")
+
+    import time
+    start = time.clock()
+
+    x_train = np.r_[
+        [__psb_depths_by_id(id, data_home=dir_path.format(id)) for id in ids if
+         id in train_ids]]
+    x_test = np.r_[
+        [__psb_depths_by_id(id, data_home=dir_path.format(id)) for id in ids if
+         id in test_ids]]
+
+    y_train = np.asarray(list(itertools.chain(
+        *[[class_label(train_cls, id)] * len(os.listdir(dir_path.format(id)))
+          for id in ids if id in train_ids])))
+    y_test = np.asarray(list(itertools.chain(
+        *[[class_label(test_cls, id)] * len(os.listdir(dir_path.format(id)))
+          for id in ids if id in test_ids])))
+
+    print "process time : {}s".format(time.clock() - start)
+
+    n_psb_train, n_img_train, w, h = x_train.shape
+    n_psb_test, n_img_test = x_test.shape[:2]
+    x_train = x_train.reshape((n_psb_train * n_img_train, 1, w, h))
+    x_test = x_test.reshape((n_psb_test * n_img_test, 1, w, h))
 
     return x_train, x_test, y_train, y_test
 
 
-def psb_depths_by_id(id, data_home=path_res_2d_psb_depth):
-    dir_path = os.path.join(data_home, 'm' + str(id))
-    [np.load(os.path.join(dir_path, file_name)) for file_name in
-     os.listdir(dir_path)]
+def __psb_depths_by_id(id, data_home=path_res_2d_psb_depth):
+    print id
+    return np.r_[[np.load(os.path.join(data_home, file_name)) for file_name in
+                  os.listdir(data_home)]]
