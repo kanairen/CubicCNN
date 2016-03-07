@@ -8,7 +8,8 @@ from src.helper.data3d import psb_ids
 
 def image_classification(data_type, n_iter, n_batch,
                          show_batch_accuracies=True,
-                         save_batch_accuracies=True):
+                         save_batch_accuracies=True,
+                         is_batch_test=False):
     # 入力画像の決定
     if data_type == 'mnist':
         x_train, x_test, y_train, y_test = mnist()
@@ -40,4 +41,5 @@ def image_classification(data_type, n_iter, n_batch,
     model = cnn((w, h), c)
 
     classifier.learning(model, x_train, x_test, y_train, y_test, n_iter,
-                        n_batch, show_batch_accuracies, save_batch_accuracies)
+                        n_batch, show_batch_accuracies, save_batch_accuracies,
+                        is_batch_test)
