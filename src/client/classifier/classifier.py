@@ -3,6 +3,7 @@
 import os
 import time
 import numpy as np
+import warnings
 from src.util.date import ymdt
 from src.util.io import numpy_save
 from src.helper.visualize import plot_2d
@@ -25,8 +26,8 @@ def learning(model, x_train, x_test, y_train, y_test, n_iter, n_batch,
 
     # バッチ数はデータ数の約数
     if len(x_train) % n_batch != 0 or len(x_test) % n_batch != 0:
-        raise ValueError("! could not be set n_batch which is not divisor of" +
-                         " len(x_train) or len(x_test) !")
+        warnings.warn("! could not be set n_batch which is not divisor of" +
+                      " len(x_train) or len(x_test) !")
 
     # バッチサイズ
     batch_size_train = len(x_train) / n_batch
