@@ -18,7 +18,7 @@ def image_classification(data_type, n_iter, n_batch,
         x_train, x_test, y_train, y_test = pattern50_distort()
     elif data_type == 'psb_projection':
         ids = psb_ids('', is_all=True, is_both=True)
-        x_train, xtest, y_train, y_test = psb_depths_by_id(ids)
+        x_train, x_test, y_train, y_test = psb_depths_by_id(ids)
 
     # 入力画像のチャネルとサイズ
     n, c, h, w = x_train.shape
