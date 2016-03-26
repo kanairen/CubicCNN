@@ -1,13 +1,25 @@
+
 language: python
 
 python:
   - 2.7
 
+before_install:
+  - wget -c http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda2/bin:$PATH
+  - conda update --yes conda
+  - conda install --yes conda=3.19
+
 install:
+  - conda create --yes -q -n pyenv python=2.7 numpy=1.10 scipy=0.16.1 pip pillow
+  - source activate pyenv
+  - pip install git+git://github.com/Theano/Theano.git
   - pip install coveralls
 
 script:
-  - coverage run --source=data3d_test setup.py test
+  - coverage run --source=main setup.py test
 
 after_success:
   - coveralls
