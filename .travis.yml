@@ -13,7 +13,8 @@ before_install:
   - conda install --yes conda=3.19
 
 install:
-  - conda create --yes -q -n python=2.7 numpy=1.10 scipy=0.16.1 pip pillow
+  - conda create --yes -q -n pyenv python=2.7 numpy=1.10 scipy=0.16.1 pip pillow
+  - source activate pyenv
   - pip install git+git://github.com/Theano/Theano.git
   - pip install coveralls
 
