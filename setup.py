@@ -7,9 +7,10 @@ sys.path.append('./src')
 sys.path.append('./tests')
 
 setup(
-    name='perspective_protection',
+    name='CubicCNN',
     version='0.1',
-    description='This is test codes for travis ci',
+    description='CubicCNN is classifier for 3d shape using convolutional '
+                'neural network.',
     packages=find_packages(),
-    test_suite='helper/data3d_test.suite'
+    test_suite='test_main.suite'
 )
