@@ -35,8 +35,11 @@ def cnn_3d_imitation(img_size, channel):
     return model
 
 
+
+
 def for_mnist(img_size):
     l1 = HiddenLayer(img_size[0] * img_size[1], 800, is_dropout=True)
     l2 = HiddenLayer(l1.n_out, 10, is_dropout=True)
     model = MLP(learning_rate=0.01, l1=l1, l2=l2)
     return model
+
