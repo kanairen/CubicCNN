@@ -13,18 +13,14 @@ class MaxPoolLayer2d(GridLayer2d):
 
         super(MaxPoolLayer2d, self).__init__(layer_id, image_size, c_in, c_in,
                                              k, s, p, activation, is_dropout,
-                                             dropout_rate)
+                                             dropout_rate, cover_all=True)
 
         self.params = []
         self.ignore_border = ignore_border
         self.mode = mode
 
     def output(self, input, is_train):
-
-        if input.ndim != 4:
-            input = input.reshape(
-                (input.shape[0], self.c_in, self.image_size[0],
-                 self.image_size[1]))
+        input = super(MaxPoolLayer2d, self).output(input, is_train)
 
         u = max_pool_2d(input, ds=self.k,
                         ignore_border=self.ignore_border,

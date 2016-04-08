@@ -21,14 +21,5 @@ class SoftMaxLayer(HiddenLayer, OutputLayerInterface):
                                            is_dropout=is_dropout,
                                            dropout_rate=dropout_rate)
 
-    def output_argmax(self, input, is_train):
-        return T.argmax(self.output(input, is_train), axis=1)
-
-    def cost(self, predict, y):
-        return -T.mean(T.log(predict)[T.arange(y.shape[0]), y])
-
-    def error(self, predict, y):
-        if predict.ndim != y.ndim or not y.dtype.startswith('int'):
-            raise TypeError
-
-        return T.mean(T.neq(predict, y))
+    def output(self, input, is_train):
+        return super(SoftMaxLayer, self).output(input, is_train)

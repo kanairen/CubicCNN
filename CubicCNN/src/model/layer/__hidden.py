@@ -16,7 +16,7 @@ class HiddenLayer(BaseLayer):
             weight = np.asarray(
                 self.rnd.uniform(low=-np.sqrt(6. / (n_in + n_out)),
                                  high=np.sqrt(6. / (n_in + n_out)),
-                                 size=(n_out, n_in)), dtype=dtype)
+                                 size=(n_in, n_out)), dtype=dtype)
             if activation == T.nnet.sigmoid:
                 weight *= 4.
         self.W = shared(weight, name='weight{}'.format(layer_id), borrow=True)

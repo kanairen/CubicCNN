@@ -1,8 +1,8 @@
 # coding: utf-8
 
 class OutputLayerInterface(object):
-    def cost(self, predict, y):
+    def cost(self, input, answer, is_train):
         raise NotImplementedError
 
-    def error(self, predict, y):
+    def error(self, input, answer, is_train):
         raise NotImplementedError

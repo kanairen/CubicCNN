@@ -6,7 +6,7 @@ from __base import BaseLayer
 
 class GridLayer2d(BaseLayer):
     def __init__(self, layer_id, image_size, c_in, c_out, k, s, p, activation,
-                 is_dropout, dropout_rate):
+                 is_dropout, dropout_rate, cover_all):
 
         self.image_size = image_size
 
@@ -22,8 +22,8 @@ class GridLayer2d(BaseLayer):
         sw, sh = self.s
         pw, ph = self.p
 
-        out_w = self._filter_outsize(img_w, kw, sw, pw)
-        out_h = self._filter_outsize(img_h, kh, sh, ph)
+        out_w = self._filter_outsize(img_w, kw, sw, pw, cover_all=cover_all)
+        out_h = self._filter_outsize(img_h, kh, sh, ph, cover_all=cover_all)
 
         self.output_image_size = out_w, out_h
 
@@ -34,7 +34,11 @@ class GridLayer2d(BaseLayer):
                                           is_dropout, dropout_rate)
 
     def output(self, input, is_train):
-        super(GridLayer2d, self).output(input, is_train)
+        if input.ndim != 4:
+            input = input.reshape(
+                (input.shape[0], self.c_in, self.image_size[0],
+                 self.image_size[1]))
+        return input
 
     @staticmethod
     def _filter_outsize(size, k, s, p, cover_all=False):

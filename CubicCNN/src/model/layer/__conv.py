@@ -14,7 +14,7 @@ class ConvLayer2d(GridLayer2d):
 
         super(ConvLayer2d, self).__init__(layer_id, image_size, c_in, c_out, k,
                                           s, p, activation, is_dropout,
-                                          dropout_rate)
+                                          dropout_rate, cover_all=False)
 
         if filters is None:
             kw, kh = self.k
@@ -32,23 +32,19 @@ class ConvLayer2d(GridLayer2d):
             b = np.zeros((c_out,), dtype=dtype)
         self.b = shared(b, name='b{}'.format(layer_id), borrow=True)
 
-        self.params = self.filters, self.params
+        self.params = self.filters, self.b
 
         self.border_mode = border_mode
 
     def output(self, input, is_train):
-
-        if input.ndim != 4:
-            input = input.reshape(
-                (input.shape[0], self.c_in, self.image_size[0],
-                 self.image_size[1]))
+        input = super(ConvLayer2d, self).output(input, is_train)
 
         u = conv2d(input, self.filters,
                    filter_shape=(self.c_out, self.c_in, self.k[1], self.k[0]),
                    border_mode=self.border_mode,
                    subsample=self.s)
         # TODO バイアスの挿入位置がここでほんとうに正しいのかテスト
-        return self._activate(u + self.b, is_train)
+        return self._activate(u + self.b.dimshuffle('x', 0, 'x', 'x'), is_train)
 
     def __str__(self):
         return super(ConvLayer2d, self).__str__()

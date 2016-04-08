@@ -2,7 +2,7 @@
 
 from itertools import chain
 from theano import tensor as T
-from layer.__base import BaseLayer
+from layer.__conv import GridLayer2d
 from layer.__output import OutputLayerInterface
 
 """
@@ -21,10 +21,14 @@ class Model(object):
         else:
             raise ValueError
 
-        output_layer = layers[-1]
-        assert isinstance(output_layer, OutputLayerInterface)
-
         self.layers = layers
+
+        # 二次元レイヤが先頭の場合、シンボルの形状を変更する
+        if isinstance(layers[0], GridLayer2d) and input_symbol.ndim != 4:
+            input_symbol = input_symbol.reshape(
+                (input_symbol.shape[0], 1, layers[0].image_size[0],
+                 layers[0].image_size[1]))
+
         self.input_symbol = input_symbol
         self.answer_symbol = answer_symbol
         self.params = list(chain(*[layer.params for layer in layers]))
@@ -39,25 +43,33 @@ class Model(object):
         prev_output = self.input_symbol
         for layer in self.layers:
             prev_output = layer.output(prev_output, is_train)
+        else:
+            assert isinstance(layer, OutputLayerInterface)
         return prev_output
 
-    def create_from_ml_file(self, ml_file):
+    @staticmethod
+    def create_from_ml_file(ml_file):
         raise NotImplementedError
 
-    def create_from_layers(self, layers_gen_func):
-        layers = layers_gen_func()
-        for layer in layers:
-            assert isinstance(layer, BaseLayer)
-        return layers
+    @staticmethod
+    def create_from_layers(layers_gen_func):
+        return layers_gen_func()
+
+    def argmax(self, is_train):
+        output = self.output_train if is_train else self.output_test
+        return T.argmax(output, axis=1)
+
+    def cost(self, is_train):
+        output = self.output_train if is_train else self.output_test
+        return -T.mean(T.log(output)[T.arange(
+            self.answer_symbol.shape[0]), self.answer_symbol])
 
     def error(self, is_train):
-        predict = self.output_train if is_train else self.output_test
-        return self.layers[-1].error(predict, self.answer_symbol)
-
-    def cost(self):
-        # cost関数は訓練時のみ使う
-        predict = self.output_train
-        return self.layers[-1].cost(predict, self.answer_symbol)
+        predict = self.argmax(is_train)
+        if predict.ndim != self.answer_symbol.ndim or not self.answer_symbol.dtype.startswith(
+                'int'):
+            raise TypeError
+        return T.mean(T.neq(predict, self.answer_symbol))
 
     def __str__(self):
         return ''
