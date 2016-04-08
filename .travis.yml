@@ -21,5 +21,8 @@ install:
 script:
   - coverage run --source=main setup.py test
 
+env:
+  - THEANO_FLAGS=floatX=float32,device='gpu'
+
 after_success:
   - coveralls
