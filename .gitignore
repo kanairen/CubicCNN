@@ -1,6 +1,5 @@
 .idea/
 res/
-config/
 *.pyc
 *.txt
 *.lm
