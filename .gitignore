@@ -3,5 +3,5 @@ res/
 config/
 *.pyc
 *.txt
-__*.py
+*.lm
 !__*__.py

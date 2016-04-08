@@ -1,0 +1,68 @@
+# mod file
+#
+# conv:
+# must : activation, c_out, k
+# any  : s=(1, 1), p=(0, 0), filters=None, b=None, border_mode='valid',
+#        dtype=config.floatX, is_dropout=False, dropout_rate=0.5
+#
+# pool:
+# must : image_size, activation, c_out, k
+# any  : s=None, p=(0, 0), ignore_border=False, mode='max',is_dropout=False,
+#        dropout_rate=0.5
+#
+# hidden:
+# must : n_in / n_out / activation
+# any  : dtype / is_dropout / dropout_rate
+#
+# TODO Insert of Weight and Bias
+
+data(
+    type=
+)
+
+conv(
+    activation=relu
+    c_out=16
+    k=(2,2)
+    s=(1,1)
+    p=(0,0)
+    border_mode=valid
+    dtype=floatX
+    is_dropout=True
+    dropout_rate=0.5
+)
+
+pool(
+    activation=identity
+    c_out=32
+    k=(2,2)
+    s=None
+    p=(0,0)
+    ignore_border=False
+    mode=max
+    is_dropout=True
+    dropout_rate=0.5
+)
+
+hidden(
+    n_out=512
+    activation=relu
+    dtype=config.floatX
+    is_dropout=False
+    dropout_rate=0.5
+)
+
+hidden(
+    n_out=256
+    activation=relu
+    dtype=config.floatX
+    is_dropout=False
+    dropout_rate=0.5
+)
+
+softmax(
+    n_out=10
+    dtype=config.floatX
+    is_dropout=False
+    dropout_rate=0.5
+)

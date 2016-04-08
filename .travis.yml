@@ -13,13 +13,16 @@ before_install:
   - conda install --yes conda=3.19
 
 install:
-  - conda create --yes -q -n pyenv python=2.7 numpy=1.10 scipy=0.16.1 pip pillow
+  - conda create --yes -q -n pyenv python=2.7 numpy=1.10 scipy=0.16.1 pip pillow matplotlib scikit-learn
   - source activate pyenv
   - pip install git+git://github.com/Theano/Theano.git
   - pip install coveralls
 
 script:
   - coverage run --source=main setup.py test
+
+env:
+  - THEANO_FLAGS=floatX=float32
 
 after_success:
   - coveralls
