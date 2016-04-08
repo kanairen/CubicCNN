@@ -29,6 +29,8 @@ class Optimizer(object):
         n_batch_train = len(x_train) / n_batch
         n_batch_test = len(x_test) / n_batch
 
+        sum_error_all = 0
+
         for iter in xrange(n_iter):
             for j in xrange(n_batch):
 
@@ -40,13 +42,17 @@ class Optimizer(object):
                 cost = self._train(b_x_train, b_y_train)
                 error = self._test(b_x_test, b_y_test)
                 error_all = self._test(x_test, y_test)
+                sum_error_all += error_all
 
                 if on_optimized is not None:
                     on_optimized(cost, error)
                 if is_print_enabled:
+                    print "{}th iteration / {}th batch".format(iter, j)
                     print "cost:{}".format(cost)
                     print "error:{}".format(error)
                     print "error all:{}".format(error_all)
+                    print "error all average:{}".format(
+                        sum_error_all / (n_batch * iter + j + 1))
 
     def _update(self, learning_rate):
         grads = T.grad(self.model.cost(True), self.model.params)

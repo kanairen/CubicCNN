@@ -13,6 +13,7 @@ from util import calcutil
 
 def main():
     d = image.mnist()
+    d.shuffle()
 
     def layer_gen():
         l1 = ConvLayer2d(layer_id=0, image_size=d.data_shape,
@@ -35,7 +36,7 @@ def main():
 
     m = Model(layer_gen)
     optimizer = Optimizer(d, m)
-    optimizer.optimize(10,100)
+    optimizer.optimize(100,1000)
 
 
 if __name__ == '__main__':
