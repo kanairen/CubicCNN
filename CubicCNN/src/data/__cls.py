@@ -1,5 +1,7 @@
 # coding: utf-8
 
+import numpy as np
+
 
 class Data(object):
     def __init__(self, x_train, x_test, y_train, y_test, data_shape):
@@ -11,6 +13,14 @@ class Data(object):
 
     def data(self):
         return self.x_train, self.x_test, self.y_train, self.y_test
+
+    def shuffle(self):
+        perm_train = np.random.permutation(len(self.x_train))
+        perm_test = np.random.permutation(len(self.x_test))
+        self.x_train = self.x_train[perm_train]
+        self.y_train = self.y_train[perm_train]
+        self.x_test = self.x_test[perm_test]
+        self.y_test = self.y_test[perm_test]
 
     def classes(self):
         return list(set(self.y_train))
