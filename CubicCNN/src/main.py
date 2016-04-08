@@ -35,7 +35,7 @@ def main():
 
     m = Model(layer_gen)
     optimizer = Optimizer(d, m)
-    optimizer.optimize(10)
+    optimizer.optimize(10,100)
 
 
 if __name__ == '__main__':
