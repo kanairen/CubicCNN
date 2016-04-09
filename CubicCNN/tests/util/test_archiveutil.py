@@ -20,6 +20,7 @@ class TestArchiveUtil(unittest.TestCase):
 
     def test_unzip(self):
         unzip(self.path_zip, self.path_dir)
+        print os.listdir(self.path_dir)
         with open(os.path.join(self.path_dir, self.path_text), 'r') as f:
             for l in f.readlines():
                 print l
