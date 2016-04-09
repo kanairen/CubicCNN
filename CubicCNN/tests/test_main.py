@@ -14,6 +14,7 @@ from CubicCNN.src.util import calcutil
 class TestCnn2d(unittest.TestCase):
     def setUp(self):
         print "setUp"
+
         def layer_gen():
             l1 = ConvLayer2d(layer_id=0, image_size=d.data_shape,
                              activation=calcutil.relu, c_in=1, c_out=16,
@@ -41,7 +42,7 @@ class TestCnn2d(unittest.TestCase):
 
     def test_cnn_2d(self):
         print "test_cnn_2d"
-        self.optimizer.optimize(5)
+        self.optimizer.optimize(3, 10)
 
 
 def suite():
