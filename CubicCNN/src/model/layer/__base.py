@@ -1,6 +1,8 @@
 # coding: utf-8
 
 import numpy as np
+from theano import config
+from theano.tensor.shared_randomstreams import RandomStreams
 
 
 class BaseLayer(object):
@@ -26,15 +28,17 @@ class BaseLayer(object):
 
         self.rnd = np.random.RandomState(1111)
 
+        self.trnd = RandomStreams(1111)
+
     def output(self, input, is_train):
         # dropoutの変更を反映させるため、出力を動的に作る
         raise NotImplementedError
 
-    def _activate(self, u, is_train):
+    def _activate(self, u, is_train, dtype=config.floatX):
         z = self.activation(u)
         if self.is_dropout:
             if is_train:
-                z *= self.rnd.binomial(size=z.shape, p=0.5)
+                z *= self.trnd.binomial(size=z.shape, p=0.5, dtype=dtype)
             else:
                 z *= self.dropout_rate
         return z
