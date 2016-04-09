@@ -11,7 +11,7 @@ from optimizer import Optimizer
 from util import calcutil
 
 
-def main():
+def cnn_2d_mnist():
     d = image.mnist()
     d.shuffle()
 
@@ -40,4 +40,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    cnn_2d_mnist()
