@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # coding: utf-8
 
 from theano.tensor.signal.downsample import max_pool_2d
