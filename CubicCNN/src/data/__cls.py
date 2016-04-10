@@ -7,12 +7,13 @@ import numpy as np
 from CubicCNN.src.util.archiveutil import unzip
 
 
-class DataFetcher(object):
-    def __init__(self, data_home, archive_home):
+class DataLoader(object):
+    def __init__(self, data_home, archive_home, root_name):
         self.data_home = data_home
         self.archive_home = archive_home
+        self.root_name = root_name
 
-    def _load(self, url, archive_name):
+    def load(self, url, archive_name):
         ext = os.path.splitext(url.split('/')[-1])[1]
         from_path = os.path.join(self.archive_home, archive_name + ext)
         to_path = os.path.join(self.archive_home, archive_name)
@@ -33,12 +34,6 @@ class DataFetcher(object):
             unzip(from_path, to_path)
         else:
             raise NotImplementedError
-
-    def _read(self, name):
-        raise NotImplementedError
-
-    def fetch(self):
-        raise NotImplementedError
 
 
 class Data(object):
