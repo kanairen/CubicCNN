@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os
 import unittest
 import zipfile
 from CubicCNN.src.util.archiveutil import unzip
@@ -22,3 +21,4 @@ class TestArchiveUtil(unittest.TestCase):
         with open("./test/testtext.txt", 'r') as f:
             for l in f.readlines():
                 print l
+
