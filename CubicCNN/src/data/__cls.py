@@ -1,7 +1,44 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
+import urllib
 import numpy as np
+from CubicCNN.src.util.archiveutil import unzip
+
+
+class DataFetcher(object):
+    def __init__(self, data_home, archive_home):
+        self.data_home = data_home
+        self.archive_home = archive_home
+
+    def _load(self, url, archive_name):
+        ext = os.path.splitext(url.split('/')[-1])[1]
+        from_path = os.path.join(self.archive_home, archive_name + ext)
+        to_path = os.path.join(self.archive_home, archive_name)
+
+        if os.path.exists(to_path):
+            return
+        elif os.path.exists(from_path):
+            self.__deploy(ext, from_path, to_path)
+        else:
+            if not os.path.exists(self.archive_home):
+                os.makedirs(self.archive_home)
+            urllib.urlretrieve(url, filename=from_path)
+            self.__deploy(ext, from_path, to_path)
+
+    @staticmethod
+    def __deploy(ext, from_path, to_path):
+        if ext == ".zip":
+            unzip(from_path, to_path)
+        else:
+            raise NotImplementedError
+
+    def _read(self, name):
+        raise NotImplementedError
+
+    def fetch(self):
+        raise NotImplementedError
 
 
 class Data(object):
