@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from theano.tensor.signal.downsample import max_pool_2d
+from theano.tensor.signal.pool import pool_2d
 from __grid import GridLayer2d
 
 
@@ -23,11 +23,11 @@ class MaxPoolLayer2d(GridLayer2d):
     def output(self, input, is_train):
         input = super(MaxPoolLayer2d, self).output(input, is_train)
 
-        u = max_pool_2d(input, ds=self.k,
-                        ignore_border=self.ignore_border,
-                        st=self.s,
-                        padding=self.p,
-                        mode=self.mode)
+        u = pool_2d(input, ds=self.k,
+                    ignore_border=self.ignore_border,
+                    st=self.s,
+                    padding=self.p,
+                    mode=self.mode)
         return self._activate(u, is_train)
 
     def __str__(self):
