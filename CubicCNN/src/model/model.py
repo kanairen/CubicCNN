@@ -27,8 +27,8 @@ class Model(object):
         # 二次元レイヤが先頭の場合、シンボルの形状を変更する
         if isinstance(layers[0], GridLayer2d) and input_symbol.ndim != 4:
             input_symbol = input_symbol.reshape(
-                (input_symbol.shape[0], 1, layers[0].image_size[0],
-                 layers[0].image_size[1]))
+                (input_symbol.shape[0], 1, layers[0].input_size[0],
+                 layers[0].input_size[1]))
 
         self.input_symbol = input_symbol
         self.answer_symbol = answer_symbol
