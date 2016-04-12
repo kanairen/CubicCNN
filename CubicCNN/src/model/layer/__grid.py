@@ -52,6 +52,13 @@ class GridLayer2d(BaseGridLayer):
                                           dropout_rate, cover_all, dim=2)
 
 
+class GridLayer3d(BaseGridLayer):
+    def __init__(self, layer_id, shape_size, c_in, c_out, k, s, p, activation,
+                 is_dropout, dropout_rate, cover_all):
+        super(GridLayer3d, self).__init__(layer_id, shape_size, c_in, c_out, k,
+                                          s, p, activation, is_dropout,
+                                          dropout_rate, cover_all, dim=3)
+
 
 def _filter_outsize(size, k, s, p, cover_all=False):
     if cover_all:

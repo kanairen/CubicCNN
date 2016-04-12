@@ -4,7 +4,7 @@
 import numpy as np
 from theano import config, shared
 from theano.tensor.nnet.conv import conv2d
-from theano.sandbox.cuda.fftconv import conv2d_fft
+from theano.sandbox.cuda.fftconv import conv2d_fft,conv3d_fft
 from __grid import GridLayer2d
 
 
@@ -49,3 +49,4 @@ class ConvLayer2d(GridLayer2d):
 
     def __str__(self):
         return super(ConvLayer2d, self).__str__()
+
