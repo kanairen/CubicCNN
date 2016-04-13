@@ -23,13 +23,13 @@ class TestCnn2d(unittest.TestCase):
                              activation=calcutil.relu, c_in=1, c_out=16,
                              k=(2, 2),
                              s=(1, 1))
-            l2 = MaxPoolLayer2d(layer_id=1, image_size=l1.output_image_size,
+            l2 = MaxPoolLayer2d(layer_id=1, image_size=l1.output_size,
                                 activation=calcutil.identity, c_in=16, k=(2, 2))
-            l3 = ConvLayer2d(layer_id=2, image_size=l2.output_image_size,
+            l3 = ConvLayer2d(layer_id=2, image_size=l2.output_size,
                              activation=calcutil.relu, c_in=16, c_out=32,
                              k=(2, 2),
                              s=(1, 1))
-            l4 = MaxPoolLayer2d(layer_id=3, image_size=l3.output_image_size,
+            l4 = MaxPoolLayer2d(layer_id=3, image_size=l3.output_size,
                                 activation=calcutil.identity, c_in=32, k=(2, 2))
             l5 = HiddenLayer(layer_id=4, n_in=l4.n_out, n_out=800,
                              activation=calcutil.relu)
