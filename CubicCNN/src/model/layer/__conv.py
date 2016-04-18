@@ -2,8 +2,9 @@
 # coding: utf-8
 
 import numpy as np
-from theano import config, shared
+from theano import config, shared, tensor as T
 from theano.tensor.nnet.conv import conv2d
+from theano.tensor.nnet.conv3d2d import conv3d
 from theano.sandbox.cuda.fftconv import conv2d_fft, conv3d_fft
 from __grid import GridLayer2d, GridLayer3d
 
@@ -82,11 +83,17 @@ class ConvLayer3d(GridLayer3d):
 
     def output(self, input, is_train):
         input = super(ConvLayer3d, self).output(input, is_train)
+        input = input.dimshuffle(0, 4, 1, 2, 3)
 
         shape = [self.c_out, self.c_in] + list(reversed(self.k))
-        u = conv3d_fft(input, self.filters,
-                       filter_shape=shape,
-                       border_mode=self.border_mode)
+
+        u = conv3d(input, self.filters, filters_shape=shape,
+                   border_mode=self.border_mode)
+        u = u.dimshuffle(0, 2, 3, 4, 1)
+        #
+        # u = conv3d_fft(input, self.filters,
+        #                filter_shape=shape,
+        #                border_mode=self.border_mode)
         # TODO バイアスの挿入位置がここでほんとうに正しいのかテスト
         return self._activate(u + self.b.dimshuffle('x', 0, 'x', 'x'), is_train)
 
