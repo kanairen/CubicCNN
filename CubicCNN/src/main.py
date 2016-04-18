@@ -70,4 +70,14 @@ def cnn_3d_psb():
 
 
 if __name__ == '__main__':
+    import numpy as np
+
+    ary = np.ones((1, 2, 3, 4, 5))
+    label = ['n', 'c', 'x', 'y', 'z']
+    ary = np.rollaxis(ary, 4, 1)
+    ary = np.rollaxis(ary, 4, 1)
+    ary = np.rollaxis(ary, 4, 1)
+    ary = np.rollaxis(ary, 4, 1)
+    print [label[i - 1] for i in ary.shape]
+    exit()
     cnn_3d_psb()
