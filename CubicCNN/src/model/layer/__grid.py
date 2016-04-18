@@ -31,7 +31,8 @@ class BaseGridLayer(BaseLayer):
 
     def output(self, input, is_train):
         if input.ndim != len(self.input_size) + 2:
-            input = input.reshape([input.shape[0], self.c_in] + self.input_size)
+            input = input.reshape(
+                [input.shape[0], self.c_in] + list(self.input_size))
         return input
 
     @staticmethod

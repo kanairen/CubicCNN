@@ -53,3 +53,4 @@ def suite():
     suite.addTest(unittest.makeSuite(TestArchiveUtil))
     suite.addTest(unittest.makeSuite(TestCnn2d))
     return suite
+
