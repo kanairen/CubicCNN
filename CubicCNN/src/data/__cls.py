@@ -81,3 +81,49 @@ class Data3d(Data):
         data_shape = x_train.shape[2:]
         super(Data3d, self).__init__(x_train, x_test, y_train, y_test,
                                      data_shape)
+
+    def rotate(self, angle, center, rotate_priority=(0, 1, 2)):
+        # メモリ溢れ防止のため、１つずつ書き換え
+        # NOTE ガーベジコレクションによるオーバヘッドの可能性
+        for i in xrange(len(self.x_train)):
+            self.x_train[i] = self._rotate(self.x_train[i], angle, center,
+                                           rotate_priority=rotate_priority)
+        for j in xrange(len(self.x_test)):
+            self.x_test[j] = self._rotate(self.x_test, angle, center,
+                                          rotate_priority=rotate_priority)
+
+    @staticmethod
+    def _rotate(voxel, angle, center, rotate_priority=(0, 1, 2)):
+
+        dz, dy, dx = voxel.shape
+
+        r_x, r_y, r_z = np.asarray(angle, dtype=np.float32) / 180. * np.pi
+
+        cx, cy, cz = center
+
+        mtr_x = np.array([[1., 0., 0.],
+                          [0., np.cos(r_x), np.sin(r_x)],
+                          [0., -np.sin(r_x), np.cos(r_x)]])
+        mtr_y = np.array([[np.cos(r_y), 0., -np.sin(r_y)],
+                          [0., 1., 0.],
+                          [np.sin(r_y), 0., np.cos(r_y)]])
+        mtr_z = np.array([[np.cos(r_z), np.sin(r_z), 0.],
+                          [-np.sin(r_z), np.cos(r_z), 0.],
+                          [0., 0., 1.]])
+
+        first, second, third = np.array((mtr_x, mtr_y, mtr_z))[rotate_priority]
+
+        r_voxel = np.zeros_like(voxel)
+
+        for z in xrange(dz):
+            for y in xrange(dy):
+                for x in xrange(dx):
+                    if voxel[z][y][x] == 0:
+                        continue
+                    rx, ry, rz = np.dot(
+                        np.dot(np.dot((x - cx, y - cy, z - cz), first), second),
+                        third)
+                    if 0 <= rx + cx < dx and 0 <= ry + cy < dy and 0 <= rz + cz < dz:
+                        r_voxel[rz + cz][ry + cy][rx + cx] = 1
+
+        return r_voxel

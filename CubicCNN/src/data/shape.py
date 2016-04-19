@@ -104,8 +104,3 @@ def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.float32,
     print x_test.shape
 
     return Data3d(x_train, x_test, y_train, y_test)
-
-
-if __name__ == '__main__':
-    PSBLoader()
-    psb_voxel()
