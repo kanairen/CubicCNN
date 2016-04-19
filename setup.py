@@ -13,5 +13,5 @@ setup(
     description='CubicCNN is classifier for 3d shape using convolutional '
                 'neural network.',
     packages=find_packages(),
-    test_suite='test_main.suite'
+    test_suite='tests.suite'
 )

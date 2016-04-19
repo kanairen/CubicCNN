@@ -11,9 +11,6 @@ from CubicCNN.src.model.layer.__softmax import SoftMaxLayer
 from CubicCNN.src.optimizer import Optimizer
 from CubicCNN.src.util import calcutil
 
-from CubicCNN.tests.util.test_archiveutil import TestArchiveUtil
-from CubicCNN.tests.util.test_calcutil import TestCalcUtil
-
 
 class TestCnn2d(unittest.TestCase):
     def setUp(self):
@@ -47,11 +44,3 @@ class TestCnn2d(unittest.TestCase):
     def test_cnn_2d(self):
         print "test_cnn_2d"
         self.optimizer.optimize(1, 5)
-
-
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestArchiveUtil))
-    suite.addTest(unittest.makeSuite(TestCalcUtil))
-    suite.addTest(unittest.makeSuite(TestCnn2d))
-    return suite

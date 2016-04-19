@@ -8,7 +8,7 @@ from CubicCNN.src.util.archiveutil import unzip
 
 class TestArchiveUtil(unittest.TestCase):
     def setUp(self):
-        print "setUp"
+        print "TestArchiveUtil : setUp"
         with open("./testtext.txt", 'wb') as tf:
             tf.write("test")
 
@@ -16,7 +16,7 @@ class TestArchiveUtil(unittest.TestCase):
             zf.write("./testtext.txt")
 
     def test_unzip(self):
-        print "test_unzip"
+        print "TestArchiveUtil : test_unzip"
         unzip("./test.zip", "./test")
         with open("./test/testtext.txt", 'r') as f:
             for l in f.readlines():
