@@ -42,9 +42,8 @@ def cnn_2d_mnist():
 
 
 def cnn_3d_psb():
-    #TODO 両データに存在するクラスのーデータのみ抽出
-    #TODO 入力データの可視化
-    data = shape.psb_voxel()
+    # TODO 入力データの可視化
+    data = shape.psb_voxel(is_co_class=True)
     data.shuffle()
 
     def layer_gen():
@@ -59,16 +58,16 @@ def cnn_3d_psb():
         l4 = MaxPoolLayer3d(layer_id=3, shape_size=l3.output_size,
                             activation=calcutil.identity, c_in=32, k=2)
         l5 = HiddenLayer(layer_id=4, n_in=l4.n_out, n_out=512,
-                         activation=calcutil.relu,is_dropout=True)
+                         activation=calcutil.relu, is_dropout=True)
         l6 = HiddenLayer(layer_id=5, n_in=l5.n_out, n_out=256,
-                         activation=calcutil.relu,is_dropout=True)
+                         activation=calcutil.relu, is_dropout=True)
         l7 = SoftMaxLayer(layer_id=6, n_in=l6.n_out, n_out=len(data.classes()))
         layers = [l1, l2, l3, l4, l5, l6, l7]
         return layers
 
     model = Model(layer_gen)
     optimizer = Optimizer(data, model)
-    optimizer.optimize(100,100,is_total_test_enabled=False)
+    optimizer.optimize(100, 100, is_total_test_enabled=False)
 
 
 if __name__ == '__main__':

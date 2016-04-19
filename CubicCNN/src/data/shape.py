@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os
 import re
 import shutil
 import numpy as np
@@ -14,18 +13,15 @@ from __cls import DataLoader, Data3d
 class PSBLoader(DataLoader):
     def __init__(self, archive_home=PATH_RES_TMP):
         data_home, root_name = os.path.split(PATH_RES_SHAPE_PSB)
-        print data_home, root_name
         super(PSBLoader, self).__init__(data_home, archive_home, root_name)
 
     def load(self, url=PSB_DATASET_URL):
 
-        super(PSBLoader, self).load(url, self.root_name)
+        super(PSBLoader, self)._load(url, self.root_name)
 
         prev_path = os.path.join(self.archive_home, self.root_name)
         prev_cla_path = os.path.join(prev_path, PSB_RELATIVE_CLA_PATH)
         prev_off_path = os.path.join(prev_path, PSB_RELATIVE_OFF_PATH)
-
-        new_path = os.path.join(self.data_home, self.root_name)
 
         # .cla
         if not os.path.exists(PATH_RES_SHAPE_PSB_CLASS):
@@ -47,7 +43,7 @@ class PSBLoader(DataLoader):
 
 
 def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.float32,
-              is_co_class=True):
+              is_co_class=False):
     # TODO yield方式にする
 
     cla_train = parseutil.parse_cla(
@@ -99,8 +95,5 @@ def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.float32,
 
     x_train = x_train.reshape([x_train.shape[0], 1] + list(x_train.shape[1:]))
     x_test = x_test.reshape([x_test.shape[0], 1] + list(x_test.shape[1:]))
-
-    print x_train.shape
-    print x_test.shape
 
     return Data3d(x_train, x_test, y_train, y_test)

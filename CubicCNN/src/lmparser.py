@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from collections import OrderedDict
 from model.layer.__hidden import HiddenLayer
 from model.layer.__conv import ConvLayer2d
 from model.layer.__pool import MaxPoolLayer2d

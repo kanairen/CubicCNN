@@ -13,7 +13,7 @@ class DataLoader(object):
         self.archive_home = archive_home
         self.root_name = root_name
 
-    def load(self, url, archive_name):
+    def _load(self, url, archive_name):
         ext = os.path.splitext(url.split('/')[-1])[1]
         from_path = os.path.join(self.archive_home, archive_name + ext)
         to_path = os.path.join(self.archive_home, archive_name)

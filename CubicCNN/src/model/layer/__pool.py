@@ -54,12 +54,6 @@ class MaxPoolLayer3d(GridLayer3d):
     def output(self, input, is_train):
         input = super(MaxPoolLayer3d, self).output(input, is_train)
 
-        # TODO implement 3d pooling
-        # u = pool_2d(input, ds=self.k,
-        #             ignore_border=self.ignore_border,
-        #             st=self.s,
-        #             padding=self.p,
-        #             mode=self.mode)
         u = max_pool_3d(input, ds=self.k, ignore_border=self.ignore_border)
 
         return self._activate(u, is_train)
