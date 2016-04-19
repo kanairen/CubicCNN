@@ -14,7 +14,7 @@ class TestCalcUtil(unittest.TestCase):
         self.assertEqual(identity(0), 0)
         self.assertEqual(identity(1), 1)
         self.assertEqual(identity(-1), -1)
-        self.assertEqual(identity(1.), -1.)
+        self.assertEqual(identity(1.), 1.)
         self.assertEqual(identity(-1.), -1.)
 
     def test_relu(self):
