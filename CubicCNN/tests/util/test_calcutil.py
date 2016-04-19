@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import unittest
-from cubiccnn.src.util.calcutil import *
+from CubicCNN.src.util.calcutil import *
 
 
 class TestCalcUtil(unittest.TestCase):
