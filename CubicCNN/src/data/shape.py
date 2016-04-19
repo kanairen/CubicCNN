@@ -46,14 +46,19 @@ class PSBLoader(DataLoader):
                                 os.path.join(PATH_RES_SHAPE_PSB_OFF, filename))
 
 
-def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX):
+def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.float32,
+              is_co_class=True):
     # TODO yield方式にする
 
     cla_train = parseutil.parse_cla(
         os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TRAIN))
     cla_test = parseutil.parse_cla(
         os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TEST))
-    cla_list = list(set(cla_train.keys() + cla_test.keys()))
+    if is_co_class:
+        cla_list = list(
+            set(cla_train.keys()).intersection(set(cla_test.keys())))
+    else:
+        cla_list = list(set(cla_train.keys() + cla_test.keys()))
 
     x_train = []
     x_test = []
@@ -66,28 +71,37 @@ def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX):
         cla = cla_train if is_train else cla_test
         for c_label, c_ids in cla.items():
             if binvox_id in c_ids:
-                return cla_list.index(c_label)
+                try:
+                    return cla_list.index(c_label)
+                except ValueError:
+                    break
         return None
 
     for f in tqdm.tqdm(os.listdir(data_path)):
         binvox = parseutil.parse_binvox(os.path.join(data_path, f))
         binvox_id = int(re_compile.findall(f)[0])
         train_binvox_y = check_binvox_y(binvox_id, True)
-        if train_binvox_y is None:
-            test_binvox_y = check_binvox_y(binvox_id, False)
-            x_test.append(binvox)
-            y_test.append(test_binvox_y)
-        else:
+        if train_binvox_y:
             x_train.append(binvox)
             y_train.append(train_binvox_y)
+        else:
+            test_binvox_y = check_binvox_y(binvox_id, False)
+            if test_binvox_y:
+                x_test.append(binvox)
+                y_test.append(test_binvox_y)
+            else:
+                continue
 
-    x_train = np.asarray(x_train)
-    x_test = np.asarray(x_test)
-    y_train = np.asarray(y_train)
-    y_test = np.asarray(y_test)
+    x_train = np.asarray(x_train, dtype=dtype)
+    x_test = np.asarray(x_test, dtype=dtype)
+    y_train = np.asarray(y_train, dtype=np.int32)
+    y_test = np.asarray(y_test, dtype=np.int32)
 
     x_train = x_train.reshape([x_train.shape[0], 1] + list(x_train.shape[1:]))
     x_test = x_test.reshape([x_test.shape[0], 1] + list(x_test.shape[1:]))
+
+    print x_train.shape
+    print x_test.shape
 
     return Data3d(x_train, x_test, y_train, y_test)
 

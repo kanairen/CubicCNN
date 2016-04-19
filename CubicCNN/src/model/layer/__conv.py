@@ -89,7 +89,7 @@ class ConvLayer3d(GridLayer3d):
 
         # shape = [self.c_out, self.c_in] + list(reversed(self.k))
 
-        u = conv3d(input, self.filters, border_mode=self.border_mode)
+        u = conv3d(input, self.filters, border_mode=self.border_mode,)
 
         u = u.dimshuffle(0, 2, 4, 3, 1)
 

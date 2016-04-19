@@ -3,7 +3,7 @@
 
 from itertools import chain
 from theano import tensor as T
-from layer.__conv import GridLayer2d
+from layer.__conv import GridLayer2d, GridLayer3d
 from layer.__output import OutputLayerInterface
 
 """
@@ -29,6 +29,9 @@ class Model(object):
             input_symbol = input_symbol.reshape(
                 (input_symbol.shape[0], 1, layers[0].input_size[0],
                  layers[0].input_size[1]))
+        # 三次元レイヤが先頭の場合、シンボルの形状を変更する
+        elif isinstance(layers[0], GridLayer3d) and input_symbol.ndim != 5:
+            input_symbol = T.TensorType('float32', (False,) * 5)(name='input')
 
         self.input_symbol = input_symbol
         self.answer_symbol = answer_symbol
