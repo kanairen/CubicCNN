@@ -4,8 +4,7 @@
 from setuptools import setup, find_packages
 import sys
 
-sys.path.append('./CubicCNN/src')
-sys.path.append('./CubicCNN/tests')
+sys.path.append('./CubicCNN')
 
 setup(
     name='CubicCNN',
