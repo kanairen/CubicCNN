@@ -93,14 +93,12 @@ class Data3d(Data):
                                           rotate_priority=rotate_priority)
 
     @staticmethod
-    def _rotate(voxel, angle, center, rotate_priority=(0, 1, 2)):
+    def _rotate(voxel, angle, center, rotate_priority=[0, 1, 2]):
 
-        dz, dy, dx = voxel.shape
-
+        # 弧度
         r_x, r_y, r_z = np.asarray(angle, dtype=np.float32) / 180. * np.pi
 
-        cx, cy, cz = center
-
+        # 回転行列
         mtr_x = np.array([[1., 0., 0.],
                           [0., np.cos(r_x), np.sin(r_x)],
                           [0., -np.sin(r_x), np.cos(r_x)]])
@@ -111,19 +109,17 @@ class Data3d(Data):
                           [-np.sin(r_z), np.cos(r_z), 0.],
                           [0., 0., 1.]])
 
-        first, second, third = np.array((mtr_x, mtr_y, mtr_z))[rotate_priority]
+        m1, m2, m3 = np.array((mtr_x, mtr_y, mtr_z))[rotate_priority]
 
         r_voxel = np.zeros_like(voxel)
 
-        for z in xrange(dz):
-            for y in xrange(dy):
-                for x in xrange(dx):
-                    if voxel[z][y][x] == 0:
-                        continue
-                    rx, ry, rz = np.dot(
-                        np.dot(np.dot((x - cx, y - cy, z - cz), first), second),
-                        third)
-                    if 0 <= rx + cx < dx and 0 <= ry + cy < dy and 0 <= rz + cz < dz:
-                        r_voxel[rz + cz][ry + cy][rx + cx] = 1
+        new_xyz = np.dot(np.dot(np.dot(np.argwhere(voxel) - center, m1), m2),
+                         m3) + center
+
+        dx, dy, dz = voxel.shape
+
+        for ix, iy, iz in new_xyz:
+            if 0 <= ix < dx and 0 <= iy < dy and 0 <= iz < dz:
+                r_voxel[ix][iy][iz] = 1
 
         return r_voxel
