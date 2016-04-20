@@ -3,6 +3,7 @@
 
 import os
 import urllib
+import itertools
 import numpy as np
 from CubicCNN.src.util.archiveutil import unzip
 
@@ -89,27 +90,31 @@ class Data3d(Data):
         tx, ty, tz = to_angles
         sx, sy, sz = step_angles
 
-        n_inc = (tx - fx) / sx + (ty - fy) / sy + (tz - fz) / sz
+        n_inc = ((tx - fx) / sx + 1) * ((ty - fy) / sy + 1) * (
+            (tz - fz) / sz + 1)
 
         def augment(x_data):
             new_data = np.empty(
                 [x_data.shape[0] * n_inc] + list(x_data.shape[1:]))
-            idx = 0
             for i in xrange(len(x_data)):
                 x = x_data[i, 0]
+                idx = 0
                 for ax in xrange(fx, tx + 1, sx):
                     for ay in xrange(fy, ty + 1, sy):
                         for az in xrange(fz, tz + 1, sz):
-                            new_data[idx] = self._rotate(x, (ax, ay, az),
-                                                         center,
-                                                         rotate_priority)
+                            new_data[n_inc * i + idx] = \
+                                self._rotate(x, (ax, ay, az),
+                                             center,
+                                             rotate_priority)
                             idx += 1
             return new_data
 
         self.x_train = augment(self.x_train)
         self.x_test = augment(self.x_test)
-        self.y_train = np.asarray([[y] * n_inc for y in self.y_train])
-        self.y_test = np.asarray([[y] * n_inc for y in self.y_test])
+        self.y_train = np.asarray(
+            list(itertools.chain(*[[y] * n_inc for y in self.y_train])))
+        self.y_test = np.asarray(
+            list(itertools.chain(*[[y] * n_inc for y in self.y_test])))
 
     @staticmethod
     def _rotate(voxel, angle, center, rotate_priority=[0, 1, 2]):
@@ -137,7 +142,7 @@ class Data3d(Data):
 
         dx, dy, dz = voxel.shape
 
-        for ix, iy, iz in new_xyz:
+        for ix, iy, iz in new_xyz.astype(np.uint8):
             if 0 <= ix < dx and 0 <= iy < dy and 0 <= iz < dz:
                 r_voxel[ix][iy][iz] = 1
 
