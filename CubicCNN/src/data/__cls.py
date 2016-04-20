@@ -82,15 +82,34 @@ class Data3d(Data):
         super(Data3d, self).__init__(x_train, x_test, y_train, y_test,
                                      data_shape)
 
-    def rotate(self, angle, center, rotate_priority=(0, 1, 2)):
-        # メモリ溢れ防止のため、１つずつ書き換え
-        # NOTE ガーベジコレクションによるオーバヘッドの可能性
-        for i in xrange(len(self.x_train)):
-            self.x_train[i] = self._rotate(self.x_train[i], angle, center,
-                                           rotate_priority=rotate_priority)
-        for j in xrange(len(self.x_test)):
-            self.x_test[j] = self._rotate(self.x_test, angle, center,
-                                          rotate_priority=rotate_priority)
+    def augment_rotate(self, from_angles, to_angles, step_angles, center,
+                       rotate_priority=[0, 1, 2]):
+        # NOTE 境界値は範囲に含む
+        fx, fy, fz = from_angles
+        tx, ty, tz = to_angles
+        sx, sy, sz = step_angles
+
+        n_inc = (tx - fx) / sx + (ty - fy) / sy + (tz - fz) / sz
+
+        def augment(x_data):
+            new_data = np.empty(
+                [x_data.shape[0] * n_inc] + list(x_data.shape[1:]))
+            idx = 0
+            for i in xrange(len(x_data)):
+                x = x_data[i, 0]
+                for ax in xrange(fx, tx + 1, sx):
+                    for ay in xrange(fy, ty + 1, sy):
+                        for az in xrange(fz, tz + 1, sz):
+                            new_data[idx] = self._rotate(x, (ax, ay, az),
+                                                         center,
+                                                         rotate_priority)
+                            idx += 1
+            return new_data
+
+        self.x_train = augment(self.x_train)
+        self.x_test = augment(self.x_test)
+        self.y_train = np.asarray([[y] * n_inc for y in self.y_train])
+        self.y_test = np.asarray([[y] * n_inc for y in self.y_test])
 
     @staticmethod
     def _rotate(voxel, angle, center, rotate_priority=[0, 1, 2]):
