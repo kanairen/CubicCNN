@@ -4,6 +4,7 @@
 import os
 import urllib
 import itertools
+import tqdm
 import numpy as np
 from CubicCNN.src.util.archiveutil import unzip
 
@@ -95,8 +96,8 @@ class Data3d(Data):
 
         def augment(x_data):
             new_data = np.empty(
-            for i in xrange(len(x_data)):
                 [x_data.shape[0] * n_inc] + list(x_data.shape[1:]), dtype=dtype)
+            for i in tqdm.tqdm(xrange(len(x_data))):
                 x = x_data[i, 0]
                 idx = 0
                 for ax in xrange(fx, tx + 1, sx):
