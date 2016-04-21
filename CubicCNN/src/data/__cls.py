@@ -84,15 +84,21 @@ class Data3d(Data):
         super(Data3d, self).__init__(x_train, x_test, y_train, y_test,
                                      data_shape)
 
-    def augment_rotate(self, from_angles, to_angles, step_angles, center,
-                       dtype=np.uint8):
-        # NOTE 境界値は範囲に含む
-        fx, fy, fz = from_angles
-        tx, ty, tz = to_angles
-        sx, sy, sz = step_angles
+    def augment_rotate(self, start, end, step, center, dtype=np.uint8):
+        def rotate(voxel, angle):
+            return self._rotate(voxel, angle, center, dtype)
 
-        n_inc = ((tx - fx) / sx + 1) * ((ty - fy) / sy + 1) * (
-            (tz - fz) / sz + 1)
+        self._augment(start, end, step, rotate, dtype=dtype)
+
+    def _augment(self, start, end, step, func, dtype=np.uint8):
+        # NOTE 境界値は範囲に含む
+        start_x, start_y, start_z = start
+        end_x, end_y, end_z = end
+        step_x, step_y, step_z = step
+
+        n_inc = ((end_x - start_x) / step_x + 1) * \
+                ((end_y - start_y) / step_y + 1) * \
+                ((end_z - start_z) / step_z + 1)
 
         def augment(x_data):
             new_data = np.empty(
@@ -100,13 +106,11 @@ class Data3d(Data):
             for i in tqdm.tqdm(xrange(len(x_data))):
                 x = x_data[i, 0]
                 idx = 0
-                for ax in xrange(fx, tx + 1, sx):
-                    for ay in xrange(fy, ty + 1, sy):
-                        for az in xrange(fz, tz + 1, sz):
-                            new_data[n_inc * i + idx] = \
-                                self._rotate(x, (ax, ay, az), center)
+                for ax in xrange(start_x, end_x + 1, step_x):
+                    for ay in xrange(start_y, end_y + 1, step_y):
+                        for az in xrange(start_z, end_z + 1, step_z):
+                            new_data[n_inc * i + idx] = func(x, (ax, ay, az))
                             idx += 1
-                del x
             return new_data
 
         self.x_train = augment(self.x_train)
@@ -116,6 +120,18 @@ class Data3d(Data):
         self.y_test = np.asarray(
             list(itertools.chain(*[[y] * n_inc for y in self.y_test])))
 
+    def augment_translate(self, start, end, step, dtype=np.uint8):
+        self._augment(start, end, step, self._translate, dtype=dtype)
+
+    @staticmethod
+    def _translate(voxel, trans, dtype=np.uint8):
+        t_voxel = np.zeros_like(voxel, dtype=dtype)
+        dx, dy, dz = voxel.shape
+        for ix, iy, iz in np.argwhere(voxel) + trans:
+            if 0 <= ix < dx and 0 <= iy < dy and 0 <= iz < dz:
+                t_voxel[int(ix)][int(iy)][int(iz)] = 1
+        return t_voxel
+
     @staticmethod
     def _rotate(voxel, angle, center, dtype=np.uint8):
         # TODO すべてのxyz軸順序を網羅した行列を用意(現在はxyzのみ)
@@ -123,7 +139,7 @@ class Data3d(Data):
         # 弧度
         rx, ry, rz = np.asarray(angle, dtype=np.float32) / 180. * np.pi
 
-        # 回転行列
+        # 回転行列(x→y→z)
         mtr = np.array(
             [[np.cos(rx) * np.cos(ry) * np.cos(rz) - np.sin(rx) * np.sin(rz),
               -np.cos(rx) * np.cos(ry) * np.sin(rz) - np.sin(rx) * np.cos(rz),
