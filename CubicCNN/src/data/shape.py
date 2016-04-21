@@ -5,6 +5,7 @@ import re
 import shutil
 import numpy as np
 import tqdm
+import warnings
 from CubicCNN import *
 from CubicCNN.src.util import parseutil
 from __cls import DataLoader, Data3d
@@ -43,16 +44,29 @@ class PSBLoader(DataLoader):
 
 
 def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.uint8,
-              is_co_class=False):
-    # TODO yield方式にする
+              is_co_class=False, is_cached=False, from_cached=False):
+
+    if from_cached:
+        print 'load voxels from .npy ...'
+        path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS \
+            if is_co_class else PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT
+        try:
+            x_train = np.load(os.path.join(path, PSB_TRAIN_INPUT_NAME)+'.npy')
+            x_test = np.load(os.path.join(path, PSB_TEST_INPUT_NAME)+'.npy')
+            y_train = np.load(os.path.join(path, PSB_TRAIN_ANSWER_NAME)+'.npy')
+            y_test = np.load(os.path.join(path, PSB_TEST_ANSWER_NAME)+'.npy')
+            return Data3d(x_train, x_test, y_train, y_test)
+        except IOError:
+            warnings.warn('psb_voxel data was not loaded.')
+
+    print 'load voxels from .off ...'
 
     cla_train = parseutil.parse_cla(
         os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TRAIN))
     cla_test = parseutil.parse_cla(
         os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TEST))
     if is_co_class:
-        cla_list = list(
-            set(cla_train.keys()).intersection(set(cla_test.keys())))
+        cla_list = list(set(cla_train.keys()).intersection(set(cla_test.keys())))
     else:
         cla_list = list(set(cla_train.keys() + cla_test.keys()))
 
@@ -95,5 +109,15 @@ def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.uint8,
 
     x_train = x_train.reshape([x_train.shape[0], 1] + list(x_train.shape[1:]))
     x_test = x_test.reshape([x_test.shape[0], 1] + list(x_test.shape[1:]))
+
+    if is_cached:
+        save_path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS \
+            if is_co_class else PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        np.save(os.path.join(save_path, PSB_TRAIN_INPUT_NAME), x_train)
+        np.save(os.path.join(save_path, PSB_TEST_INPUT_NAME), x_test)
+        np.save(os.path.join(save_path, PSB_TRAIN_ANSWER_NAME), y_train)
+        np.save(os.path.join(save_path, PSB_TEST_ANSWER_NAME), y_test)
 
     return Data3d(x_train, x_test, y_train, y_test)
