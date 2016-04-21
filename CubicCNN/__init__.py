@@ -42,7 +42,3 @@ PSB_RELATIVE_OFF_PATH = "benchmark/db"
 PSB_CLS_TEST = "test.cla"
 PSB_CLS_TRAIN = "train.cla"
 
-PSB_TRAIN_INPUT_NAME = "x_train"
-PSB_TEST_INPUT_NAME = "x_test"
-PSB_TRAIN_ANSWER_NAME = "y_train"
-PSB_TEST_ANSWER_NAME = "y_test"

@@ -43,19 +43,13 @@ class PSBLoader(DataLoader):
                                 os.path.join(PATH_RES_SHAPE_PSB_OFF, filename))
 
 
-def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.uint8,
-              is_co_class=False, is_cached=False, from_cached=False):
-
+def psb_voxel(is_co_class=False, is_cached=False, from_cached=False):
     if from_cached:
         print 'load voxels from .npy ...'
         path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS \
             if is_co_class else PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT
         try:
-            x_train = np.load(os.path.join(path, PSB_TRAIN_INPUT_NAME)+'.npy')
-            x_test = np.load(os.path.join(path, PSB_TEST_INPUT_NAME)+'.npy')
-            y_train = np.load(os.path.join(path, PSB_TRAIN_ANSWER_NAME)+'.npy')
-            y_test = np.load(os.path.join(path, PSB_TEST_ANSWER_NAME)+'.npy')
-            return Data3d(x_train, x_test, y_train, y_test)
+            return Data3d.load(path)
         except IOError:
             warnings.warn('psb_voxel data was not loaded.')
 
@@ -66,14 +60,10 @@ def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.uint8,
     cla_test = parseutil.parse_cla(
         os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TEST))
     if is_co_class:
-        cla_list = list(set(cla_train.keys()).intersection(set(cla_test.keys())))
+        cla_list = list(
+            set(cla_train.keys()).intersection(set(cla_test.keys())))
     else:
         cla_list = list(set(cla_train.keys() + cla_test.keys()))
-
-    x_train = []
-    x_test = []
-    y_train = []
-    y_test = []
 
     re_compile = re.compile("\d+")
 
@@ -87,8 +77,14 @@ def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.uint8,
                     break
         return None
 
-    for f in tqdm.tqdm(os.listdir(data_path)):
-        binvox = parseutil.parse_binvox(os.path.join(data_path, f))
+    x_train = []
+    x_test = []
+    y_train = []
+    y_test = []
+
+    for f in tqdm.tqdm(os.listdir(PATH_RES_SHAPE_PSB_BINVOX)):
+        binvox = parseutil.parse_binvox(
+            os.path.join(PATH_RES_SHAPE_PSB_BINVOX, f))
         binvox_id = int(re_compile.findall(f)[0])
         train_binvox_y = check_binvox_y(binvox_id, True)
         if train_binvox_y:
@@ -102,22 +98,19 @@ def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.uint8,
             else:
                 continue
 
-    x_train = np.asarray(x_train, dtype=dtype)
-    x_test = np.asarray(x_test, dtype=dtype)
+    x_train = np.asarray(x_train, dtype=np.uint8)
+    x_test = np.asarray(x_test, dtype=np.uint8)
     y_train = np.asarray(y_train, dtype=np.uint8)
     y_test = np.asarray(y_test, dtype=np.uint8)
 
     x_train = x_train.reshape([x_train.shape[0], 1] + list(x_train.shape[1:]))
     x_test = x_test.reshape([x_test.shape[0], 1] + list(x_test.shape[1:]))
 
+    data = Data3d(x_train, x_test, y_train, y_test)
+
     if is_cached:
         save_path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS \
             if is_co_class else PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-        np.save(os.path.join(save_path, PSB_TRAIN_INPUT_NAME), x_train)
-        np.save(os.path.join(save_path, PSB_TEST_INPUT_NAME), x_test)
-        np.save(os.path.join(save_path, PSB_TRAIN_ANSWER_NAME), y_train)
-        np.save(os.path.join(save_path, PSB_TEST_ANSWER_NAME), y_test)
+        data.save(save_path)
 
-    return Data3d(x_train, x_test, y_train, y_test)
+    return data
