@@ -65,7 +65,7 @@ def parse_binvox(binvox_file, show_params=False):
             head += n_uc
 
     # 3Dにして返戻
-    return np.rollaxis(array.reshape(dim), 2)
+    return array.reshape(dim)
 
 
 def parse_off(off_file):
@@ -127,7 +127,6 @@ def parse_cla(cla_file):
     return classifier
 
 
-# NOTE きもい
 class ClaTree(object):
     def __init__(self, root_name):
         self.root = self.ClaNode(root_name, None, 0)
