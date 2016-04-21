@@ -28,8 +28,10 @@ class Optimizer(object):
                  is_print_enabled=True, is_total_test_enabled=True):
         x_train, x_test, y_train, y_test = self.data.data()
 
-        n_batch_train = len(x_train) / n_batch
-        n_batch_test = len(x_test) / n_batch
+        bs_train = len(x_train) / n_batch if len(x_train) % n_batch == 0 \
+            else len(x_train) / n_batch + 1
+        bs_test = len(x_test) / n_batch if len(x_test) % n_batch == 0 \
+            else len(x_test) / n_batch + 1
 
         sum_error_all = 0.
 
@@ -37,10 +39,12 @@ class Optimizer(object):
             batch_sum_error = 0.
             for j in xrange(n_batch):
 
-                b_x_train = x_train[j * n_batch_train:(j + 1) * n_batch_train]
-                b_x_test = x_test[j * n_batch_test:(j + 1) * n_batch_test]
-                b_y_train = y_train[j * n_batch_train:(j + 1) * n_batch_train]
-                b_y_test = y_test[j * n_batch_test:(j + 1) * n_batch_test]
+                b_x_train = x_train[j * bs_train:(j + 1) * bs_train]
+                b_x_test = x_test[j * bs_test:(j + 1) * bs_test]
+                b_y_train = y_train[j * bs_train:(j + 1) * bs_train]
+                b_y_test = y_test[j * bs_test:(j + 1) * bs_test]
+
+                print b_x_train.shape
 
                 # train
                 start = time.clock()
