@@ -85,7 +85,7 @@ class Data3d(Data):
                                      data_shape)
 
     def augment_rotate(self, from_angles, to_angles, step_angles, center,
-                       rotate_priority=[0, 1, 2], dtype=np.uint8):
+                       dtype=np.uint8):
         # NOTE 境界値は範囲に含む
         fx, fy, fz = from_angles
         tx, ty, tz = to_angles
@@ -104,9 +104,7 @@ class Data3d(Data):
                     for ay in xrange(fy, ty + 1, sy):
                         for az in xrange(fz, tz + 1, sz):
                             new_data[n_inc * i + idx] = \
-                                self._rotate(x, (ax, ay, az),
-                                             center,
-                                             rotate_priority)
+                                self._rotate(x, (ax, ay, az), center)
                             idx += 1
             return new_data
 
@@ -118,23 +116,13 @@ class Data3d(Data):
             list(itertools.chain(*[[y] * n_inc for y in self.y_test])))
 
     @staticmethod
-    def _rotate(voxel, angle, center, rotate_priority=[0, 1, 2],
-                dtype=np.uint8):
+    def _rotate(voxel, angle, center, dtype=np.uint8):
+        # TODO すべてのxyz軸順序を網羅した行列を用意(現在はxyzのみ)
 
         # 弧度
         rx, ry, rz = np.asarray(angle, dtype=np.float32) / 180. * np.pi
 
         # 回転行列
-        # mtr_x = np.array([[1., 0., 0.],
-        #                   [0., np.cos(r_x), np.sin(r_x)],
-        #                   [0., -np.sin(r_x), np.cos(r_x)]])
-        # mtr_y = np.array([[np.cos(r_y), 0., -np.sin(r_y)],
-        #                   [0., 1., 0.],
-        #                   [np.sin(r_y), 0., np.cos(r_y)]])
-        # mtr_z = np.array([[np.cos(r_z), np.sin(r_z), 0.],
-        #                   [-np.sin(r_z), np.cos(r_z), 0.],
-        #                   [0., 0., 1.]])
-
         mtr = np.array(
             [[np.cos(rx) * np.cos(ry) * np.cos(rz) - np.sin(rx) * np.sin(rz),
               -np.cos(rx) * np.cos(ry) * np.sin(rz) - np.sin(rx) * np.cos(rz),
@@ -144,17 +132,12 @@ class Data3d(Data):
               np.sin(rx) * np.sin(ry)],
              [-np.sin(ry) * np.cos(rz), np.sin(ry) * np.sin(rz), np.cos(ry)]])
 
-        # m1, m2, m3 = np.array((mtr_x, mtr_y, mtr_z))[rotate_priority]
-
-        r_voxel = np.zeros_like(voxel, dtype=dtype)
-
-        # new_xyz = (np.dot(np.dot(np.dot(np.argwhere(voxel) - center, m1), m2),
-        #                   m3) + center).astype(np.uint8)
-
-        new_xyz = np.dot(np.argwhere(voxel) - center, mtr)
+        new_xyz = (np.dot(np.argwhere(voxel) - center, mtr) + center).astype(
+            np.uint8)
 
         dx, dy, dz = voxel.shape
 
+        r_voxel = np.zeros_like(voxel, dtype=dtype)
         for ix, iy, iz in new_xyz:
             if 0 <= ix < dx and 0 <= iy < dy and 0 <= iz < dz:
                 r_voxel[ix][iy][iz] = 1
