@@ -84,7 +84,7 @@ class Data3d(Data):
                                      data_shape)
 
     def augment_rotate(self, from_angles, to_angles, step_angles, center,
-                       rotate_priority=[0, 1, 2]):
+                       rotate_priority=[0, 1, 2], dtype=np.uint8):
         # NOTE 境界値は範囲に含む
         fx, fy, fz = from_angles
         tx, ty, tz = to_angles
@@ -95,8 +95,8 @@ class Data3d(Data):
 
         def augment(x_data):
             new_data = np.empty(
-                [x_data.shape[0] * n_inc] + list(x_data.shape[1:]))
             for i in xrange(len(x_data)):
+                [x_data.shape[0] * n_inc] + list(x_data.shape[1:]), dtype=dtype)
                 x = x_data[i, 0]
                 idx = 0
                 for ax in xrange(fx, tx + 1, sx):
@@ -117,7 +117,8 @@ class Data3d(Data):
             list(itertools.chain(*[[y] * n_inc for y in self.y_test])))
 
     @staticmethod
-    def _rotate(voxel, angle, center, rotate_priority=[0, 1, 2]):
+    def _rotate(voxel, angle, center, rotate_priority=[0, 1, 2],
+                dtype=np.uint8):
 
         # 弧度
         r_x, r_y, r_z = np.asarray(angle, dtype=np.float32) / 180. * np.pi
@@ -135,7 +136,7 @@ class Data3d(Data):
 
         m1, m2, m3 = np.array((mtr_x, mtr_y, mtr_z))[rotate_priority]
 
-        r_voxel = np.zeros_like(voxel)
+        r_voxel = np.zeros_like(voxel, dtype=dtype)
 
         new_xyz = np.dot(np.dot(np.dot(np.argwhere(voxel) - center, m1), m2),
                          m3) + center

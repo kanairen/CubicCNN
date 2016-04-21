@@ -42,7 +42,7 @@ class PSBLoader(DataLoader):
                                 os.path.join(PATH_RES_SHAPE_PSB_OFF, filename))
 
 
-def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.float32,
+def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.uint8,
               is_co_class=False):
     # TODO yield方式にする
 
@@ -90,8 +90,8 @@ def psb_voxel(data_path=PATH_RES_SHAPE_PSB_BINVOX, dtype=np.float32,
 
     x_train = np.asarray(x_train, dtype=dtype)
     x_test = np.asarray(x_test, dtype=dtype)
-    y_train = np.asarray(y_train, dtype=np.int32)
-    y_test = np.asarray(y_test, dtype=np.int32)
+    y_train = np.asarray(y_train, dtype=np.uint8)
+    y_test = np.asarray(y_test, dtype=np.uint8)
 
     x_train = x_train.reshape([x_train.shape[0], 1] + list(x_train.shape[1:]))
     x_test = x_test.reshape([x_test.shape[0], 1] + list(x_test.shape[1:]))
