@@ -106,6 +106,7 @@ class Data3d(Data):
                             new_data[n_inc * i + idx] = \
                                 self._rotate(x, (ax, ay, az), center)
                             idx += 1
+                del x
             return new_data
 
         self.x_train = augment(self.x_train)
@@ -132,14 +133,13 @@ class Data3d(Data):
               np.sin(rx) * np.sin(ry)],
              [-np.sin(ry) * np.cos(rz), np.sin(ry) * np.sin(rz), np.cos(ry)]])
 
-        new_xyz = (np.dot(np.argwhere(voxel) - center, mtr) + center).astype(
-            np.uint8)
+        new_xyz = np.dot(np.argwhere(voxel) - center, mtr) + center
 
         dx, dy, dz = voxel.shape
 
         r_voxel = np.zeros_like(voxel, dtype=dtype)
         for ix, iy, iz in new_xyz:
             if 0 <= ix < dx and 0 <= iy < dy and 0 <= iz < dz:
-                r_voxel[ix][iy][iz] = 1
+                r_voxel[int(ix)][int(iy)][int(iz)] = 1
 
         return r_voxel
