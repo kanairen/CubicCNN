@@ -122,29 +122,40 @@ class Data3d(Data):
                 dtype=np.uint8):
 
         # 弧度
-        r_x, r_y, r_z = np.asarray(angle, dtype=np.float32) / 180. * np.pi
+        rx, ry, rz = np.asarray(angle, dtype=np.float32) / 180. * np.pi
 
         # 回転行列
-        mtr_x = np.array([[1., 0., 0.],
-                          [0., np.cos(r_x), np.sin(r_x)],
-                          [0., -np.sin(r_x), np.cos(r_x)]])
-        mtr_y = np.array([[np.cos(r_y), 0., -np.sin(r_y)],
-                          [0., 1., 0.],
-                          [np.sin(r_y), 0., np.cos(r_y)]])
-        mtr_z = np.array([[np.cos(r_z), np.sin(r_z), 0.],
-                          [-np.sin(r_z), np.cos(r_z), 0.],
-                          [0., 0., 1.]])
+        # mtr_x = np.array([[1., 0., 0.],
+        #                   [0., np.cos(r_x), np.sin(r_x)],
+        #                   [0., -np.sin(r_x), np.cos(r_x)]])
+        # mtr_y = np.array([[np.cos(r_y), 0., -np.sin(r_y)],
+        #                   [0., 1., 0.],
+        #                   [np.sin(r_y), 0., np.cos(r_y)]])
+        # mtr_z = np.array([[np.cos(r_z), np.sin(r_z), 0.],
+        #                   [-np.sin(r_z), np.cos(r_z), 0.],
+        #                   [0., 0., 1.]])
 
-        m1, m2, m3 = np.array((mtr_x, mtr_y, mtr_z))[rotate_priority]
+        mtr = np.array(
+            [[np.cos(rx) * np.cos(ry) * np.cos(rz) - np.sin(rx) * np.sin(rz),
+              -np.cos(rx) * np.cos(ry) * np.sin(rz) - np.sin(rx) * np.cos(rz),
+              np.cos(rx) * np.sin(ry)],
+             [np.sin(rx) * np.cos(ry) * np.cos(rz) + np.cos(rx) * np.sin(rz),
+              -np.sin(rx) * np.cos(ry) * np.sin(rz) + np.cos(rx) * np.cos(rz),
+              np.sin(rx) * np.sin(ry)],
+             [-np.sin(ry) * np.cos(rz), np.sin(ry) * np.sin(rz), np.cos(ry)]])
+
+        # m1, m2, m3 = np.array((mtr_x, mtr_y, mtr_z))[rotate_priority]
 
         r_voxel = np.zeros_like(voxel, dtype=dtype)
 
-        new_xyz = np.dot(np.dot(np.dot(np.argwhere(voxel) - center, m1), m2),
-                         m3) + center
+        # new_xyz = (np.dot(np.dot(np.dot(np.argwhere(voxel) - center, m1), m2),
+        #                   m3) + center).astype(np.uint8)
+
+        new_xyz = np.dot(np.argwhere(voxel) - center, mtr)
 
         dx, dy, dz = voxel.shape
 
-        for ix, iy, iz in new_xyz.astype(np.uint8):
+        for ix, iy, iz in new_xyz:
             if 0 <= ix < dx and 0 <= iy < dy and 0 <= iz < dz:
                 r_voxel[ix][iy][iz] = 1
 
