@@ -39,12 +39,19 @@ class DataLoader(object):
 
 
 class Data(object):
-    def __init__(self, x_train, x_test, y_train, y_test, data_shape):
+    __TRAIN_INPUT_NAME = "x_train"
+    __TEST_INPUT_NAME = "x_test"
+    __TRAIN_ANSWER_NAME = "y_train"
+    __TEST_ANSWER_NAME = "y_test"
+
+    def __init__(self, x_train, x_test, y_train, y_test):
         self.x_train = x_train
         self.x_test = x_test
         self.y_train = y_train
         self.y_test = y_test
-        self.data_shape = data_shape
+        self.data_shape = x_train.shape[2:]
+        assert len(x_train) == len(y_train)
+        assert len(x_test) == len(y_test)
 
     def data(self):
         return self.x_train, self.x_test, self.y_train, self.y_test
@@ -60,17 +67,34 @@ class Data(object):
     def classes(self):
         return list(set(self.y_train))
 
+    def save(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        np.save(os.path.join(path, self.__TRAIN_INPUT_NAME), self.x_train)
+        np.save(os.path.join(path, self.__TEST_INPUT_NAME), self.x_test)
+        np.save(os.path.join(path, self.__TRAIN_ANSWER_NAME), self.y_train)
+        np.save(os.path.join(path, self.__TEST_ANSWER_NAME), self.y_test)
+
+    @classmethod
+    def load(cls, path):
+        x_train = np.load(os.path.join(path, cls.__TRAIN_INPUT_NAME) + '.npy')
+        x_test = np.load(os.path.join(path, cls.__TEST_INPUT_NAME) + '.npy')
+        y_train = np.load(os.path.join(path, cls.__TRAIN_ANSWER_NAME) + '.npy')
+        y_test = np.load(os.path.join(path, cls.__TEST_ANSWER_NAME) + '.npy')
+        return Data(x_train, x_test, y_train, y_test)
+
 
 class Data2d(Data):
     def __init__(self, x_train, x_test, y_train, y_test):
         # shape = (n,c,w,h)
         assert len(x_train.shape) == 4
         assert len(x_test.shape) == 4
-        assert len(x_train) == len(y_train)
-        assert len(x_test) == len(y_test)
-        data_shape = x_train.shape[2:]
-        super(Data2d, self).__init__(x_train, x_test, y_train, y_test,
-                                     data_shape)
+        super(Data2d, self).__init__(x_train, x_test, y_train, y_test)
+
+    @classmethod
+    def load(cls, path):
+        d = super(Data2d, cls).load(path)
+        return Data2d(d.x_train, d.x_test, d.y_train, d.y_test)
 
 
 class Data3d(Data):
@@ -78,11 +102,12 @@ class Data3d(Data):
         # shape = (n,c,dx,dy,dz)
         assert len(x_train.shape) == 5
         assert len(x_test.shape) == 5
-        assert len(x_train) == len(y_train)
-        assert len(x_test) == len(y_test)
-        data_shape = x_train.shape[2:]
-        super(Data3d, self).__init__(x_train, x_test, y_train, y_test,
-                                     data_shape)
+        super(Data3d, self).__init__(x_train, x_test, y_train, y_test)
+
+    @classmethod
+    def load(cls, path):
+        d = super(Data3d, cls).load(path)
+        return Data3d(d.x_train, d.x_test, d.y_train, d.y_test)
 
     def augment_rotate(self, start, end, step, center, dtype=np.uint8):
         def rotate(voxel, angle):
