@@ -28,10 +28,8 @@ class Optimizer(object):
                  is_print_enabled=True, is_total_test_enabled=True):
         x_train, x_test, y_train, y_test = self.data.data()
 
-        bs_train = len(x_train) / n_batch if len(x_train) % n_batch == 0 \
-            else len(x_train) / n_batch + 1
-        bs_test = len(x_test) / n_batch if len(x_test) % n_batch == 0 \
-            else len(x_test) / n_batch + 1
+        bs_train = len(x_train) / n_batch
+        bs_test = len(x_test) / n_batch
 
         sum_error_all = 0.
 
