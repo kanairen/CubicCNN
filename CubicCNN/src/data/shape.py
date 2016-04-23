@@ -89,12 +89,12 @@ def psb_voxel(is_co_class=False, is_cached=False, from_cached=False):
         binvox = parseutil.parse_binvox(binvox_path)
         binvox_id = int(re_compile.findall(f)[0])
         train_binvox_y = check_binvox_y(binvox_id, True)
-        if train_binvox_y:
+        if train_binvox_y is not None:
             x_train.append(binvox)
             y_train.append(train_binvox_y)
         else:
             test_binvox_y = check_binvox_y(binvox_id, False)
-            if test_binvox_y:
+            if test_binvox_y is not None:
                 x_test.append(binvox)
                 y_test.append(test_binvox_y)
             else:
