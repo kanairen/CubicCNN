@@ -43,76 +43,109 @@ class PSBLoader(DataLoader):
                                 os.path.join(PATH_RES_SHAPE_PSB_OFF, filename))
 
 
-def psb_voxel(is_co_class=False, is_cached=False, from_cached=False):
-    if from_cached:
-        print 'load voxels from .npy ...'
-        path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS \
-            if is_co_class else PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT
-        try:
-            return Data3d.load(path)
-        except IOError:
-            warnings.warn('psb_voxel data was not loaded.')
+class PSBVoxel(Data3d):
+    def __init__(self, x_train, x_test, y_train, y_test):
+        super(PSBVoxel, self).__init__(x_train, x_test, y_train, y_test)
 
-    print 'load voxels from .off ...'
+    @classmethod
+    def load(cls, path):
+        d = super(PSBVoxel, cls).load(path)
+        return PSBVoxel(d.x_train, d.x_test, d.y_train, d.y_test)
 
-    cla_train = parseutil.parse_cla(
-        os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TRAIN))
-    cla_test = parseutil.parse_cla(
-        os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TEST))
-    if is_co_class:
-        cla_list = list(
-            set(cla_train.keys()).intersection(set(cla_test.keys())))
-    else:
-        cla_list = list(set(cla_train.keys() + cla_test.keys()))
-
-    re_compile = re.compile("\d+")
-
-    def check_binvox_y(binvox_id, is_train):
-        cla = cla_train if is_train else cla_test
-        for c_label, c_ids in cla.items():
-            if binvox_id in c_ids:
-                try:
-                    return cla_list.index(c_label)
-                except ValueError:
-                    break
-        return None
-
-    x_train = []
-    x_test = []
-    y_train = []
-    y_test = []
-
-    for f in tqdm.tqdm(os.listdir(PATH_RES_SHAPE_PSB_BINVOX)):
-        binvox_path = os.path.join(PATH_RES_SHAPE_PSB_BINVOX, f)
-        if os.path.isdir(binvox_path):
-            continue
-        binvox = parseutil.parse_binvox(binvox_path)
-        binvox_id = int(re_compile.findall(f)[0])
-        train_binvox_y = check_binvox_y(binvox_id, True)
-        if train_binvox_y is not None:
-            x_train.append(binvox)
-            y_train.append(train_binvox_y)
-        else:
-            test_binvox_y = check_binvox_y(binvox_id, False)
-            if test_binvox_y is not None:
-                x_test.append(binvox)
-                y_test.append(test_binvox_y)
+    @staticmethod
+    def create(is_co_class=False, is_cached=False, from_cached=False):
+        if from_cached:
+            print 'load voxels from .npy ...'
+            if is_co_class:
+                load_path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_ORIGIN
             else:
+                load_path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT_ORIGIN
+            try:
+                return PSBVoxel.load(load_path)
+            except IOError:
+                warnings.warn('psb_voxel data was not loaded.')
+
+        print 'load voxels from .off ...'
+
+        cla_train = parseutil.parse_cla(
+            os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TRAIN))
+        cla_test = parseutil.parse_cla(
+            os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TEST))
+        if is_co_class:
+            cla_list = list(
+                set(cla_train.keys()).intersection(set(cla_test.keys())))
+        else:
+            cla_list = list(set(cla_train.keys() + cla_test.keys()))
+
+        re_compile = re.compile("\d+")
+
+        def check_binvox_y(binvox_id, is_train):
+            cla = cla_train if is_train else cla_test
+            for c_label, c_ids in cla.items():
+                if binvox_id in c_ids:
+                    try:
+                        return cla_list.index(c_label)
+                    except ValueError:
+                        break
+            return None
+
+        x_train = []
+        x_test = []
+        y_train = []
+        y_test = []
+
+        for f in tqdm.tqdm(os.listdir(PATH_RES_SHAPE_PSB_BINVOX)):
+            binvox_path = os.path.join(PATH_RES_SHAPE_PSB_BINVOX, f)
+            if os.path.isdir(binvox_path):
                 continue
+            binvox = parseutil.parse_binvox(binvox_path)
+            binvox_id = int(re_compile.findall(f)[0])
+            train_binvox_y = check_binvox_y(binvox_id, True)
+            if train_binvox_y is not None:
+                x_train.append(binvox)
+                y_train.append(train_binvox_y)
+            else:
+                test_binvox_y = check_binvox_y(binvox_id, False)
+                if test_binvox_y is not None:
+                    x_test.append(binvox)
+                    y_test.append(test_binvox_y)
+                else:
+                    continue
 
-    x_train = np.asarray(x_train, dtype=np.uint8)
-    x_test = np.asarray(x_test, dtype=np.uint8)
-    y_train = np.asarray(y_train, dtype=np.uint8)
-    y_test = np.asarray(y_test, dtype=np.uint8)
+        x_train = np.asarray(x_train, dtype=np.uint8)
+        x_test = np.asarray(x_test, dtype=np.uint8)
+        y_train = np.asarray(y_train, dtype=np.uint8)
+        y_test = np.asarray(y_test, dtype=np.uint8)
 
-    x_train = x_train.reshape([x_train.shape[0], 1] + list(x_train.shape[1:]))
-    x_test = x_test.reshape([x_test.shape[0], 1] + list(x_test.shape[1:]))
+        x_train = x_train.reshape(
+            [x_train.shape[0], 1] + list(x_train.shape[1:]))
+        x_test = x_test.reshape([x_test.shape[0], 1] + list(x_test.shape[1:]))
 
-    data = Data3d(x_train, x_test, y_train, y_test)
+        data = PSBVoxel(x_train, x_test, y_train, y_test)
 
-    if is_cached:
-        save_path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS \
-            if is_co_class else PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT
-        data.save(save_path)
+        if is_cached:
+            if is_co_class:
+                save_path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_ORIGIN
+            else:
+                save_path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT_ORIGIN
+            data.save(save_path)
 
-    return data
+        return data
+
+    def augment_rotate(self, start, end, step, center, dtype=np.uint8,
+                       is_co_class=False, is_cached=False, from_cached=False):
+        path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_ROTATE \
+            if is_co_class else PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT_ROTATE
+        if from_cached:
+            print 'load augumented voxels from .npy ...'
+            try:
+                return PSBVoxel.load(path)
+            except IOError:
+                warnings.warn(
+                    'augumented psb_voxel data (rotate )was not loaded.')
+
+        super(PSBVoxel, self).augment_rotate(start, end, step, center,
+                                             dtype=dtype)
+
+        if is_cached:
+            self.save(path)

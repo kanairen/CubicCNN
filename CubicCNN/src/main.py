@@ -6,7 +6,7 @@ from model.layer.__conv import ConvLayer2d, ConvLayer3d
 from model.layer.__pool import MaxPoolLayer2d, MaxPoolLayer3d
 from model.layer.__softmax import SoftMaxLayer
 from data import image
-from data import shape
+from data.shape import PSBVoxel
 from model.model import Model
 from optimizer import Optimizer
 
@@ -44,10 +44,11 @@ def cnn_2d_mnist():
 def cnn_3d_psb():
     # TODO 入力データの可視化
 
-    data = shape.psb_voxel(is_co_class=True, is_cached=True, from_cached=True)
-    data.shuffle()
+    data = PSBVoxel.create(is_co_class=True, is_cached=True, from_cached=True)
     data.augment_rotate(start=(-5, 0, 0), end=(5, 0, 0),
-                        step=(1, 1, 1), center=(50, 50, 50))
+                        step=(1, 1, 1), center=(50, 50, 50), is_cached=True,
+                        from_cached=True, is_co_class=True)
+    data.shuffle()
 
     def layer_gen():
         l1 = ConvLayer3d(layer_id=0, shape_size=data.data_shape,
@@ -63,9 +64,9 @@ def cnn_3d_psb():
         layers = [l1, l2, l3, l4, l5]
         return layers
 
-    model = Model(input_dtype='float32',layers_gen_func=layer_gen)
+    model = Model(input_dtype='float32', layers_gen_func=layer_gen)
     optimizer = Optimizer(data, model)
-    optimizer.optimize(100, len(data.x_train)/5, is_total_test_enabled=False)
+    optimizer.optimize(100, len(data.x_train) / 5, is_total_test_enabled=False)
 
 
 if __name__ == '__main__':

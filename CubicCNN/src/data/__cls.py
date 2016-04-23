@@ -83,6 +83,13 @@ class Data(object):
         y_test = np.load(os.path.join(path, cls.__TEST_ANSWER_NAME) + '.npy')
         return Data(x_train, x_test, y_train, y_test)
 
+    def set(self, data):
+        assert isinstance(data, Data)
+        self.x_train = data.x_train
+        self.x_test = data.x_test
+        self.y_train = data.y_train
+        self.y_test = data.y_test
+
 
 class Data2d(Data):
     def __init__(self, x_train, x_test, y_train, y_test):
