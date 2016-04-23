@@ -43,6 +43,7 @@ def cnn_2d_mnist():
 
 def cnn_3d_psb():
     # TODO 入力データの可視化
+
     data = shape.psb_voxel(is_co_class=True, is_cached=True, from_cached=True)
     data.shuffle()
     data.augment_rotate(start=(-5, 0, 0), end=(5, 0, 0),
@@ -62,9 +63,9 @@ def cnn_3d_psb():
         layers = [l1, l2, l3, l4, l5]
         return layers
 
-    model = Model(input_dtype='uint8',layers_gen_func=layer_gen)
+    model = Model(input_dtype='float32',layers_gen_func=layer_gen)
     optimizer = Optimizer(data, model)
-    optimizer.optimize(100, len(data.x_train) / 100, is_total_test_enabled=False)
+    optimizer.optimize(100, len(data.x_train)/5, is_total_test_enabled=False)
 
 
 if __name__ == '__main__':

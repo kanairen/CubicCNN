@@ -42,8 +42,6 @@ class Optimizer(object):
                 b_y_train = y_train[j * bs_train:(j + 1) * bs_train]
                 b_y_test = y_test[j * bs_test:(j + 1) * bs_test]
 
-                print b_x_train.shape
-
                 # train
                 start = time.clock()
                 cost = self._train(b_x_train, b_y_train)
