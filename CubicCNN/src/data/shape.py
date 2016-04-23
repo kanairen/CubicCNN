@@ -83,8 +83,10 @@ def psb_voxel(is_co_class=False, is_cached=False, from_cached=False):
     y_test = []
 
     for f in tqdm.tqdm(os.listdir(PATH_RES_SHAPE_PSB_BINVOX)):
-        binvox = parseutil.parse_binvox(
-            os.path.join(PATH_RES_SHAPE_PSB_BINVOX, f))
+        binvox_path = os.path.join(PATH_RES_SHAPE_PSB_BINVOX, f)
+        if os.path.isdir(binvox_path):
+            continue
+        binvox = parseutil.parse_binvox(binvox_path)
         binvox_id = int(re_compile.findall(f)[0])
         train_binvox_y = check_binvox_y(binvox_id, True)
         if train_binvox_y:
