@@ -43,8 +43,10 @@ def cnn_2d_mnist():
 
 def cnn_3d_psb():
     # TODO 入力データの可視化
-    data = shape.psb_voxel(is_co_class=True)
+    data = shape.psb_voxel(is_co_class=True, is_cached=True, from_cached=True)
     data.shuffle()
+    data.augment_rotate(start=(-5, 0, 0), end=(5, 0, 0),
+                        step=(1, 1, 1), center=(50, 50, 50))
 
     def layer_gen():
         l1 = ConvLayer3d(layer_id=0, shape_size=data.data_shape,
@@ -52,22 +54,17 @@ def cnn_3d_psb():
                          s=1, is_dropout=True)
         l2 = MaxPoolLayer3d(layer_id=1, shape_size=l1.output_size,
                             activation=calcutil.identity, c_in=16, k=4)
-        l3 = ConvLayer3d(layer_id=2, shape_size=l2.output_size,
-                         activation=calcutil.relu, c_in=16, c_out=32, k=2,
-                         s=1, is_dropout=True)
-        l4 = MaxPoolLayer3d(layer_id=3, shape_size=l3.output_size,
-                            activation=calcutil.identity, c_in=32, k=2)
-        l5 = HiddenLayer(layer_id=4, n_in=l4.n_out, n_out=512,
+        l3 = HiddenLayer(layer_id=4, n_in=l2.n_out, n_out=512,
                          activation=calcutil.relu, is_dropout=True)
-        l6 = HiddenLayer(layer_id=5, n_in=l5.n_out, n_out=256,
+        l4 = HiddenLayer(layer_id=5, n_in=l3.n_out, n_out=256,
                          activation=calcutil.relu, is_dropout=True)
-        l7 = SoftMaxLayer(layer_id=6, n_in=l6.n_out, n_out=len(data.classes()))
-        layers = [l1, l2, l3, l4, l5, l6, l7]
+        l5 = SoftMaxLayer(layer_id=6, n_in=l4.n_out, n_out=len(data.classes()))
+        layers = [l1, l2, l3, l4, l5]
         return layers
 
-    model = Model(layer_gen)
+    model = Model(input_dtype='uint8',layers_gen_func=layer_gen)
     optimizer = Optimizer(data, model)
-    optimizer.optimize(100, 100, is_total_test_enabled=False)
+    optimizer.optimize(100, len(data.x_train) / 100, is_total_test_enabled=False)
 
 
 if __name__ == '__main__':
