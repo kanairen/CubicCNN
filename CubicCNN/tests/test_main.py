@@ -38,7 +38,7 @@ class TestCnn2d(unittest.TestCase):
             return layers
 
         d = image.mnist()
-        m = Model(layer_gen)
+        m = Model(input_dtype='float32', layers_gen_func=layer_gen)
         self.optimizer = Optimizer(d, m)
 
     def test_cnn_2d(self):
