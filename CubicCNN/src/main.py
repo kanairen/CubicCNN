@@ -36,7 +36,7 @@ def cnn_2d_mnist():
         layers = [l1, l2, l3, l4, l5, l6, l7]
         return layers
 
-    m = Model(layer_gen)
+    m = Model(input_dtype='float32', layers_gen_func=layer_gen)
     optimizer = Optimizer(d, m)
     optimizer.optimize(100, 1000)
 
