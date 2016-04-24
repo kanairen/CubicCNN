@@ -53,7 +53,7 @@ def cnn_3d_psb():
     def layer_gen():
         l1 = ConvLayer3d(layer_id=0, shape_size=data.data_shape,
                          activation=calcutil.relu, c_in=1, c_out=16, k=5,
-                         s=1, is_dropout=True)
+                         s=3, is_dropout=True)
         l2 = MaxPoolLayer3d(layer_id=1, shape_size=l1.output_size,
                             activation=calcutil.identity, c_in=16, k=4)
         l3 = HiddenLayer(layer_id=4, n_in=l2.n_out, n_out=512,

@@ -4,7 +4,7 @@
 import numpy as np
 from theano import config, shared
 from theano.tensor.nnet.conv import conv2d
-from theano.tensor.nnet.conv3d2d import conv3d
+from theano.tensor.nnet.Conv3D import conv3D
 from __grid import GridLayer2d, GridLayer3d
 
 
@@ -65,7 +65,8 @@ class ConvLayer3d(GridLayer3d):
             f_in = c_in * np.prod(self.k)
             f_out = c_out * np.prod(self.k)
             w_bound = np.sqrt(6. / (f_in + f_out))
-            shape = (c_out, self.k[2], c_in, self.k[1], self.k[0])
+            # shape = (c_out, self.k[2], c_in, self.k[1], self.k[0])
+            shape = (c_out, self.k[2], self.k[1], self.k[0], c_in)
             filters = np.asarray(self.rnd.uniform(low=-w_bound,
                                                   high=w_bound,
                                                   size=shape),
@@ -84,12 +85,11 @@ class ConvLayer3d(GridLayer3d):
     def output(self, input, is_train):
         input = super(ConvLayer3d, self).output(input, is_train)
 
-        u = conv3d(input.dimshuffle(0, 4, 1, 3, 2), self.filters,
-                   border_mode=self.border_mode).dimshuffle(0, 2, 4, 3, 1)
+        u = conv3D(input.dimshuffle(0, 2, 3, 4, 1), self.filters,
+                   self.b, d=self.s).dimshuffle(0, 4, 1, 2, 3)
 
         # TODO バイアスの挿入位置がここでほんとうに正しいのかテスト
-        return self._activate(u + self.b.dimshuffle('x', 0, 'x', 'x', 'x'),
-                              is_train)
+        return self._activate(u, is_train)
 
     def __str__(self):
         super(ConvLayer3d, self).__str__()
