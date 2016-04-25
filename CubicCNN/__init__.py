@@ -9,6 +9,7 @@ PATH_RES = os.path.join(PATH, 'res')
 
 # /res
 PATH_RES_IMAGE = os.path.join(PATH_RES, 'image')
+PATH_RES_RESULT = os.path.join(PATH_RES, 'result')
 PATH_RES_SHAPE = os.path.join(PATH_RES, 'shape')
 PATH_RES_TMP = os.path.join(PATH_RES, 'tmp')
 

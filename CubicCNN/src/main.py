@@ -66,7 +66,8 @@ def cnn_3d_psb():
 
     model = Model(input_dtype='float32', layers_gen_func=layer_gen)
     optimizer = Optimizer(data, model)
-    optimizer.optimize(100, len(data.x_train) / 5, is_total_test_enabled=False)
+    optimizer.optimize(n_iter=100, n_batch=len(data.x_train) / 5,
+                       is_total_test_enabled=False)
 
 
 if __name__ == '__main__':
