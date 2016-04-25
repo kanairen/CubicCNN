@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import numpy as np
 from itertools import chain
-from theano import config, tensor as T
+from theano import tensor as T
 from layer.__conv import GridLayer2d, GridLayer3d
 from layer.__output import OutputLayerInterface
 
