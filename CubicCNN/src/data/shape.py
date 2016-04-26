@@ -139,7 +139,8 @@ class PSBVoxel(Data3d):
         if from_cached:
             print 'load augumented voxels from .npy ...'
             try:
-                return PSBVoxel.load(path)
+                self.set(PSBVoxel.load(path))
+                return
             except IOError:
                 warnings.warn(
                     'augumented psb_voxel data (rotate )was not loaded.')
