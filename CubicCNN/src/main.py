@@ -79,7 +79,7 @@ def cnn_3d_psb():
         optimizer.result.save()
 
     # 最適化開始
-    optimizer.optimize(n_iter=100, n_batch=len(data.x_train) / 5,
+    optimizer.optimize(n_iter=100, n_batch=len(data.x_train) / 10,
                        is_total_test_enabled=False, on_optimized=on_optimized)
 
 
