@@ -43,7 +43,8 @@ def cnn_2d_mnist():
 
 def cnn_3d_psb():
     # PSB ボクセルデータ(Train/Test双方に存在するクラスのデータのみ)
-    data = PSBVoxel.create(is_co_class=True, is_cached=True, from_cached=True)
+    data = PSBVoxel.create(is_co_class=True, is_cached=True, from_cached=True,
+                           align_data=True)
     # ボクセルデータを回転してデータ数増加
     data.augment_rotate(start=(-5, 0, 0), end=(5, 0, 0),
                         step=(1, 1, 1), center=(50, 50, 50), is_cached=True,

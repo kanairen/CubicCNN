@@ -53,7 +53,8 @@ class PSBVoxel(Data3d):
         return PSBVoxel(d.x_train, d.x_test, d.y_train, d.y_test)
 
     @staticmethod
-    def create(is_co_class=False, is_cached=False, from_cached=False):
+    def create(is_co_class=False, is_cached=False, from_cached=False,
+               align_data=False):
         if from_cached:
             print 'load voxels from .npy ...'
             if is_co_class:
@@ -120,6 +121,13 @@ class PSBVoxel(Data3d):
         x_train = x_train.reshape(
             [x_train.shape[0], 1] + list(x_train.shape[1:]))
         x_test = x_test.reshape([x_test.shape[0], 1] + list(x_test.shape[1:]))
+
+        if align_data:
+            aligned_size = min([len(x_train), len(x_test)])
+            x_train = x_train[:aligned_size]
+            x_test = x_test[:aligned_size]
+            y_train = y_train[:aligned_size]
+            y_test = y_test[:aligned_size]
 
         data = PSBVoxel(x_train, x_test, y_train, y_test)
 
