@@ -42,16 +42,18 @@ def cnn_2d_mnist():
 
 
 def cnn_3d_psb():
-    # TODO 入力データの可視化
-
+    # PSB ボクセルデータ(Train/Test双方に存在するクラスのデータのみ)
     data = PSBVoxel.create(is_co_class=True, is_cached=True, from_cached=True)
+    # ボクセルデータを回転してデータ数増加
     data.augment_rotate(start=(-5, 0, 0), end=(5, 0, 0),
                         step=(1, 1, 1), center=(50, 50, 50), is_cached=True,
                         from_cached=True, is_co_class=True)
+    # データの順番をランダムに入れ替え
     data.shuffle()
-
+    # データセットの次元ごとの要素数確認
     print data
 
+    # 学習モデル生成関数
     def layer_gen():
         l1 = ConvLayer3d(layer_id=0, shape_size=data.data_shape,
                          activation=calcutil.relu, c_in=1, c_out=16, k=5,
@@ -66,12 +68,17 @@ def cnn_3d_psb():
         layers = [l1, l2, l3, l4, l5]
         return layers
 
+    # 学習モデル
     model = Model(input_dtype='float32', layers_gen_func=layer_gen)
+
+    # 学習モデルの学習パラメタを最適化するオブジェクト
     optimizer = Optimizer(data, model)
 
+    # バッチ一回分の学習時に呼ばれる関数
     def on_optimized():
         optimizer.result.save()
 
+    # 最適化開始
     optimizer.optimize(n_iter=100, n_batch=len(data.x_train) / 5,
                        is_total_test_enabled=False, on_optimized=on_optimized)
 
