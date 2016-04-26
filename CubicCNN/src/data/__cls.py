@@ -90,6 +90,13 @@ class Data(object):
         self.y_train = data.y_train
         self.y_test = data.y_test
 
+    def __str__(self):
+        return '\n{} : '.format(self.__class__.__name__) + \
+               '\nx_train.shape : {}'.format(self.x_train.shape) + \
+               '\nx_test.shape : {}'.format(self.x_test.shape) + \
+               '\ny_train.shape : {}'.format(self.y_train.shape) + \
+               '\ny_test.shape : {}\n'.format(self.y_test.shape)
+
 
 class Data2d(Data):
     def __init__(self, x_train, x_test, y_train, y_test):

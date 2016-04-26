@@ -50,6 +50,8 @@ def cnn_3d_psb():
                         from_cached=True, is_co_class=True)
     data.shuffle()
 
+    print data
+
     def layer_gen():
         l1 = ConvLayer3d(layer_id=0, shape_size=data.data_shape,
                          activation=calcutil.relu, c_in=1, c_out=16, k=5,
