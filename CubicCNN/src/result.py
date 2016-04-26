@@ -12,34 +12,33 @@ from CubicCNN import PATH_RES_RESULT
 class Result(object):
     def __init__(self):
         self.results = OrderedDict()
+        self.time_stamp = datetime.datetime.today().strftime(
+            '%Y-%m-%d_%H:%M:%S')
 
     def add(self, key, value):
-        array = self.results.setdefault(key, [])
-        array.append(value)
+        array = self.results.setdefault(key, np.asarray([]))
+        self.results[key] = np.append(array, value)
 
     def add_all(self, items):
         for k, v in items:
             self.add(k, v)
 
     def set(self, key, array):
-        self.results[key] = array
+        self.results[key] = np.asarray(array)
 
     def save(self):
         for key, array in self.results.items():
-            name = key + datetime.datetime.today().strftime(
-                '_%Y-%m-%d_%H:%M:%S')
-            np.save(os.path.join(PATH_RES_RESULT, name), array)
+            if not os.path.exists(
+                    os.path.join(PATH_RES_RESULT, self.time_stamp)):
+                os.makedirs(os.path.join(PATH_RES_RESULT, self.time_stamp))
+            np.save(os.path.join(PATH_RES_RESULT, self.time_stamp, key), array)
 
     @staticmethod
-    def load(file_name, key_name=None):
+    def load(time_stamp):
         result = Result()
-        file_name = os.path.splitext(file_name)[0] + ".npy"
-        array = np.load(os.path.join(PATH_RES_RESULT, file_name))
-        if key_name is None:
-            key_name = file_name.replace(
-                '_\d{4}-\d{1,2}-\d{1,2}_\d{2}:\d{2}:\d{2}', '').replace('.npy',
-                                                                        '')
-        result.add(key_name, array)
+        for f in os.listdir(os.path.join(PATH_RES_RESULT, time_stamp)):
+            array = np.load(os.path.join(PATH_RES_RESULT, time_stamp, f))
+            result.set(f.replace('.npy', ''), array)
         return result
 
     def sub_result(self, keys):

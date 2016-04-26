@@ -70,12 +70,10 @@ def cnn_3d_psb():
     optimizer = Optimizer(data, model)
 
     def on_optimized():
-        r = optimizer.result
-        r_error = r.sub_result((Optimizer.KEY_TEST_BATCH_ERROR,))
-
+        optimizer.result.save()
 
     optimizer.optimize(n_iter=100, n_batch=len(data.x_train) / 5,
-                       is_total_test_enabled=False)
+                       is_total_test_enabled=False, on_optimized=on_optimized)
 
 
 if __name__ == '__main__':
