@@ -45,4 +45,7 @@ class BaseLayer(object):
         return z
 
     def __str__(self):
-        return "[{}:{:^13}]".format(self.layer_id, self.__class__.__name__)
+        return ''.join(
+            ("[{}:{:<15}]".format(self.layer_id, self.__class__.__name__),
+             " n_in : {:<8}".format(self.n_in),
+             " n_out : {:<8}".format(self.n_out)))

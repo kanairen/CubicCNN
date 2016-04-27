@@ -35,6 +35,4 @@ class HiddenLayer(BaseLayer):
         return self._activate(T.dot(input, self.W) + self.b, is_train)
 
     def __str__(self):
-        return super(HiddenLayer, self).__str__() + \
-               " n_in : {:<5}".format(self.n_in) + \
-               " n_out : {:<5}".format(self.n_out)
+        return super(HiddenLayer, self).__str__()

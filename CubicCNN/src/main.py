@@ -61,16 +61,17 @@ def cnn_3d_psb():
                          s=3, is_dropout=True)
         l2 = MaxPoolLayer3d(layer_id=1, shape_size=l1.output_size,
                             activation=calcutil.identity, c_in=16, k=4)
-        l3 = HiddenLayer(layer_id=4, n_in=l2.n_out, n_out=512,
+        l3 = HiddenLayer(layer_id=2, n_in=l2.n_out, n_out=512,
                          activation=calcutil.relu, is_dropout=True)
-        l4 = HiddenLayer(layer_id=5, n_in=l3.n_out, n_out=256,
+        l4 = HiddenLayer(layer_id=3, n_in=l3.n_out, n_out=256,
                          activation=calcutil.relu, is_dropout=True)
-        l5 = SoftMaxLayer(layer_id=6, n_in=l4.n_out, n_out=len(data.classes()))
+        l5 = SoftMaxLayer(layer_id=4, n_in=l4.n_out, n_out=len(data.classes()))
         layers = [l1, l2, l3, l4, l5]
         return layers
 
     # 学習モデル
     model = Model(input_dtype='float32', layers_gen_func=layer_gen)
+    print model
 
     # 学習モデルの学習パラメタを最適化するオブジェクト
     optimizer = Optimizer(data, model)

@@ -57,6 +57,9 @@ class MaxPoolLayer3d(GridLayer3d):
         u = max_pool_3d(input, ds=self.k, ignore_border=self.ignore_border)
 
         return self._activate(u, is_train)
+    
+    def __str__(self):
+        return super(MaxPoolLayer3d, self).__str__()
 
 
 def max_pool_3d(input, ds, ignore_border=False):

@@ -44,6 +44,15 @@ class BaseGridLayer(BaseLayer):
                 raise ValueError
         return [x] * dim
 
+    def __str__(self):
+        return ''.join((super(BaseGridLayer, self).__str__(),
+                        ' c_in : {:<4}'.format(self.c_in),
+                        ' c_out : {:<4}'.format(self.c_out),
+                        ' output size : {:<15}'.format(self.output_size),
+                        ' kernel : {:<10}'.format(self.k),
+                        ' stride : {:<10}'.format(self.s),
+                        ' padding : {:<10}'.format(self.p)))
+
 
 class GridLayer2d(BaseGridLayer):
     def __init__(self, layer_id, image_size, c_in, c_out, k, s, p, activation,

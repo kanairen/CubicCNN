@@ -82,4 +82,7 @@ class Model(object):
         return T.mean(T.neq(predict, self.answer_symbol))
 
     def __str__(self):
-        return ''
+        _str = '{} : '.format(self.__class__.__name__) + '\n'
+        for layer in self.layers:
+            _str += str(layer) + '\n'
+        return _str

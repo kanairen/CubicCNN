@@ -92,4 +92,4 @@ class ConvLayer3d(GridLayer3d):
         return self._activate(u, is_train)
 
     def __str__(self):
-        super(ConvLayer3d, self).__str__()
+        return super(ConvLayer3d, self).__str__()
