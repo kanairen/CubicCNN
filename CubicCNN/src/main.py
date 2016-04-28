@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import datetime
 from model.layer.__hidden import HiddenLayer
 from model.layer.__conv import ConvLayer2d, ConvLayer3d
 from model.layer.__pool import MaxPoolLayer2d, MaxPoolLayer3d
@@ -86,4 +87,5 @@ def cnn_3d_psb():
 
 
 if __name__ == '__main__':
+    print datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
     cnn_3d_psb()
