@@ -53,6 +53,10 @@ class Optimizer(object):
         bs_train = len(x_train) / n_batch
         bs_test = len(x_test) / n_batch
 
+        # 指定したバッチ数で余りが出る場合、余ったデータでも学習・テストするようにバッチ数+1
+        if bs_train * n_batch < len(x_train) or bs_test * n_batch < len(x_test):
+            n_batch += 1
+
         sum_error_all = 0.
 
         for i in xrange(n_iter):
