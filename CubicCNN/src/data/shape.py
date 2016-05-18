@@ -142,8 +142,37 @@ class PSBVoxel(Data3d):
 
     def augment_rotate(self, start, end, step, center, dtype=np.uint8,
                        is_co_class=False, is_cached=False, from_cached=False):
-        path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_ROTATE \
-            if is_co_class else PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT_ROTATE
+        self._aug(aug_type='rotate', start=start, end=end, step=step,
+                  dtype=dtype, is_co_class=is_co_class, is_cached=is_cached,
+                  from_cached=from_cached)
+
+    def augment_translate(self, start, end, step, dtype=np.uint8,
+                          is_co_class=False, is_cached=False,
+                          from_cached=False):
+        self._aug(aug_type='translate', start=start, end=end, step=step,
+                  dtype=dtype, is_co_class=is_co_class, is_cached=is_cached,
+                  from_cached=from_cached)
+
+    def _aug(self, **kwargs):
+        aug_type = kwargs['aug_type']
+        is_co_class = kwargs['is_co_class']
+        is_cached = kwargs['is_cached']
+        from_cached = kwargs['from_cached']
+        if aug_type == 'rotate':
+            aug_func = super(PSBVoxel, self).augment_rotate
+            if is_co_class:
+                path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_ROTATE
+            else:
+                path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT_ROTATE
+        elif aug_type == 'translate':
+            aug_func = super(PSBVoxel, self).augment_translate
+            if is_co_class:
+                path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_TRANS
+            else:
+                path = PATH_RES_SHAPE_PSB_BINVOX_CACHE_DEFAULT_ROTATE
+        else:
+            raise TypeError
+
         if from_cached:
             print 'load augumented voxels from .npy ...'
             try:
@@ -151,10 +180,16 @@ class PSBVoxel(Data3d):
                 return
             except IOError:
                 warnings.warn(
-                    'augumented psb_voxel data (rotate )was not loaded.')
+                    'augumented psb_voxel({}) was not loaded.'.format(aug_type))
 
-        super(PSBVoxel, self).augment_rotate(start, end, step, center,
-                                             dtype=dtype)
+        # 不要な引数の削除
+        del kwargs['aug_type'], \
+            kwargs['is_co_class'], \
+            kwargs['is_cached'], \
+            kwargs['from_cached']
+
+        # Data Augmentation処理
+        aug_func(**kwargs)
 
         if is_cached:
             self.save(path)
