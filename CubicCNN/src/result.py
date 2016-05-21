@@ -10,10 +10,11 @@ from CubicCNN import PATH_RES_RESULT
 
 
 class Result(object):
-    def __init__(self):
+    def __init__(self,dir=None):
         self.results = OrderedDict()
-        self.time_stamp = datetime.datetime.today().strftime(
-            '%Y-%m-%d_%H:%M:%S')
+        if dir is None:
+            dir = datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
+        self.dir = dir
 
     def add(self, key, value):
         array = self.results.setdefault(key, np.asarray([]))
@@ -27,21 +28,20 @@ class Result(object):
         self.results[key] = np.asarray(array)
 
     def save(self):
+        if not os.path.exists(os.path.join(PATH_RES_RESULT, self.dir)):
+            os.makedirs(os.path.join(PATH_RES_RESULT, self.dir))
         for key, array in self.results.items():
-            if not os.path.exists(
-                    os.path.join(PATH_RES_RESULT, self.time_stamp)):
-                os.makedirs(os.path.join(PATH_RES_RESULT, self.time_stamp))
-            np.save(os.path.join(PATH_RES_RESULT, self.time_stamp, key), array)
+            np.save(os.path.join(PATH_RES_RESULT, self.dir, key), array)
 
     @staticmethod
-    def load(time_stamp):
+    def load(dir):
         result = Result()
-        for f in os.listdir(os.path.join(PATH_RES_RESULT, time_stamp)):
-            array = np.load(os.path.join(PATH_RES_RESULT, time_stamp, f))
+        for f in os.listdir(os.path.join(PATH_RES_RESULT, dir)):
+            array = np.load(os.path.join(PATH_RES_RESULT, dir, f))
             result.set(f.replace('.npy', ''), array)
         return result
 
-    def sub_result(self, keys):
+    def copy(self, keys):
         new_result = Result()
         for key in keys:
             new_result.set(key, self.results[key])

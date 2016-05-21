@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
 import time
 from theano import function, tensor as T
 from data.__cls import Data
@@ -30,6 +31,7 @@ class Optimizer(object):
         self.data = data
         self.model = model
         self.result = Result()
+        self.params_result = Result(os.path.join(self.result.dir, 'params'))
 
         self._cost = function(
             inputs=(self.model.input_symbol, self.model.answer_symbol),
@@ -47,7 +49,8 @@ class Optimizer(object):
             updates=[])
 
     def optimize(self, n_iter, n_batch, is_total_test_enabled=True,
-                 is_print_enabled=True, on_optimized=None):
+                 is_params_saved=True, is_print_enabled=True,
+                 on_optimized=None):
         x_train, x_test, y_train, y_test = self.data.data()
 
         bs_train = len(x_train) / n_batch
@@ -114,12 +117,16 @@ class Optimizer(object):
                          (self.KEY_TEST_TOTAL_ERROR_AVERAGE,
                           sum_error_all / (n_batch * i + j + 1))))
 
+                if is_params_saved:
+                    for p in self.model.params:
+                        self.params_result.set(p.name, p.get_value())
+
                 # output
                 if is_print_enabled:
                     print '\n{}th iteration / {}th batch'.format(i + 1, j + 1)
                     for l, a in self.result.results.items():
-                        m_format = "{}: {}s" if 'time' in l else "{}: {}"
-                        print m_format.format(l.replace('_', ' '), a[-1])
+                        m_form = "{:<26}: {}s" if 'time' in l else "{:<26}: {}"
+                        print m_form.format(l.replace('_', ' '), a[-1])
 
                 # callback
                 if on_optimized is not None:

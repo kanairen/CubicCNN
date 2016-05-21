@@ -50,6 +50,8 @@ def cnn_3d_psb():
     data.augment_rotate(start=(-5, 0, 0), end=(5, 0, 0),
                         step=(1, 1, 1), center=(50, 50, 50), is_cached=True,
                         from_cached=True, is_co_class=True)
+    # data.augment_translate(start=(0, 0, -5), end=(0, 0, 5), step=(1, 1, 1),
+    #                        is_cached=True, from_cached=True, is_co_class=True)
     # データの順番をランダムに入れ替え
     data.shuffle()
     # データセットの次元ごとの要素数確認
@@ -80,6 +82,7 @@ def cnn_3d_psb():
     # バッチ一回分の学習時に呼ばれる関数
     def on_optimized():
         optimizer.result.save()
+        optimizer.params_result.save()
 
     # 最適化開始
     optimizer.optimize(n_iter=100, n_batch=len(data.x_train) / 10,
