@@ -143,8 +143,8 @@ class PSBVoxel(Data3d):
     def augment_rotate(self, start, end, step, center, dtype=np.uint8,
                        is_co_class=False, is_cached=False, from_cached=False):
         self._aug(aug_type='rotate', start=start, end=end, step=step,
-                  dtype=dtype, is_co_class=is_co_class, is_cached=is_cached,
-                  from_cached=from_cached)
+                  center=center, dtype=dtype, is_co_class=is_co_class,
+                  is_cached=is_cached, from_cached=from_cached)
 
     def augment_translate(self, start, end, step, dtype=np.uint8,
                           is_co_class=False, is_cached=False,
