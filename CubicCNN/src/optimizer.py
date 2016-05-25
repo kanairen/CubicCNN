@@ -3,6 +3,7 @@
 
 import os
 import time
+import numpy as np
 from theano import function, tensor as T
 from data.__cls import Data
 from model.model import Model
@@ -25,7 +26,7 @@ class Optimizer(object):
     KEY_TEST_BATCH_ERROR_AVERAGE = 'test_batch_error_average'
     KEY_TEST_BATCH_ERROR_TIME = 'test_batch_time'
 
-    def __init__(self, data, model, learning_rate=0.01):
+    def __init__(self, data, model, learning_rate=0.01, l1_rate=0., l2_rate=0.):
         assert isinstance(data, Data)
         assert isinstance(model, Model)
         self.data = data
@@ -33,9 +34,14 @@ class Optimizer(object):
         self.result = Result()
         self.params_result = Result(os.path.join(self.result.dir, 'params'))
 
+        weights = [p for p in self.model.params
+                   if 'weight' in p.name or 'filter' in p.name]
+        l1 = np.sum([abs(w).sum() for w in weights])
+        l2 = np.sum([(w ** 2).sum() for w in weights])
+
         self._cost = function(
             inputs=(self.model.input_symbol, self.model.answer_symbol),
-            outputs=self.model.cost(True),
+            outputs=self.model.cost(True) + l1_rate * l1 + l2_rate * l2,
             updates=self._update(learning_rate))
 
         self._train_error = function(
