@@ -66,7 +66,7 @@ class ConvLayer3d(GridLayer3d):
             f_out = c_out * np.prod(self.k)
             w_bound = np.sqrt(6. / (f_in + f_out))
             # shape = (c_out, self.k[2], c_in, self.k[1], self.k[0])
-            shape = (c_out, self.k[2], self.k[1], self.k[0], c_in)
+            shape = (c_out, self.k[0], self.k[1], self.k[2], c_in)
             filters = np.asarray(self.rnd.uniform(low=-w_bound,
                                                   high=w_bound,
                                                   size=shape),
