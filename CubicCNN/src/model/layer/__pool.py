@@ -57,26 +57,32 @@ class MaxPoolLayer3d(GridLayer3d):
         u = max_pool_3d(input, ds=self.k, ignore_border=self.ignore_border)
 
         return self._activate(u, is_train)
-    
+
     def __str__(self):
         return super(MaxPoolLayer3d, self).__str__()
 
 
 def max_pool_3d(input, ds, ignore_border=False):
+    # [n,c,x,y,z]以外の入力は受け付けない
+    if input.ndim != 5:
+        raise NotImplementedError(
+            'max_pool_3d requires a input [n, c, x, y, z]')
 
-    if input.ndim < 3:
-        raise NotImplementedError('max_pool_3d requires a dimension >= 3')
-
+    # 入力次元
     vid_dim = input.ndim
 
+    # [y, z]フレームの次元数
     frame_shape = input.shape[-2:]
 
+    # バッチサイズ
+    # フレーム次元以外の全ての次元の要素数を掛け合わせる
     batch_size = T.prod(input.shape[:-2])
+    # http://deeplearning.net/software/theano/library/tensor/basic.html#theano.tensor.shape_padright
     batch_size = T.shape_padright(batch_size, 1)
 
-    new_shape = T.cast(T.join(0, batch_size,
-                              T.as_tensor([1, ]),
-                              frame_shape), 'int32')
+
+    new_shape = T.cast(T.join(0, batch_size, T.as_tensor([1, ]), frame_shape),
+                       'int32')
     input_4D = T.reshape(input, new_shape, ndim=4)
 
     op = DownsampleFactorMax((ds[1], ds[2]), ignore_border)
@@ -85,7 +91,8 @@ def max_pool_3d(input, ds, ignore_border=False):
     out = T.reshape(output, outshape, ndim=input.ndim)
 
     shufl = (
-    list(range(vid_dim - 3)) + [vid_dim - 2] + [vid_dim - 1] + [vid_dim - 3])
+        list(range(vid_dim - 3)) + [vid_dim - 2] + [vid_dim - 1] + [
+            vid_dim - 3])
     input_time = out.dimshuffle(shufl)
     vid_shape = input_time.shape[-2:]
 
@@ -100,5 +107,6 @@ def max_pool_3d(input, ds, ignore_border=False):
     outtime = op(input_4D_time)
     outshape = T.join(0, input_time.shape[:-2], outtime.shape[-2:])
     shufl = (
-    list(range(vid_dim - 3)) + [vid_dim - 1] + [vid_dim - 3] + [vid_dim - 2])
+        list(range(vid_dim - 3)) + [vid_dim - 1] + [vid_dim - 3] + [
+            vid_dim - 2])
     return T.reshape(outtime, outshape, ndim=input.ndim).dimshuffle(shufl)
