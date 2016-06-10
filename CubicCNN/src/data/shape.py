@@ -234,6 +234,6 @@ class SHRECVoxel(Data3d):
         y = np.asarray(y, dtype=np.uint8)
 
         x_train, x_test, y_train, y_test = train_test_split(x, y,
-                                                            train_size=1. / n_fold)
+                                                            train_size=1. - 1. / n_fold)
 
         return SHRECVoxel(x_train, x_test, y_train, y_test)
