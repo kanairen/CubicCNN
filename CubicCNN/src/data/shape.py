@@ -6,6 +6,7 @@ import shutil
 import numpy as np
 import tqdm
 import warnings
+from sklearn.cross_validation import train_test_split
 from CubicCNN import *
 from CubicCNN.src.util import parseutil
 from __cls import DataLoader, Data3d
@@ -193,3 +194,46 @@ class PSBVoxel(Data3d):
 
         if is_cached:
             self.save(path)
+
+
+class SHRECVoxel(Data3d):
+    def __init__(self, x_train, x_test, y_train, y_test):
+        super(SHRECVoxel, self).__init__(x_train, x_test, y_train, y_test)
+
+    @staticmethod
+    def create(n_fold):
+        # ID抽出用正規表現
+        re_compile = re.compile("\d+")
+
+        cla_items = parseutil.parse_cla(
+            PATH_RES_SHAPE_SHREC_CLASS_TEST_CLA).items()
+
+        def find_class(binvox_id):
+            for i, pair in enumerate(cla_items):
+                name, ids = pair
+                if binvox_id in ids:
+                    return i
+            raise IndexError
+
+        x = []
+        y = []
+
+        for f in tqdm.tqdm(os.listdir(PATH_RES_SHAPE_SHREC_BINVOX)):
+            # binvoxファイルフルパス
+            binvox_path = os.path.join(PATH_RES_SHAPE_SHREC_BINVOX, f)
+            # binvox配列
+            binvox = parseutil.parse_binvox(binvox_path)
+            # shrecデータに割り振られたID
+            binvox_id = int(re_compile.findall(f)[0])
+
+            x.append([binvox, ])
+            y.append(find_class(binvox_id))
+
+        x = np.vstack(x).astype(np.uint8)
+        x = x.reshape((x.shape[0], 1, x.shape[1], x.shape[2], x.shape[3]))
+        y = np.asarray(y, dtype=np.uint8)
+
+        x_train, x_test, y_train, y_test = train_test_split(x, y,
+                                                            train_size=1. / n_fold)
+
+        return SHRECVoxel(x_train, x_test, y_train, y_test)
