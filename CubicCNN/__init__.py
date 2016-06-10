@@ -15,6 +15,7 @@ PATH_RES_TMP = os.path.join(PATH_RES, 'tmp')
 
 # /res/shape
 PATH_RES_SHAPE_PSB = os.path.join(PATH_RES_SHAPE, 'psb')
+PATH_RES_SHAPE_SHREC = os.path.join(PATH_RES_SHAPE, 'shrec')
 
 # /res/shape/psb
 PATH_RES_SHAPE_PSB_OFF = os.path.join(PATH_RES_SHAPE_PSB, 'off')
@@ -46,6 +47,14 @@ PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_ROTATE = \
     os.path.join(PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS, 'rotate')
 PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_TRANS = \
     os.path.join(PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS, 'trans')
+
+# /res/shape/psb/class
+PATH_RES_SHAPE_SHREC_CLASS = os.path.join(PATH_RES_SHAPE_SHREC, 'class')
+PATH_RES_SHAPE_SHREC_BINVOX = os.path.join(PATH_RES_SHAPE_SHREC, 'binvox')
+
+# /res/shape/psb/class
+PATH_RES_SHAPE_SHREC_CLASS_TEST_CLA = os.path.join(PATH_RES_SHAPE_SHREC_CLASS,
+                                                   'test.cla')
 
 """
 PSB
