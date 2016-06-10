@@ -90,6 +90,10 @@ class Data(object):
         self.y_train = data.y_train
         self.y_test = data.y_test
 
+    @staticmethod
+    def center(voxel):
+        raise NotImplementedError
+
     def __str__(self):
         return '\n{} : '.format(self.__class__.__name__) + \
                '\nx_train.shape : {}'.format(self.x_train.shape) + \
@@ -198,3 +202,30 @@ class Data3d(Data):
                 r_voxel[int(ix)][int(iy)][int(iz)] = 1
 
         return r_voxel
+
+    @staticmethod
+    def center(voxel):
+
+        # 新しいボクセル
+        new_voxel = np.zeros(shape=voxel.shape)
+
+        # 非ゼロインデックス
+        non_zeros = np.argwhere(voxel)
+
+        # 平均との差分
+        diff = (
+            np.average(non_zeros, axis=0) - np.array(voxel.shape) / 2).astype(
+            np.int8)
+
+        # 中央寄せした座標
+        new_coordinates = non_zeros - diff
+
+        # ボクセルの最大座標値+1
+        max_x, max_y, max_z = voxel.shape
+
+        # 新しい座標に対応するボクセルを有効にする
+        for x, y, z in new_coordinates:
+            # ボクセル空間外の座標はフィルタリング
+            if 0 <= x < max_x and 0 <= y < max_y and 0 <= z < max_z:
+                new_voxel[x][y][z] = 1
+        return new_voxel
