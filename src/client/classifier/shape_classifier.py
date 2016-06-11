@@ -5,7 +5,8 @@ import numpy as np
 import itertools
 import classifier
 import enum
-from src.client.structure.shape_structure import cnn
+from src.client.structure.shape_structure import cnn, cnn_for_mnist
+from src.helper.data2d import mnist
 from src.helper.data3d import psb_binvoxs, psb_ids
 from src.helper.config import path_res_numpy_cache_psb
 from src.util.shape import rotate_voxels, trans_voxels, centerize_voxel
@@ -119,3 +120,16 @@ def psb_binvox_classification(ids, n_iter, n_batch, aug_type, box, from_r, to_r,
     classifier.learning(model, x_train, x_test, y_train, y_test, n_iter,
                         n_batch, show_batch_accuracies, save_batch_accuracies,
                         is_batch_test=True)
+
+
+def cnn_3d_mnist():
+    x_train, x_test, y_train, y_test = mnist()
+
+    x_train = x_train.reshape((len(x_train), 28 * 28))
+    x_test = x_test.reshape((len(x_test), 28 * 28))
+
+    model = cnn_for_mnist((28, 28))
+
+    classifier.learning(model, x_train, x_test, y_train, y_test, 100, 100,
+                        show_batch_accuracies=True, is_batch_test=True,
+                        save_weights_and_biases=False)

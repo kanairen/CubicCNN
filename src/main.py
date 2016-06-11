@@ -45,4 +45,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    from src.client.classifier.shape_classifier import cnn_3d_mnist
+    cnn_3d_mnist()
+    # main()
