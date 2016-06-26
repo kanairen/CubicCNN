@@ -69,6 +69,14 @@ def parse_binvox(binvox_file, show_params=False):
 
 
 def parse_off(off_file):
+    """
+    .offファイルを読み込み、3Dボクセル配列を返す
+    :type off_file: str
+    :param off_file: PATH含むファイル名
+    :rtype tuple(numpy.ndarray)
+    :returns 頂点座標のリストと面リスト
+    """
+
     with open(off_file) as f:
         # 一行目はファイルフォーマット名
         if "OFF" not in f.readline():
@@ -94,6 +102,13 @@ def parse_off(off_file):
 
 # TODO ClaTreeを使わない設計にする
 def parse_cla(cla_file):
+    """
+    .claファイルを読み込み、所属クラスデータを返す
+    :type cla_file: str
+    :param cla_file: PATH含むファイル名
+    :rtype collections.OrderedDict
+    :return: クラスラベル:属するデータの辞書
+    """
     # クラス階層情報を保持するツリー
     tree = ClaTree('0')
 
@@ -128,6 +143,9 @@ def parse_cla(cla_file):
 
 
 class ClaTree(object):
+    """
+    .claファイル中のクラス階層を表現するクラス
+    """
     def __init__(self, root_name):
         self.root = self.ClaNode(root_name, None, 0)
 
