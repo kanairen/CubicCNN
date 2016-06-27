@@ -146,6 +146,7 @@ class ClaTree(object):
     """
     .claファイル中のクラス階層を表現するクラス
     """
+
     def __init__(self, root_name):
         self.root = self.ClaNode(root_name, None, 0)
 
@@ -213,3 +214,53 @@ class ClaTree(object):
                 return self
             else:
                 return self.parent.get_parent(degree)
+
+
+def parse_vxl(vxl_file):
+    """
+    .vxlファイルを読み込み、ボクセルデータを返す
+    :type vxl_file: str
+    :param vxl_file: PATH含むファイル名
+    :rtype numpy.ndarray
+    :return ボクセルデータ
+    """
+
+    with open(vxl_file, 'rb') as f:
+        # comment
+        comment = f.readline()
+
+        # dim: ボクセルxyz軸の分解能
+        dim = map(int, f.readline().strip().split(' ')[1:])
+
+        # data: バイナリ開始行
+        data = f.readline()
+
+        # ボクセル配列
+        array = np.zeros(shape=(dim[0] * dim[1] * dim[2]), dtype=np.uint8)
+
+        # 先頭インデックス
+        head = 0
+
+        while True:
+            # 2バイトずつ取り出し
+            binaly = f.read(1)
+            num = f.read(1)
+
+            # ファイル終端であれば終了
+            if binaly == '':
+                break
+
+            # ボクセル値
+            bin_uc = struct.unpack('B', binaly)[0]
+            # bin_ucの連続数
+            n_uc = struct.unpack('B', num)[0]
+
+            # ボクセル内の値が非ゼロの場合、n_ucボクセル分だけbin_ucの値で埋めていく
+            if bin_uc > 0:
+                array[head:head + n_uc] = bin_uc
+
+            # 次の値格納のために、headをn_ucずらす
+            head += n_uc
+
+    return array.reshape(dim)
+
