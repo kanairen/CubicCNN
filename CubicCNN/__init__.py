@@ -48,11 +48,12 @@ PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_ROTATE = \
 PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS_TRANS = \
     os.path.join(PATH_RES_SHAPE_PSB_BINVOX_CACHE_CO_CLASS, 'trans')
 
-# /res/shape/psb/class
+# /res/shape/shrec/class
 PATH_RES_SHAPE_SHREC_CLASS = os.path.join(PATH_RES_SHAPE_SHREC, 'class')
 PATH_RES_SHAPE_SHREC_BINVOX = os.path.join(PATH_RES_SHAPE_SHREC, 'binvox')
+PATH_RES_SHAPE_SHREC_VXL = os.path.join(PATH_RES_SHAPE_SHREC, 'vxl')
 
-# /res/shape/psb/class
+# /res/shape/shrec/class
 PATH_RES_SHAPE_SHREC_CLASS_TEST_CLA = os.path.join(PATH_RES_SHAPE_SHREC_CLASS,
                                                    'test.cla')
 
