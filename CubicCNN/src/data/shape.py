@@ -8,7 +8,7 @@ import tqdm
 import warnings
 from sklearn.cross_validation import train_test_split
 from CubicCNN import *
-from CubicCNN.src.util import parseutil
+from CubicCNN.src.util.parseutil import parse_cla, parse_binvox, parse_vxl
 from __cls import DataLoader, Data3d
 
 
@@ -69,9 +69,9 @@ class PSBVoxel(Data3d):
 
         print 'load voxels from .off ...'
 
-        cla_train = parseutil.parse_cla(
+        cla_train = parse_cla(
             os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TRAIN))
-        cla_test = parseutil.parse_cla(
+        cla_test = parse_cla(
             os.path.join(PATH_RES_SHAPE_PSB_CLASS, PSB_CLS_TEST))
         if is_co_class:
             cla_list = list(
@@ -100,7 +100,7 @@ class PSBVoxel(Data3d):
             binvox_path = os.path.join(PATH_RES_SHAPE_PSB_BINVOX, f)
             if os.path.isdir(binvox_path):
                 continue
-            binvox = parseutil.parse_binvox(binvox_path)
+            binvox = parse_binvox(binvox_path)
             binvox_id = int(re_compile.findall(f)[0])
             train_binvox_y = check_binvox_y(binvox_id, True)
             if train_binvox_y is not None:
@@ -201,12 +201,16 @@ class SHRECVoxel(Data3d):
         super(SHRECVoxel, self).__init__(x_train, x_test, y_train, y_test)
 
     @staticmethod
-    def create(n_fold):
+    def create_shrec_voxel(n_fold):
+        return SHRECVoxel._create(n_fold, parse_binvox,
+                                  PATH_RES_SHAPE_SHREC_BINVOX)
+
+    @staticmethod
+    def _create(n_fold, parser, file_dir):
         # ID抽出用正規表現
         re_compile = re.compile("\d+")
 
-        cla_items = parseutil.parse_cla(
-            PATH_RES_SHAPE_SHREC_CLASS_TEST_CLA).items()
+        cla_items = parse_cla(PATH_RES_SHAPE_SHREC_CLASS_TEST_CLA).items()
 
         def find_class(binvox_id):
             for i, pair in enumerate(cla_items):
@@ -218,16 +222,16 @@ class SHRECVoxel(Data3d):
         x = []
         y = []
 
-        for f in tqdm.tqdm(os.listdir(PATH_RES_SHAPE_SHREC_BINVOX)):
+        for f in tqdm.tqdm(os.listdir(file_dir)):
             # binvoxファイルフルパス
-            binvox_path = os.path.join(PATH_RES_SHAPE_SHREC_BINVOX, f)
+            fullpath = os.path.join(file_dir, f)
             # binvox配列
-            binvox = parseutil.parse_binvox(binvox_path)
+            shrec_voxel = parser(fullpath)
             # shrecデータに割り振られたID
-            binvox_id = int(re_compile.findall(f)[0])
+            shrec_voxel_id = int(re_compile.findall(f)[0])
 
-            x.append([binvox, ])
-            y.append(find_class(binvox_id))
+            x.append([shrec_voxel, ])
+            y.append(find_class(shrec_voxel_id))
 
         x = np.vstack(x).astype(np.uint8)
         x = x.reshape((x.shape[0], 1, x.shape[1], x.shape[2], x.shape[3]))
@@ -237,3 +241,12 @@ class SHRECVoxel(Data3d):
                                                             train_size=1. - 1. / n_fold)
 
         return SHRECVoxel(x_train, x_test, y_train, y_test)
+
+
+class SHRECVoxelUSDF(Data3d):
+    def __init__(self, x_train, x_test, y_train, y_test):
+        super(SHRECVoxelUSDF, self).__init__(x_train, x_test, y_train, y_test)
+
+    @staticmethod
+    def create_shrec_voxel_usdf(n_fold):
+        return SHRECVoxel._create(n_fold, parse_vxl, PATH_RES_SHAPE_SHREC_VXL)

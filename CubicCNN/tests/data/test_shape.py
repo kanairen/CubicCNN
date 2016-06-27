@@ -13,7 +13,7 @@ def test_shrec_voxel():
     """
     # TODO:SHRECデータセットをダウンロード・binvox変換の機構ができたら適宜unittest対応
     classes = parse_cla(PATH_RES_SHAPE_SHREC_CLASS_TEST_CLA).keys()
-    shrec = SHRECVoxel.create(n_fold=6)
+    shrec = SHRECVoxel.create_shrec_voxel(n_fold=6)
     for x, y in zip(shrec.x_train, shrec.y_train):
         print classes[y]
         plot_voxel(x[0])

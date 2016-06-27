@@ -7,7 +7,7 @@ from model.layer.__conv import ConvLayer2d, ConvLayer3d
 from model.layer.__pool import MaxPoolLayer2d, MaxPoolLayer3d
 from model.layer.__softmax import SoftMaxLayer
 from data import image
-from data.shape import PSBVoxel, SHRECVoxel
+from data.shape import PSBVoxel, SHRECVoxel, SHRECVoxelUSDF
 from model.model import Model
 from optimizer import Optimizer
 
@@ -91,7 +91,53 @@ def cnn_3d_psb():
 
 def cnn_3d_shrec(n_fold):
     # PSB ボクセルデータ(Train/Test双方に存在するクラスのデータのみ)
-    data = SHRECVoxel.create(n_fold=n_fold)
+    data = SHRECVoxel.__create(n_fold=n_fold)
+
+    # データの順番をランダムに入れ替え
+    data.shuffle()
+    # データセットの次元ごとの要素数確認
+    print data
+
+    # 学習モデル生成関数
+    def layer_gen():
+        l1 = ConvLayer3d(layer_id=0, shape_size=data.data_shape,
+                         activation=calcutil.relu, c_in=1, c_out=16, k=5,
+                         s=3, is_dropout=True)
+        l2 = MaxPoolLayer3d(layer_id=1, shape_size=l1.output_size,
+                            activation=calcutil.identity, c_in=16, k=4)
+        l3 = HiddenLayer(layer_id=2, n_in=l2.n_out, n_out=512,
+                         activation=calcutil.relu, is_dropout=True)
+        l4 = HiddenLayer(layer_id=3, n_in=l3.n_out, n_out=256,
+                         activation=calcutil.relu, is_dropout=True)
+        l5 = SoftMaxLayer(layer_id=4, n_in=l4.n_out, n_out=len(data.classes()))
+        layers = [l1, l2, l3, l4, l5]
+        return layers
+
+    # 学習モデル
+    model = Model(input_dtype='float32', layers_gen_func=layer_gen)
+    print model
+
+    # 学習モデルの学習パラメタを最適化するオブジェクト
+    optimizer = Optimizer(data, model)
+
+    # バッチ一回分の学習時に呼ばれる関数
+    def on_optimized():
+        optimizer.result.save()
+        optimizer.params_result.save()
+
+    # 最適化開始
+    optimizer.optimize(n_iter=100, n_batch=len(data.x_train) / 10,
+                       is_total_test_enabled=False, on_optimized=on_optimized)
+
+
+def cnn_3d_shrec_usdf(n_fold):
+    # PSB ボクセルデータ(Train/Test双方に存在するクラスのデータのみ)
+    data = SHRECVoxelUSDF.create_shrec_voxel_usdf(n_fold=n_fold)
+
+    from CubicCNN.src.util.plotutil import plot_voxel
+    for x, y in zip(data.x_test[:, 0], data.y_test):
+        print y
+        plot_voxel(x == 10)
 
     # データの順番をランダムに入れ替え
     data.shuffle()
@@ -132,4 +178,4 @@ def cnn_3d_shrec(n_fold):
 
 if __name__ == '__main__':
     print datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
-    cnn_3d_shrec(n_fold=6)
+    cnn_3d_shrec_usdf(n_fold=6)
